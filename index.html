@@ -49,6 +49,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="favicon.ico" sizes="any">
 	
 </head>
@@ -85,9 +86,16 @@
         <!-- Project Management -->
         <div class="project-bar">
             <div class="project-controls">
-                <select id="project-select" class="project-selector" onchange="switchProject()">
-                    <option value="current">Current Project</option>
-                </select>
+                <div class="project-select-wrapper">
+                    <div class="project-menu">
+                        <select id="project-select" class="project-selector" onchange="handleProjectAction(this.value)">
+                            <option value="current">Current Project</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-danger btn-sm project-delete-btn" onclick="deleteCurrentProject()" id="delete-project-btn" style="display: none;" title="Delete selected project">
+                        <span class="label">🗑️</span>
+                    </button>
+                </div>
                 <div class="project-actions">
                     <button class="btn btn-ghost btn-sm" onclick="newProject()">
                         <span class="label">New</span>
@@ -95,8 +103,8 @@
                     <button class="btn btn-ghost btn-sm" onclick="saveProject()">
                         <span class="label">Save</span>
                     </button>
-                    <button class="btn btn-ghost btn-sm" onclick="loadProject()">
-                        <span class="label">Load</span>
+                    <button class="btn btn-ghost btn-sm" onclick="manageProjects()">
+                        <span class="label">Manage</span>
                     </button>
                 </div>
                 <input type="file" id="project-file" style="display: none;" accept=".json" onchange="importProject(event)">
@@ -220,7 +228,7 @@
                     </div>
 
                     <div class="random-idea-section">
-                        <button class="btn btn-secondary" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
+                        <button class="btn btn-secondary" onclick="generateRandomIdea()" id="random-idea-btn" style="display: inline-flex;">
                             <span class="label">Generate Random Idea</span>
                         </button>
                         <p class="random-idea-hint">Select genre and target audience first, then generate a random book idea!</p>
@@ -528,10 +536,10 @@
                         </div>
                     </div>
 
-                    <div class="output-section">
+                    <!--<div class="output-section">
                         <h3>Book Quality Analysis</h3>
                         <div id="quality-analysis">Complete the writing process to see quality analysis...</div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -1001,6 +1009,44 @@
         </div>
     </div>
 
+    <!-- Project Management Modal -->
+    <div id="project-management-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Manage Projects</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeProjectManagementModal()">
+                    <span class="label">Close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="project-management-content">
+                    <div class="project-stats">
+                        <p>Saved Projects: <span id="project-count">0</span>/10</p>
+                        <div class="progress-bar">
+                            <div id="project-count-progress" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="project-list" class="project-list">
+                        <!-- Projects will be populated here -->
+                    </div>
+                    
+                    <div class="project-management-actions">
+                        <button class="btn btn-ghost btn-sm" onclick="exportAllProjects()">
+                            <span class="label">Export All</span>
+                        </button>
+                        <button class="btn btn-ghost btn-sm" onclick="importProjects()">
+                            <span class="label">Import Projects</span>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="clearAllProjects()">
+                            <span class="label">Clear All</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Feedback Modal -->
     <div id="feedback-modal" class="modal">
         <div class="modal-content">
@@ -1102,6 +1148,9 @@
             </button>
         </div>
     </div>
+
+    <!-- Hidden file inputs -->
+    <input type="file" id="projects-import-file" style="display: none;" accept=".json" onchange="handleProjectsImport(event)">
 
     <script src="script.js"></script>
 </body>

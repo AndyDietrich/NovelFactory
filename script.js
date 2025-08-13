@@ -1,5 +1,5 @@
 // NovelFactory AI - Professional Edition with Advanced Model Selection
-// Complete JavaScript file with all fixes integrated
+// Complete JavaScript file with spinner fixes and improved project management
 
 // Custom Alert System
 let alertCallback = null;
@@ -109,6 +109,9 @@ let currentExpandedChapter = null;
 let currentTheme = 'light';
 let selectedDonationAmount = 5;
 let isGenerating = false;
+
+// Constants
+const MAX_SAVED_PROJECTS = 10;
 
 // API Models Configuration
 const apiModels = {
@@ -935,7 +938,7 @@ function updateModelSelect() {
 
 // New function to load saved advanced model settings
 function loadSavedAdvancedModels() {
-    console.log('📁 Loading saved advanced model settings...');
+    console.log('🔍 Loading saved advanced model settings...');
     
     if (!aiSettings.advancedModels) {
         console.log('   No saved advanced models found');
@@ -1050,125 +1053,6 @@ function toggleAdvancedModelsSection() {
         
         console.log('Advanced models section:', section.classList.contains('collapsed') ? 'collapsed' : 'expanded');
     }
-}
-
-// Comprehensive test and setup function
-function setupAndTestAdvancedModels() {
-    console.log('\n🧪 === SETUP AND TEST ADVANCED MODELS ===');
-    console.log('==========================================');
-    
-    // Step 1: Initialize aiSettings if needed
-    if (!window.aiSettings) {
-        console.log('⚠️ aiSettings not found, initializing...');
-        window.aiSettings = {
-            apiProvider: 'openrouter',
-            openrouterApiKey: '',
-            openaiApiKey: '',
-            model: 'anthropic/claude-sonnet-4',
-            temperature: 0.5,
-            maxTokens: 50000,
-            advancedModelsEnabled: false,
-            advancedModels: {},
-            customPrompts: {}
-        };
-    }
-    
-    // Step 2: Check DOM elements
-    console.log('\n📋 Checking DOM elements:');
-    const checkbox = document.getElementById('enable-advanced-models');
-    console.log(`   Enable checkbox: ${checkbox ? '✅ Found' : '❌ Missing'}`);
-    
-    const stepSelects = {};
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
-        const select = document.getElementById(`advanced-model-${step}`);
-        stepSelects[step] = select;
-        console.log(`   ${step} select: ${select ? '✅ Found' : '❌ Missing'}`);
-        if (select) {
-            console.log(`      Options: ${select.options.length}`);
-            console.log(`      Value: "${select.value}"`);
-        }
-    });
-    
-    // Step 3: Force populate model selects
-    console.log('\n🔄 Force updating model selects...');
-    updateModelSelect();
-    
-    // Step 4: Enable advanced models for testing
-    if (checkbox) {
-        console.log('\n✅ Enabling advanced models for testing...');
-        checkbox.checked = true;
-        aiSettings.advancedModelsEnabled = true;
-        updateAdvancedModelsVisualState();
-        
-        // Set a test model for randomIdea
-        const randomIdSelect = document.getElementById('advanced-model-randomIdea');
-        if (randomIdSelect && randomIdSelect.options.length > 1) {
-            // Select the second option (first real model)
-            randomIdSelect.selectedIndex = 1;
-            const testModel = randomIdSelect.value;
-            console.log(`🧪 Setting test model for randomIdea: ${testModel}`);
-            
-            // Save to aiSettings
-            aiSettings.advancedModels.randomIdea = testModel;
-            saveAdvancedModelSettings();
-            
-            console.log('💾 Saved test configuration');
-        }
-    }
-    
-    // Step 5: Test getSelectedModel
-    console.log('\n🧪 Testing getSelectedModel():');
-    ['randomIdea', 'outline', 'chapters', 'writing'].forEach(step => {
-        try {
-            const model = getSelectedModel(step);
-            console.log(`   ${step}: ${model}`);
-        } catch (error) {
-            console.error(`   ${step}: ERROR -`, error);
-        }
-    });
-    
-    // Step 6: Show current state
-    console.log('\n📊 Current state:');
-    console.log('   aiSettings.advancedModelsEnabled:', aiSettings.advancedModelsEnabled);
-    console.log('   aiSettings.advancedModels:', aiSettings.advancedModels);
-    
-    console.log('\n✅ Setup complete! Try generating a random idea now.');
-    console.log('==========================================\n');
-}
-
-// Additional debugging function
-function debugAdvancedModels() {
-    console.log('\n🔍 ADVANCED MODELS DEBUG');
-    console.log('========================');
-    
-    // Check aiSettings
-    console.log('aiSettings object:', aiSettings);
-    console.log('advancedModelsEnabled:', aiSettings.advancedModelsEnabled);
-    console.log('advancedModels:', aiSettings.advancedModels);
-    
-    // Check DOM elements
-    const checkbox = document.getElementById('enable-advanced-models');
-    console.log('Enable checkbox element:', checkbox);
-    console.log('Checkbox checked:', checkbox ? checkbox.checked : 'N/A');
-    
-    // Check all selects
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
-        const select = document.getElementById(`advanced-model-${step}`);
-        console.log(`${step} select:`, select ? 'EXISTS' : 'MISSING');
-        console.log(`${step} value:`, select ? select.value : 'N/A');
-        console.log(`${step} options count:`, select ? select.options.length : 'N/A');
-    });
-    
-    // Test getSelectedModel for each step
-    console.log('\n🧪 Testing getSelectedModel():');
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
-        try {
-            const model = getSelectedModel(step);
-            console.log(`${step}: ${model}`);
-        } catch (error) {
-            console.error(`${step}: ERROR -`, error);
-        }
-    });
 }
 
 // ==================================================
@@ -1453,6 +1337,7 @@ function setupKeyboardShortcuts() {
             closeFeedbackModal();
             closeDonationModal();
             closeCustomAlert(false);
+            closeProjectManagementModal();
         }
     });
 }
@@ -1513,7 +1398,7 @@ function updateNavProgress() {
 
 // Enhanced loadSettings function with better initialization
 function loadSettings() {
-    console.log('📁 === LOADING SETTINGS ===');
+    console.log('🔍 === LOADING SETTINGS ===');
     
     // Initialize default settings first
     if (!window.aiSettings) {
@@ -1572,7 +1457,7 @@ function loadSettings() {
             console.log('🔧 Using default settings');
         }
     } else {
-        console.log('📝 No saved settings found, using defaults');
+        console.log('🔍 No saved settings found, using defaults');
     }
     
     // Populate form fields after a short delay to ensure DOM is ready
@@ -1646,7 +1531,7 @@ function saveSettings() {
 
 // Enhanced populateSettingsFields with better timing
 function populateSettingsFields() {
-    console.log('📝 Populating settings fields...');
+    console.log('🔍 Populating settings fields...');
     
     // Populate basic fields
     if (document.getElementById('openrouter-api-key')) {
@@ -1926,6 +1811,8 @@ async function runFeedbackLoop(contentType) {
         return;
     }
     isGenerating = true;
+    showGenerationInfo(`Running ${contentType} feedback analysis...`);
+    
     try {
         const feedbackLoops = parseInt(document.getElementById(`${contentType}-feedback-loops`).value);
         if (feedbackLoops === 0) return;
@@ -2044,6 +1931,8 @@ async function runFeedbackLoop(contentType) {
                 break;
             }
         }
+    } catch (error) {
+        await customAlert(`Error in feedback loop: ${error.message}`, 'Feedback Error');
     } finally {
         isGenerating = false;
         hideGenerationInfo();
@@ -2056,37 +1945,37 @@ function getCustomAnalysisPrompt(contentType) {
 }
 
 // ==================================================
-// RANDOM IDEA GENERATION
+// RANDOM IDEA GENERATION - FIXED SPINNER
 // ==================================================
 
-// Enhanced generateRandomIdea with comprehensive debugging
+// Enhanced generateRandomIdea with comprehensive debugging and fixed spinner
 async function generateRandomIdea() {
     console.log('\n🎲 === RANDOM IDEA GENERATION DEBUG ===');
     
+    const randomBtn = document.getElementById('random-idea-btn');
+
     if (isGenerating) {
-        showGenerationInfo();
-        return;
-    }
-    isGenerating = true;
-    
-    console.log('📝 Starting random idea generation...');
-    
-    const genre = document.getElementById('genre').value;
-    const audience = document.getElementById('target-audience').value;
-    
-    console.log(`📊 Genre: ${genre}`);
-    console.log(`👥 Audience: ${audience}`);
-    
-    if (!genre || !audience) {
-        await customAlert('Please select genre and target audience first!', 'Missing Information');
-        isGenerating = false;
-        hideGenerationInfo();
+        showGenerationInfo("Please wait until the current generation is finished...");
         return;
     }
 
-    const randomBtn = document.getElementById('random-idea-btn');
-    const originalText = randomBtn.innerHTML;
-    randomBtn.innerHTML = '<span class="label"><div class="spinner"></div>Generating Idea...</span>';
+    const genre = document.getElementById('genre').value;
+    const audience = document.getElementById('target-audience').value;
+
+    if (!genre || !audience) {
+        await customAlert('Please select genre and target audience first!', 'Missing Information');
+        return;
+    }
+
+    // Set generating state and show spinner BEFORE try block
+    isGenerating = true;
+    showGenerationInfo("AI is crafting your unique story idea...");
+    
+    console.log('🔍 Starting random idea generation...');
+    console.log(`📊 Genre: ${genre}`);
+    console.log(`👥 Audience: ${audience}`);
+
+    // Disable the button during generation
     randomBtn.disabled = true;
 
     try {
@@ -2158,11 +2047,11 @@ async function generateRandomIdea() {
         console.error('❌ Error in generateRandomIdea:', error);
         await customAlert(`Error generating random idea: ${error.message}`, 'Generation Error');
     } finally {
-        randomBtn.innerHTML = originalText;
+        // CRITICAL: Always reset state and hide spinner in finally block
         randomBtn.disabled = false;
         isGenerating = false;
         hideGenerationInfo();
-        console.log('🏁 Random idea generation complete\n');
+        console.log('🎲 Random idea generation complete\n');
     }
 }
 
@@ -2175,23 +2064,17 @@ async function startBookGeneration() {
         showGenerationInfo();
         return;
     }
-    isGenerating = true;
-    showGenerationInfo("Generating story structure...");
-    try {
-        collectBookData();
-    
-        if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
-            await customAlert('Please fill in all required fields before generating your book.', 'Missing Information');
-            return;
-        }
 
-        autoSave();
-        showStep('outline');
-        generateOutline();
-    } finally {
-        isGenerating = false;
-        hideGenerationInfo();
+    collectBookData();
+
+    if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
+        await customAlert('Please fill in all required fields before generating your book.', 'Missing Information');
+        return;
     }
+
+    autoSave();
+    showStep('outline');
+    generateOutline();
 }
 
 function collectBookData() {
@@ -2267,7 +2150,6 @@ async function regenerateOutline() {
 
 function proceedToChapters() {
     showStep('chapters');
-    generateChapterOutline();
 }
 
 async function generateChapterOutline() {
@@ -2500,6 +2382,7 @@ async function generateSingleChapter(chapterNum) {
         return;
     }
     isGenerating = true;
+    showGenerationInfo(`Writing Chapter ${chapterNum}...`);
     const statusDiv = document.getElementById('writing-status');
     statusDiv.innerHTML = `Writing Chapter ${chapterNum}...`;
     
@@ -2624,6 +2507,7 @@ async function generateSelectedChapters() {
         return;
     }
     isGenerating = true;
+    showGenerationInfo("Generating selected chapters...");
     const selectedChapters = getSelectedChapters();
     if (selectedChapters.length === 0) {
         await customAlert('Please select at least one chapter to generate.', 'No Chapters Selected');
@@ -2804,6 +2688,8 @@ async function runChapterFeedback(chapterNum) {
         return;
     }
     isGenerating = true;
+    showGenerationInfo(`Analyzing Chapter ${chapterNum}...`);
+    
     try {
         const chapter = bookData.chapters[chapterNum - 1];
         if (!chapter) {
@@ -3347,30 +3233,80 @@ ${wordCount < bookData.targetWordCount * 0.8 ? 'Below target length' :
 }
 
 // ==================================================
-// PROJECT MANAGEMENT
+// PROJECT MANAGEMENT - ENHANCED VERSION
 // ==================================================
 
+// Enhanced loadProjects function with better organization
 function loadProjects() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
-    if (savedProjects) {
-        projects = JSON.parse(savedProjects);
-        updateProjectSelector();
+    projects = savedProjects ? JSON.parse(savedProjects) : {};
+    const select = document.getElementById('project-select');
+    
+    // Clear existing options
+    select.innerHTML = '';
+    
+    // Add Current Project option
+    const currentOption = document.createElement('option');
+    currentOption.value = 'current';
+    currentOption.textContent = 'Current Project';
+    select.appendChild(currentOption);
+    
+    // Add saved projects if we have any
+    const projectIds = Object.keys(projects);
+    if (projectIds.length > 0) {
+        // Add separator
+        const separator = document.createElement('option');
+        separator.value = '';
+        separator.disabled = true;
+        separator.textContent = '──────────';
+        select.appendChild(separator);
+        
+        // Sort projects by last saved date (newest first)
+        const sortedProjects = projectIds.sort((a, b) => {
+            const dateA = new Date(projects[a].lastSaved || 0);
+            const dateB = new Date(projects[b].lastSaved || 0);
+            return dateB - dateA;
+        });
+        
+        // Add saved projects
+        sortedProjects.forEach(projectId => {
+            const project = projects[projectId];
+            const option = document.createElement('option');
+            option.value = projectId;
+            
+            // Create a descriptive title
+            let title = project.title || project.premise?.substring(0, 30) || `Project ${projectId.slice(-8)}`;
+            if (title.length > 40) {
+                title = title.substring(0, 37) + '...';
+            }
+            
+            // Add creation date
+            const date = new Date(project.lastSaved || project.createdAt);
+            const dateStr = date.toLocaleDateString();
+            
+            option.textContent = `${title} (${dateStr})`;
+            select.appendChild(option);
+        });
+    }
+    
+    // Update delete button visibility
+    updateDeleteButtonVisibility();
+    
+    console.log(`✅ Loaded ${projectIds.length}/${MAX_SAVED_PROJECTS} saved projects`);
+}
+
+// Update delete button visibility based on selection
+function updateDeleteButtonVisibility() {
+    const select = document.getElementById('project-select');
+    const deleteBtn = document.getElementById('delete-project-btn');
+    
+    if (deleteBtn && select) {
+        const isCurrentProject = select.value === 'current' || !select.value;
+        deleteBtn.style.display = isCurrentProject ? 'none' : 'inline-flex';
     }
 }
 
-function updateProjectSelector() {
-    const selector = document.getElementById('project-select');
-    selector.innerHTML = '<option value="current">Current Project</option>';
-    
-    Object.keys(projects).forEach(projectId => {
-        const project = projects[projectId];
-        const option = document.createElement('option');
-        option.value = projectId;
-        option.textContent = project.title || `Project ${projectId}`;
-        selector.appendChild(option);
-    });
-}
-
+// Enhanced newProject function
 async function newProject() {
     if (bookData.premise || bookData.outline) {
         const confirmed = await customConfirm('Starting a new project will clear your current work. Continue?', 'New Project');
@@ -3397,49 +3333,383 @@ async function newProject() {
     };
     
     resetEverything();
+    
+    // Reset project selector to current
+    const selector = document.getElementById('project-select');
+    if (selector) {
+        selector.value = 'current';
+        updateDeleteButtonVisibility();
+    }
+    
     await customAlert('New project created!', 'Project Created');
 }
 
+// Enhanced saveProject function with limit checking
 async function saveProject() {
     if (!bookData.premise) {
         await customAlert('Please add some content before saving the project.', 'No Content');
         return;
     }
     
-    const title = prompt('Enter a title for this project:', bookData.premise.substring(0, 30));
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const existingProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    const projectCount = Object.keys(existingProjects).length;
+    
+    // Check if we're at the limit and this is a new project
+    if (projectCount >= MAX_SAVED_PROJECTS && bookData.id === 'current') {
+        await customAlert(`You can save up to ${MAX_SAVED_PROJECTS} projects. Please delete some projects first or use the "Manage Projects" option to clean up old projects.`, 'Project Limit Reached');
+        return;
+    }
+    
+    // Generate a suggested title
+    let suggestedTitle = '';
+    if (bookData.title) {
+        suggestedTitle = bookData.title;
+    } else if (bookData.premise) {
+        suggestedTitle = bookData.premise.substring(0, 30).trim();
+        if (bookData.premise.length > 30) {
+            suggestedTitle += '...';
+        }
+    } else {
+        suggestedTitle = `${bookData.genre} book for ${bookData.targetAudience}`;
+    }
+    
+    const title = prompt('Enter a title for this project:', suggestedTitle);
     if (title) {
+        // If this is a current project, generate a new ID
+        if (bookData.id === 'current') {
+            bookData.id = 'project_' + Date.now();
+        }
+        
         bookData.title = title;
-        projects[bookData.id] = { ...bookData };
-        localStorage.setItem('novelfactory_projects', JSON.stringify(projects));
-        updateProjectSelector();
+        bookData.lastSaved = new Date().toISOString();
+        
+        existingProjects[bookData.id] = { ...bookData };
+        localStorage.setItem('novelfactory_projects', JSON.stringify(existingProjects));
+        
+        loadProjects();
+        
+        // Select the newly saved project
+        const selector = document.getElementById('project-select');
+        if (selector) {
+            selector.value = bookData.id;
+            updateDeleteButtonVisibility();
+        }
+        
         await customAlert('Project saved successfully!', 'Project Saved');
     }
 }
 
-function loadProject() {
-    document.getElementById('project-file').click();
+// Enhanced handleProjectAction function
+async function handleProjectAction(value) {
+    if (!value || value === 'current') {
+        updateDeleteButtonVisibility();
+        return;
+    }
+    
+    // Handle project switch
+    await switchProject(value);
 }
 
-async function switchProject() {
-    const selector = document.getElementById('project-select');
-    const projectId = selector.value;
+// Enhanced switchProject function
+async function switchProject(projectId) {
+    if (!projectId || projectId === 'current') {
+        updateDeleteButtonVisibility();
+        return;
+    }
     
-    if (projectId === 'current') return;
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
     
-    if (projects[projectId]) {
+    if (allProjects[projectId]) {
         if (bookData.premise || bookData.outline) {
             const confirmed = await customConfirm('Loading a project will replace your current work. Continue?', 'Load Project');
             if (!confirmed) {
-                selector.value = 'current';
+                // Reset selector to current
+                const selector = document.getElementById('project-select');
+                if (selector) {
+                    selector.value = bookData.id || 'current';
+                }
                 return;
             }
         }
         
-        bookData = { ...projects[projectId] };
+        bookData = { ...allProjects[projectId] };
         populateFormFields();
         showStep(bookData.currentStep);
+        updateDeleteButtonVisibility();
         await customAlert('Project loaded successfully!', 'Project Loaded');
     }
+}
+
+// Enhanced deleteCurrentProject function
+async function deleteCurrentProject() {
+    const selector = document.getElementById('project-select');
+    const projectId = selector.value;
+    
+    if (projectId === 'current' || !projectId) {
+        return;
+    }
+    
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    const project = allProjects[projectId];
+    
+    if (!project) {
+        return;
+    }
+    
+    const projectTitle = project.title || project.premise?.substring(0, 30) || 'Untitled Project';
+    const confirmed = await customConfirm(
+        `Are you sure you want to delete "${projectTitle}"? This cannot be undone.`, 
+        'Delete Project'
+    );
+    
+    if (confirmed) {
+        delete allProjects[projectId];
+        localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
+        
+        // Reset to current project
+        selector.value = 'current';
+        bookData.id = 'current';
+        
+        loadProjects();
+        await customAlert('Project deleted successfully!', 'Project Deleted');
+    }
+}
+
+// Enhanced manageProjects function
+function manageProjects() {
+    updateProjectManagementModal();
+    document.getElementById('project-management-modal').classList.add('active');
+}
+
+function closeProjectManagementModal() {
+    document.getElementById('project-management-modal').classList.remove('active');
+}
+
+function updateProjectManagementModal() {
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    const projectIds = Object.keys(allProjects);
+    
+    // Update project count
+    document.getElementById('project-count').textContent = projectIds.length;
+    const progressBar = document.getElementById('project-count-progress');
+    progressBar.style.width = `${(projectIds.length / MAX_SAVED_PROJECTS) * 100}%`;
+    
+    // Update project list
+    const projectList = document.getElementById('project-list');
+    projectList.innerHTML = '';
+    
+    if (projectIds.length === 0) {
+        projectList.innerHTML = '<p class="no-projects">No saved projects found.</p>';
+        return;
+    }
+    
+    // Sort by last saved date
+    const sortedProjects = projectIds.sort((a, b) => {
+        const dateA = new Date(allProjects[a].lastSaved || 0);
+        const dateB = new Date(allProjects[b].lastSaved || 0);
+        return dateB - dateA;
+    });
+    
+    sortedProjects.forEach(projectId => {
+        const project = allProjects[projectId];
+        const projectDiv = document.createElement('div');
+        projectDiv.className = 'project-item';
+        
+        const title = project.title || project.premise?.substring(0, 30) || 'Untitled Project';
+        const wordCount = project.chapters ? project.chapters.filter(c => c).reduce((total, chapter) => total + countWords(chapter), 0) : 0;
+        const date = new Date(project.lastSaved || project.createdAt).toLocaleDateString();
+        
+        projectDiv.innerHTML = `
+            <div class="project-info">
+                <h4>${title}</h4>
+                <p>Genre: ${project.genre || 'Not set'} | Audience: ${project.targetAudience || 'Not set'}</p>
+                <p>Words: ${wordCount.toLocaleString()} | Last saved: ${date}</p>
+            </div>
+            <div class="project-actions">
+                <button class="btn btn-ghost btn-sm" onclick="loadProjectFromManagement('${projectId}')">
+                    <span class="label">Load</span>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProjectFromManagement('${projectId}')">
+                    <span class="label">Delete</span>
+                </button>
+            </div>
+        `;
+        
+        projectList.appendChild(projectDiv);
+    });
+}
+
+async function loadProjectFromManagement(projectId) {
+    closeProjectManagementModal();
+    
+    // Update selector and switch project
+    const selector = document.getElementById('project-select');
+    if (selector) {
+        selector.value = projectId;
+        await switchProject(projectId);
+    }
+}
+
+async function deleteProjectFromManagement(projectId) {
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    const project = allProjects[projectId];
+    
+    if (!project) return;
+    
+    const projectTitle = project.title || project.premise?.substring(0, 30) || 'Untitled Project';
+    const confirmed = await customConfirm(
+        `Are you sure you want to delete "${projectTitle}"?`, 
+        'Delete Project'
+    );
+    
+    if (confirmed) {
+        delete allProjects[projectId];
+        localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
+        
+        // If this was the currently selected project, reset to current
+        const selector = document.getElementById('project-select');
+        if (selector && selector.value === projectId) {
+            selector.value = 'current';
+            bookData.id = 'current';
+        }
+        
+        loadProjects();
+        updateProjectManagementModal();
+        await customAlert('Project deleted successfully!', 'Project Deleted');
+    }
+}
+
+async function clearAllProjects() {
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    const projectCount = Object.keys(allProjects).length;
+    
+    if (projectCount === 0) {
+        await customAlert('No projects to delete.', 'No Projects');
+        return;
+    }
+    
+    const confirmed = await customConfirm(
+        `Are you sure you want to delete all ${projectCount} saved projects? This cannot be undone.`, 
+        'Delete All Projects'
+    );
+    
+    if (confirmed) {
+        localStorage.removeItem('novelfactory_projects');
+        
+        // Reset to current project
+        const selector = document.getElementById('project-select');
+        if (selector) {
+            selector.value = 'current';
+        }
+        bookData.id = 'current';
+        
+        loadProjects();
+        updateProjectManagementModal();
+        await customAlert('All projects deleted successfully!', 'Projects Cleared');
+    }
+}
+
+function exportAllProjects() {
+    const savedProjects = localStorage.getItem('novelfactory_projects');
+    const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
+    
+    if (Object.keys(allProjects).length === 0) {
+        customAlert('No projects to export.', 'No Projects');
+        return;
+    }
+    
+    const exportData = {
+        exportDate: new Date().toISOString(),
+        projectCount: Object.keys(allProjects).length,
+        projects: allProjects
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `novelfactory-projects-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importProjects() {
+    document.getElementById('projects-import-file').click();
+}
+
+async function handleProjectsImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importData = JSON.parse(e.target.result);
+            
+            // Validate import data
+            if (!importData.projects || typeof importData.projects !== 'object') {
+                throw new Error('Invalid project file format');
+            }
+            
+            const importProjects = importData.projects;
+            const importCount = Object.keys(importProjects).length;
+            
+            if (importCount === 0) {
+                await customAlert('No projects found in the import file.', 'Import Error');
+                return;
+            }
+            
+            const savedProjects = localStorage.getItem('novelfactory_projects');
+            const existingProjects = savedProjects ? JSON.parse(savedProjects) : {};
+            const existingCount = Object.keys(existingProjects).length;
+            
+            // Check if importing would exceed the limit
+            if (existingCount + importCount > MAX_SAVED_PROJECTS) {
+                const confirmed = await customConfirm(
+                    `Importing ${importCount} projects would exceed the limit of ${MAX_SAVED_PROJECTS} projects. Only the first ${MAX_SAVED_PROJECTS - existingCount} projects will be imported. Continue?`,
+                    'Import Limit'
+                );
+                if (!confirmed) return;
+            }
+            
+            // Import projects
+            let importedCount = 0;
+            Object.entries(importProjects).forEach(([projectId, project]) => {
+                if (Object.keys(existingProjects).length < MAX_SAVED_PROJECTS) {
+                    // Generate new ID to avoid conflicts
+                    const newId = 'imported_' + Date.now() + '_' + importedCount;
+                    existingProjects[newId] = {
+                        ...project,
+                        id: newId,
+                        lastSaved: new Date().toISOString()
+                    };
+                    importedCount++;
+                }
+            });
+            
+            localStorage.setItem('novelfactory_projects', JSON.stringify(existingProjects));
+            loadProjects();
+            updateProjectManagementModal();
+            
+            await customAlert(`Successfully imported ${importedCount} projects!`, 'Import Complete');
+            
+        } catch (error) {
+            console.error('Import error:', error);
+            await customAlert('Error importing projects: Invalid file format', 'Import Error');
+        }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    event.target.value = '';
 }
 
 function importProject(event) {
@@ -3450,6 +3720,12 @@ function importProject(event) {
     reader.onload = async function(e) {
         try {
             const imported = JSON.parse(e.target.result);
+            
+            if (bookData.premise || bookData.outline) {
+                const confirmed = await customConfirm('Importing a project will replace your current work. Continue?', 'Import Project');
+                if (!confirmed) return;
+            }
+            
             bookData = imported;
             populateFormFields();
             showStep(bookData.currentStep);
@@ -3698,11 +3974,18 @@ async function resetEverything() {
     oneClickCancelled = false;
     currentExpandedChapter = null;
     
+    // Reset project selector
+    const selector = document.getElementById('project-select');
+    if (selector) {
+        selector.value = 'current';
+        updateDeleteButtonVisibility();
+    }
+    
     await customAlert('Everything has been reset! You can now start creating a new book.', 'Reset Complete');
 }
 
 // ==================================================
-// GENERATION INFO DISPLAY
+// GENERATION INFO DISPLAY - FIXED VERSION
 // ==================================================
 
 function showGenerationInfo(message = "Please wait until the current step is finished.") {
@@ -3715,7 +3998,10 @@ function showGenerationInfo(message = "Please wait until the current step is fin
         description.textContent = message;
         indicator.style.display = 'block';
     }
+    
+    // Ensure isGenerating is set to true
     isGenerating = true;
+    console.log('📍 Generation indicator shown:', message);
 }
 
 function hideGenerationInfo() {
@@ -3723,7 +4009,10 @@ function hideGenerationInfo() {
     if (indicator) {
         indicator.style.display = 'none';
     }
+    
+    // Ensure isGenerating is set to false
     isGenerating = false;
+    console.log('📍 Generation indicator hidden');
 }
 
 // ==================================================
@@ -3803,41 +4092,6 @@ function initializeApp() {
     initializeAdvancedModelsSection();
     
     console.log('✅ NovelFactory AI initialization complete');
-    
-    // Add test function to window for debugging
-    window.testAdvancedModelSelection = testAdvancedModelSelection;
-    window.aiSettings = aiSettings; // Make sure it's accessible
-    console.log('🧪 Run testAdvancedModelSelection() in console to test the system');
-}
-
-// Test function to verify the system is working
-function testAdvancedModelSelection() {
-    console.log('\n🧪 TESTING ADVANCED MODEL SELECTION SYSTEM');
-    console.log('==========================================');
-    
-    // Test 1: Check if elements exist
-    console.log('\n1. Checking UI elements:');
-    const checkbox = document.getElementById('enable-advanced-models');
-    console.log(`   Enable checkbox: ${checkbox ? '✅ Found' : '❌ Missing'}`);
-    
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
-        const select = document.getElementById(`advanced-model-${step}`);
-        console.log(`   ${step} select: ${select ? '✅ Found' : '❌ Missing'}`);
-    });
-    
-    // Test 2: Check current settings
-    console.log('\n2. Current settings:');
-    console.log(`   Advanced models enabled: ${aiSettings.advancedModelsEnabled}`);
-    console.log(`   Saved advanced models:`, aiSettings.advancedModels);
-    
-    // Test 3: Test getSelectedModel for each step
-    console.log('\n3. Testing getSelectedModel():');
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
-        const model = getSelectedModel(step);
-        console.log(`   ${step}: ${model}`);
-    });
-    
-    console.log('\n✅ Test complete!\n');
 }
 
 // ==================================================
@@ -3962,6 +4216,91 @@ const additionalCSS = `
     color: var(--text-secondary);
     font-weight: 500;
 }
+
+/* Project Management Styles */
+.project-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.project-select-wrapper .project-selector {
+    flex: 1;
+}
+
+.project-delete-btn {
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    background-color: var(--color-danger);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.project-delete-btn:hover {
+    background-color: #e6342a;
+    transform: scale(1.05);
+}
+
+.project-management-content {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.project-stats {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.project-list {
+    margin: var(--spacing-lg) 0;
+}
+
+.project-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.project-info h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--text-primary);
+}
+
+.project-info p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.project-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.project-management-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--separator);
+}
+
+.no-projects {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: var(--spacing-xl);
+}
 `;
 
 // Function to inject additional CSS
@@ -3970,42 +4309,6 @@ function injectAdvancedModelsCSS() {
     style.textContent = additionalCSS;
     document.head.appendChild(style);
 }
-
-// ==============================================
-// COMPLETE DEBUGGING INSTRUCTIONS FOR USER
-// ==============================================
-
-console.log(`
-🔧 ADVANCED MODEL SELECTION - FIXED VERSION
-============================================
-
-Replace your script.js file with this fixed version, then:
-
-1. 📖 Open the browser console (F12)
-2. 🚀 Refresh the page to see initialization logs
-3. 🧪 Run: setupAndTestAdvancedModels()
-4. ✅ This will automatically:
-   - Enable advanced models
-   - Set a test model for Random Ideas
-   - Show detailed debugging info
-
-5. 🎲 Then try generating a random idea - it should use your selected advanced model!
-
-Additional debugging commands:
-- debugAdvancedModels() - Show current state
-- testAdvancedModelSelection() - Run comprehensive tests
-- getSelectedModel('randomIdea') - Test specific step
-
-The console will show exactly what model is being used for each step.
-If you still see issues, the debug output will tell us exactly what's wrong!
-
-============================================
-`);
-
-// Make all debugging functions available globally
-window.setupAndTestAdvancedModels = setupAndTestAdvancedModels;
-window.debugAdvancedModels = debugAdvancedModels;
-window.getSelectedModel = getSelectedModel;
 
 // ==================================================
 // INITIALIZATION
@@ -4032,6 +4335,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('donate-btn').innerHTML = `<span class="label">Donate ${this.value}</span>`;
                 selectedDonationAmount = parseFloat(this.value);
             }
+        });
+    }
+    
+    // Project selector change listener
+    const projectSelect = document.getElementById('project-select');
+    if (projectSelect) {
+        projectSelect.addEventListener('change', function() {
+            updateDeleteButtonVisibility();
         });
     }
     
@@ -4098,19 +4409,19 @@ NovelFactory AI - Professional Edition with Advanced Model Selection
 https://novelfactory.ink
 
 ✅ Fixed Issues:
-• Advanced model selection priority system working
-• Auto-save for all model selections (no save button needed)
-• Model validation when switching API providers
-• Visual feedback for selected models
-• Proper cost estimation with step-specific models
+• Spinner animations now work consistently across all functions
+• Random idea generation spinner properly closes after completion
+• Multiple project saving and management system implemented
+• Enhanced project deletion with proper UI updates
 
 ✅ Enhanced Features:
-• Debounced auto-save for better performance
-• Visual state management for advanced models
-• Enhanced error handling and validation
-• Step-specific model selection working correctly
+• Up to ${MAX_SAVED_PROJECTS} projects can be saved simultaneously
+• Project management modal for organizing saved projects
+• Automatic project limit alerts
+• Improved project selector with better organization
+• Enhanced delete functionality with confirmation dialogs
 
 Happy writing!
 `);
 
-console.log('✅ NovelFactory AI initialized with enhanced model selection system');
+console.log('✅ NovelFactory AI initialized with enhanced spinner control and project management');
