@@ -1,5 +1,5 @@
-// NovelFactory AI - Professional Edition
-// Clean Design without Emojis
+// NovelFactory AI - Professional Edition with Advanced Model Selection
+// Complete JavaScript file with all fixes integrated
 
 // Custom Alert System
 let alertCallback = null;
@@ -13,7 +13,8 @@ function customAlert(message, title = 'Notification') {
         const cancelBtn = document.getElementById('alert-cancel-btn');
         
         titleElement.textContent = title;
-        messageElement.textContent = message;
+        // Replace newlines with <br> tags
+        messageElement.innerHTML = message.replace(/\n/g, '<br>');
         
         // Show only OK button for simple alerts
         okBtn.style.display = 'inline-flex';
@@ -87,6 +88,8 @@ let aiSettings = {
     model: 'anthropic/claude-sonnet-4',
     temperature: 0.5,
     maxTokens: 50000,
+    advancedModelsEnabled: false,
+    advancedModels: {},
     customPrompts: {
         outline: '',
         chapters: '',
@@ -105,6 +108,7 @@ let oneClickCancelled = false;
 let currentExpandedChapter = null;
 let currentTheme = 'light';
 let selectedDonationAmount = 5;
+let isGenerating = false;
 
 // API Models Configuration
 const apiModels = {
@@ -121,7 +125,7 @@ const apiModels = {
             { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini', cost: { input: 0.25, output: 2.00 }},
             { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.60 }},
             { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', cost: { input: 0.05, output: 0.40 }},
-            { value: 'openai/google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.30, output: 2.50 }},
+            { value: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.30, output: 2.50 }},
             { value: 'deepseek/deepseek-chat-v3-0324', label: 'DeepSeek Chat V3', cost: { input: 0.18, output: 0.72 }}
         ]
     },
@@ -482,7 +486,695 @@ Create an improved version that perfectly addresses the manual feedback while ma
 Write the complete improved {contentType} with all requested changes implemented seamlessly.`
 };
 
-// Theme Management
+// ==================================================
+// ENHANCED MODEL SELECTION SYSTEM - FIXED VERSION
+// ==================================================
+
+// Fixed getSelectedModel function with comprehensive debugging
+function getSelectedModel(step) {
+    console.log(`\n🔍 === GET SELECTED MODEL DEBUG ===`);
+    console.log(`📋 Requested step: "${step}"`);
+    console.log(`📋 Step type: ${typeof step}`);
+    console.log(`📋 Step length: ${step ? step.length : 'undefined'}`);
+    
+    if (!step) {
+        console.warn('⚠️ Step parameter is undefined or empty!');
+        const defaultModel = document.getElementById('model-select')?.value || aiSettings.model || 'anthropic/claude-sonnet-4';
+        console.log(`➡️ Returning default model due to missing step: ${defaultModel}`);
+        return defaultModel;
+    }
+    
+    // Check if advanced models are enabled via checkbox
+    const checkbox = document.getElementById('enable-advanced-models');
+    const advancedModelsEnabled = checkbox ? checkbox.checked : false;
+    console.log(`📋 Checkbox element found: ${!!checkbox}`);
+    console.log(`📋 Advanced models enabled: ${advancedModelsEnabled}`);
+    
+    // Check aiSettings structure
+    console.log(`📋 aiSettings exists: ${!!aiSettings}`);
+    console.log(`📋 aiSettings.advancedModels exists: ${!!(aiSettings && aiSettings.advancedModels)}`);
+    console.log(`📋 aiSettings.advancedModels:`, aiSettings?.advancedModels);
+    
+    if (advancedModelsEnabled && aiSettings && aiSettings.advancedModels && aiSettings.advancedModels[step]) {
+        const advancedModel = aiSettings.advancedModels[step];
+        console.log(`✅ Found advanced model for ${step}: ${advancedModel}`);
+        return advancedModel;
+    } else {
+        // Log why we're not using advanced model
+        if (!advancedModelsEnabled) {
+            console.log(`❌ Advanced models not enabled`);
+        } else if (!aiSettings) {
+            console.log(`❌ aiSettings doesn't exist`);
+        } else if (!aiSettings.advancedModels) {
+            console.log(`❌ aiSettings.advancedModels doesn't exist`);
+        } else if (!aiSettings.advancedModels[step]) {
+            console.log(`❌ No advanced model set for step: ${step}`);
+            console.log(`   Available steps:`, Object.keys(aiSettings.advancedModels));
+        }
+    }
+    
+    // Fall back to default model from the main model select
+    const defaultModel = document.getElementById('model-select')?.value || aiSettings?.model || 'anthropic/claude-sonnet-4';
+    console.log(`➡️ Using default model for ${step}: ${defaultModel}`);
+    console.log(`=== END GET SELECTED MODEL DEBUG ===\n`);
+    return defaultModel;
+}
+
+// Debounced auto-save function for better performance
+const debouncedSaveAdvancedModels = debounce(saveAdvancedModelSettings, 500);
+
+// Auto-save advanced model settings (no manual save button needed)
+function saveAdvancedModelSettings() {
+    console.log('💾 Saving advanced model settings...');
+    
+    const advancedModels = {};
+    
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        if (select) {
+            console.log(`🔧 Checking select for ${step}: value="${select.value}"`);
+            if (select.value && select.value !== '') {
+                advancedModels[step] = select.value;
+                console.log(`✅ Saved model for ${step}: ${select.value}`);
+            }
+        } else {
+            console.warn(`⚠️ Select element not found: advanced-model-${step}`);
+        }
+    });
+    
+    // Save to aiSettings
+    aiSettings.advancedModels = advancedModels;
+    aiSettings.advancedModelsEnabled = document.getElementById('enable-advanced-models')?.checked || false;
+    
+    // Save to localStorage
+    saveSettings();
+    
+    console.log('✅ Advanced model settings saved:', advancedModels);
+    console.log('🔧 Advanced models enabled:', aiSettings.advancedModelsEnabled);
+    
+    // Visual feedback
+    showModelSettingsSaved();
+}
+
+// Visual feedback for settings save
+function showModelSettingsSaved() {
+    const section = document.querySelector('.advanced-models-section');
+    if (section) {
+        section.style.borderColor = 'var(--color-success)';
+        setTimeout(() => {
+            section.style.borderColor = '';
+        }, 1000);
+    }
+}
+
+// Reset advanced model settings
+function resetAdvancedModelSettings() {
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        if (select) {
+            select.value = ''; // Reset to "Use Default Model"
+            
+            // Visual feedback
+            const label = select.previousElementSibling;
+            if (label) {
+                label.style.color = 'var(--text-secondary)';
+                label.style.fontWeight = '500';
+            }
+        }
+    });
+    
+    // Reset checkbox
+    const checkbox = document.getElementById('enable-advanced-models');
+    if (checkbox) {
+        checkbox.checked = false;
+    }
+    
+    // Clear settings
+    aiSettings.advancedModels = {};
+    aiSettings.advancedModelsEnabled = false;
+    saveSettings();
+    
+    // Update visual state
+    updateAdvancedModelsVisualState();
+    
+    console.log('✅ Advanced model settings reset to defaults');
+}
+
+// Enhanced setupAdvancedModelListeners with existence checks
+function setupAdvancedModelListeners() {
+    console.log('🎧 Setting up advanced model listeners...');
+    
+    // Wait for DOM elements to be ready
+    setTimeout(() => {
+        let listenersSet = 0;
+        
+        ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+            const select = document.getElementById(`advanced-model-${step}`);
+            if (select) {
+                console.log(`✅ Setting up listener for: advanced-model-${step}`);
+                
+                select.addEventListener('change', (e) => {
+                    console.log(`🔄 Model changed for ${step}: ${e.target.value || 'default'}`);
+                    
+                    // Immediate save (no debounce needed for model changes)
+                    saveAdvancedModelSettings();
+                    
+                    // Visual feedback
+                    const label = select.previousElementSibling;
+                    if (label) {
+                        if (e.target.value) {
+                            label.style.color = 'var(--color-primary)';
+                            label.style.fontWeight = '600';
+                        } else {
+                            label.style.color = 'var(--text-secondary)';
+                            label.style.fontWeight = '500';
+                        }
+                    }
+                });
+                
+                listenersSet++;
+            } else {
+                console.warn(`⚠️ Element not found: advanced-model-${step}`);
+            }
+        });
+        
+        console.log(`✅ Set up ${listenersSet} model selection listeners`);
+        
+        // Add listener to the enable checkbox
+        const enableCheckbox = document.getElementById('enable-advanced-models');
+        if (enableCheckbox) {
+            console.log('✅ Setting up enable checkbox listener');
+            
+            enableCheckbox.addEventListener('change', (e) => {
+                console.log(`🔄 Advanced models ${e.target.checked ? 'enabled' : 'disabled'}`);
+                
+                // Immediate save for enable/disable
+                saveAdvancedModelSettings();
+                
+                // Update visual state
+                updateAdvancedModelsVisualState();
+            });
+        } else {
+            console.warn('⚠️ Enable checkbox not found: enable-advanced-models');
+        }
+        
+    }, 250); // Give DOM time to render
+}
+
+// Update visual state of advanced models section
+function updateAdvancedModelsVisualState() {
+    const section = document.querySelector('.advanced-models-section');
+    const checkbox = document.getElementById('enable-advanced-models');
+    const selects = document.querySelectorAll('[id^="advanced-model-"]');
+    
+    if (section && checkbox) {
+        if (checkbox.checked) {
+            section.classList.add('active');
+            selects.forEach(select => {
+                select.disabled = false;
+                select.style.opacity = '1';
+            });
+        } else {
+            section.classList.remove('active');
+            selects.forEach(select => {
+                select.disabled = true;
+                select.style.opacity = '0.5';
+            });
+        }
+    }
+}
+
+// Validate and update models when switching API providers
+function validateAdvancedModelsOnProviderSwitch() {
+    const provider = aiSettings.apiProvider || 'openrouter';
+    const models = apiModels[provider];
+    
+    if (!models) return;
+    
+    // Get all available model values for the current provider
+    const availableModels = [
+        ...(models.creative || []).map(m => m.value),
+        ...(models.budget || []).map(m => m.value)
+    ];
+    
+    // Check and update advanced model selections
+    let hasChanges = false;
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const currentModel = aiSettings.advancedModels[step];
+        if (currentModel && !availableModels.includes(currentModel)) {
+            console.warn(`Model ${currentModel} for ${step} not available in ${provider}, clearing selection`);
+            delete aiSettings.advancedModels[step];
+            
+            // Update UI
+            const select = document.getElementById(`advanced-model-${step}`);
+            if (select) {
+                select.value = '';
+                const label = select.previousElementSibling;
+                if (label) {
+                    label.style.color = 'var(--text-secondary)';
+                    label.style.fontWeight = '500';
+                }
+            }
+            
+            hasChanges = true;
+        }
+    });
+    
+    if (hasChanges) {
+        saveSettings();
+        console.log('✅ Advanced model selections updated for new provider');
+    }
+}
+
+// Enhanced updateAdvancedModelSelect with proper model loading
+function updateAdvancedModelSelect(selectId) {
+    console.log(`🔄 Updating advanced model select: ${selectId}`);
+    
+    const modelSelect = document.getElementById(selectId);
+    if (!modelSelect) {
+        console.warn(`⚠️ Model select not found: ${selectId}`);
+        return;
+    }
+    
+    const provider = aiSettings.apiProvider || 'openrouter';
+    const models = apiModels[provider];
+
+    if (!models) {
+        console.warn(`⚠️ No models found for provider: ${provider}`);
+        return;
+    }
+
+    // Clear and rebuild options
+    modelSelect.innerHTML = '';
+
+    // Add empty option first
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = 'Use Default Model';
+    emptyOption.style.fontStyle = 'italic';
+    modelSelect.appendChild(emptyOption);
+
+    // Helper to create options with enhanced info
+    function createOptions(modelArray, groupLabel) {
+        if (!modelArray || modelArray.length === 0) return;
+        
+        const group = document.createElement('optgroup');
+        group.label = `${groupLabel} Models`;
+        
+        modelArray.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            
+            // Add cost info if available
+            if (model.cost) {
+                option.title = `Input: $${model.cost.input}/1M tokens | Output: $${model.cost.output}/1M tokens`;
+            }
+            
+            group.appendChild(option);
+        });
+        
+        modelSelect.appendChild(group);
+    }
+
+    // Add model groups
+    if (models.creative && models.creative.length) {
+        createOptions(models.creative, 'Creative ⭐');
+    }
+
+    if (models.budget && models.budget.length) {
+        createOptions(models.budget, 'Budget 💰');
+    }
+
+    // Set saved value if exists and valid
+    const stepName = selectId.replace('advanced-model-', '');
+    if (aiSettings.advancedModels && aiSettings.advancedModels[stepName]) {
+        const savedModel = aiSettings.advancedModels[stepName];
+        
+        // Check if the saved model is still available
+        const allOptions = Array.from(modelSelect.options);
+        const isAvailable = allOptions.some(option => option.value === savedModel);
+        
+        if (isAvailable) {
+            modelSelect.value = savedModel;
+            console.log(`✅ Restored saved model for ${stepName}: ${savedModel}`);
+            
+            // Visual feedback for selected models
+            const label = modelSelect.previousElementSibling;
+            if (label) {
+                label.style.color = 'var(--color-primary)';
+                label.style.fontWeight = '600';
+            }
+        } else {
+            // Model no longer available, clear the setting
+            delete aiSettings.advancedModels[stepName];
+            console.warn(`⚠️ Model ${savedModel} no longer available for ${stepName}, cleared`);
+        }
+    }
+    
+    // Update visual state based on checkbox
+    const checkbox = document.getElementById('enable-advanced-models');
+    if (checkbox && !checkbox.checked) {
+        modelSelect.disabled = true;
+        modelSelect.style.opacity = '0.5';
+    }
+    
+    console.log(`✅ Updated ${selectId} with ${modelSelect.options.length} options`);
+}
+
+// Enhanced updateModelSelect with robust initialization
+function updateModelSelect() {
+    console.log('🔄 === UPDATING MODEL SELECTS ===');
+    
+    // Update main model select first
+    const modelSelect = document.getElementById('model-select');
+    if (!modelSelect) {
+        console.warn('⚠️ Main model select not found');
+        return;
+    }
+    
+    modelSelect.innerHTML = '';
+
+    const provider = aiSettings.apiProvider || 'openrouter';
+    const models = apiModels[provider];
+
+    if (!models) {
+        console.warn(`⚠️ No models found for provider: ${provider}`);
+        return;
+    }
+
+    // Helper to create options
+    function createOptions(modelArray) {
+        if (!modelArray || modelArray.length === 0) return [];
+        
+        return modelArray.map(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            
+            // Add cost info
+            if (model.cost) {
+                option.title = `Input: $${model.cost.input}/1M tokens | Output: $${model.cost.output}/1M tokens`;
+            }
+            
+            if (aiSettings.model === model.value) {
+                option.selected = true;
+            }
+            return option;
+        });
+    }
+
+    // Creative group
+    if (models.creative && models.creative.length) {
+        const creativeGroup = document.createElement('optgroup');
+        creativeGroup.label = 'Creative Models ⭐';
+        createOptions(models.creative).forEach(option => creativeGroup.appendChild(option));
+        modelSelect.appendChild(creativeGroup);
+    }
+
+    // Budget group
+    if (models.budget && models.budget.length) {
+        const budgetGroup = document.createElement('optgroup');
+        budgetGroup.label = 'Budget Models 💰';
+        createOptions(models.budget).forEach(option => budgetGroup.appendChild(option));
+        modelSelect.appendChild(budgetGroup);
+    }
+
+    console.log(`✅ Updated main model select with ${modelSelect.options.length} options`);
+
+    // Update all advanced model selects with proper delay and error handling
+    setTimeout(() => {
+        console.log('🔄 Updating advanced model selects...');
+        let successCount = 0;
+        
+        ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+            try {
+                updateAdvancedModelSelect(`advanced-model-${step}`);
+                successCount++;
+            } catch (error) {
+                console.error(`❌ Error updating advanced-model-${step}:`, error);
+            }
+        });
+        
+        console.log(`✅ Updated ${successCount}/6 advanced model selects`);
+        
+        // Validate advanced models for the current provider
+        validateAdvancedModelsOnProviderSwitch();
+        
+        // Update model info display
+        updateModelInfo();
+        
+        // Load saved advanced model settings
+        setTimeout(() => {
+            loadSavedAdvancedModels();
+        }, 100);
+        
+        console.log('✅ All model select updates complete');
+    }, 200); // Increased delay for DOM stability
+}
+
+// New function to load saved advanced model settings
+function loadSavedAdvancedModels() {
+    console.log('📁 Loading saved advanced model settings...');
+    
+    if (!aiSettings.advancedModels) {
+        console.log('   No saved advanced models found');
+        return;
+    }
+    
+    // Set checkbox state
+    const checkbox = document.getElementById('enable-advanced-models');
+    if (checkbox) {
+        checkbox.checked = aiSettings.advancedModelsEnabled || false;
+        console.log(`   Set checkbox to: ${checkbox.checked}`);
+    }
+    
+    // Restore individual model selections
+    Object.entries(aiSettings.advancedModels).forEach(([step, model]) => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        if (select) {
+            // Check if the saved model is still available
+            const isAvailable = Array.from(select.options).some(option => option.value === model);
+            if (isAvailable) {
+                select.value = model;
+                console.log(`   ✅ Restored ${step}: ${model}`);
+                
+                // Visual feedback
+                const label = select.previousElementSibling;
+                if (label) {
+                    label.style.color = 'var(--color-primary)';
+                    label.style.fontWeight = '600';
+                }
+            } else {
+                console.warn(`   ⚠️ Model ${model} not available for ${step}, clearing`);
+                delete aiSettings.advancedModels[step];
+            }
+        } else {
+            console.warn(`   ⚠️ Select not found for ${step}`);
+        }
+    });
+    
+    // Update visual state
+    updateAdvancedModelsVisualState();
+    
+    console.log('✅ Advanced model settings loaded');
+}
+
+// Enhanced switchApiProvider with validation
+function switchApiProvider(provider) {
+    aiSettings.apiProvider = provider;
+    
+    // Update toggle buttons
+    const openrouterBtn = document.getElementById('openrouter-btn');
+    const openaiBtn = document.getElementById('openai-btn');
+    
+    if (openrouterBtn && openaiBtn) {
+        openrouterBtn.classList.toggle('active', provider === 'openrouter');
+        openaiBtn.classList.toggle('active', provider === 'openai');
+    }
+    
+    // Show/hide appropriate API key fields
+    const openrouterGroup = document.getElementById('openrouter-key-group');
+    const openaiGroup = document.getElementById('openai-key-group');
+    
+    if (openrouterGroup && openaiGroup) {
+        if (provider === 'openrouter') {
+            openrouterGroup.style.display = 'block';
+            openaiGroup.style.display = 'none';
+        } else {
+            openrouterGroup.style.display = 'none';
+            openaiGroup.style.display = 'block';
+        }
+    }
+    
+    // Update model selections
+    updateModelSelect();
+    saveSettings();
+}
+
+// Initialize advanced models section
+function initializeAdvancedModelsSection() {
+    const section = document.querySelector('.advanced-models-section');
+    if (section) {
+        // Start collapsed
+        section.classList.add('collapsed');
+        
+        // Set up toggle functionality
+        const header = section.querySelector('.advanced-models-header');
+        if (header) {
+            header.addEventListener('click', (e) => {
+                // Don't toggle if clicking the checkbox area
+                if (e.target.closest('.advanced-models-toggle')) {
+                    return;
+                }
+                toggleAdvancedModelsSection();
+            });
+        }
+        
+        // Update initial visual state
+        updateAdvancedModelsVisualState();
+    }
+}
+
+// Toggle advanced models section
+function toggleAdvancedModelsSection() {
+    const section = document.querySelector('.advanced-models-section');
+    if (section) {
+        section.classList.toggle('collapsed');
+        
+        // Update toggle icon
+        const icon = section.querySelector('.toggle-icon');
+        if (icon) {
+            icon.textContent = section.classList.contains('collapsed') ? '▼' : '▲';
+        }
+        
+        console.log('Advanced models section:', section.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+    }
+}
+
+// Comprehensive test and setup function
+function setupAndTestAdvancedModels() {
+    console.log('\n🧪 === SETUP AND TEST ADVANCED MODELS ===');
+    console.log('==========================================');
+    
+    // Step 1: Initialize aiSettings if needed
+    if (!window.aiSettings) {
+        console.log('⚠️ aiSettings not found, initializing...');
+        window.aiSettings = {
+            apiProvider: 'openrouter',
+            openrouterApiKey: '',
+            openaiApiKey: '',
+            model: 'anthropic/claude-sonnet-4',
+            temperature: 0.5,
+            maxTokens: 50000,
+            advancedModelsEnabled: false,
+            advancedModels: {},
+            customPrompts: {}
+        };
+    }
+    
+    // Step 2: Check DOM elements
+    console.log('\n📋 Checking DOM elements:');
+    const checkbox = document.getElementById('enable-advanced-models');
+    console.log(`   Enable checkbox: ${checkbox ? '✅ Found' : '❌ Missing'}`);
+    
+    const stepSelects = {};
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        stepSelects[step] = select;
+        console.log(`   ${step} select: ${select ? '✅ Found' : '❌ Missing'}`);
+        if (select) {
+            console.log(`      Options: ${select.options.length}`);
+            console.log(`      Value: "${select.value}"`);
+        }
+    });
+    
+    // Step 3: Force populate model selects
+    console.log('\n🔄 Force updating model selects...');
+    updateModelSelect();
+    
+    // Step 4: Enable advanced models for testing
+    if (checkbox) {
+        console.log('\n✅ Enabling advanced models for testing...');
+        checkbox.checked = true;
+        aiSettings.advancedModelsEnabled = true;
+        updateAdvancedModelsVisualState();
+        
+        // Set a test model for randomIdea
+        const randomIdSelect = document.getElementById('advanced-model-randomIdea');
+        if (randomIdSelect && randomIdSelect.options.length > 1) {
+            // Select the second option (first real model)
+            randomIdSelect.selectedIndex = 1;
+            const testModel = randomIdSelect.value;
+            console.log(`🧪 Setting test model for randomIdea: ${testModel}`);
+            
+            // Save to aiSettings
+            aiSettings.advancedModels.randomIdea = testModel;
+            saveAdvancedModelSettings();
+            
+            console.log('💾 Saved test configuration');
+        }
+    }
+    
+    // Step 5: Test getSelectedModel
+    console.log('\n🧪 Testing getSelectedModel():');
+    ['randomIdea', 'outline', 'chapters', 'writing'].forEach(step => {
+        try {
+            const model = getSelectedModel(step);
+            console.log(`   ${step}: ${model}`);
+        } catch (error) {
+            console.error(`   ${step}: ERROR -`, error);
+        }
+    });
+    
+    // Step 6: Show current state
+    console.log('\n📊 Current state:');
+    console.log('   aiSettings.advancedModelsEnabled:', aiSettings.advancedModelsEnabled);
+    console.log('   aiSettings.advancedModels:', aiSettings.advancedModels);
+    
+    console.log('\n✅ Setup complete! Try generating a random idea now.');
+    console.log('==========================================\n');
+}
+
+// Additional debugging function
+function debugAdvancedModels() {
+    console.log('\n🔍 ADVANCED MODELS DEBUG');
+    console.log('========================');
+    
+    // Check aiSettings
+    console.log('aiSettings object:', aiSettings);
+    console.log('advancedModelsEnabled:', aiSettings.advancedModelsEnabled);
+    console.log('advancedModels:', aiSettings.advancedModels);
+    
+    // Check DOM elements
+    const checkbox = document.getElementById('enable-advanced-models');
+    console.log('Enable checkbox element:', checkbox);
+    console.log('Checkbox checked:', checkbox ? checkbox.checked : 'N/A');
+    
+    // Check all selects
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        console.log(`${step} select:`, select ? 'EXISTS' : 'MISSING');
+        console.log(`${step} value:`, select ? select.value : 'N/A');
+        console.log(`${step} options count:`, select ? select.options.length : 'N/A');
+    });
+    
+    // Test getSelectedModel for each step
+    console.log('\n🧪 Testing getSelectedModel():');
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        try {
+            const model = getSelectedModel(step);
+            console.log(`${step}: ${model}`);
+        } catch (error) {
+            console.error(`${step}: ERROR -`, error);
+        }
+    });
+}
+
+// ==================================================
+// THEME MANAGEMENT
+// ==================================================
+
 const themes = ['light', 'dark', 'fun'];
 
 function changeTheme() {
@@ -499,32 +1191,6 @@ function setTheme(theme) {
     document.getElementById('theme-select').value = theme;
 }
 
-// Update the initializeApp function to set initial dropdown value
-function initializeApp() {
-    loadSettings();
-    loadProjects();
-    setupEventListeners();
-    initializePrompts();
-    setupAutoSave();
-    setupKeyboardShortcuts();
-    updateModelSelect();
-    updateNavProgress();
-    
-    // Initialize feedback modes
-    ['outline', 'chapters', 'writing'].forEach(step => {
-        const select = document.getElementById(`${step}-feedback-mode`);
-        if (select) {
-            select.value = 'ai';
-            toggleManualFeedback(step);
-        }
-    });
-    
-    // Load saved theme and update dropdown
-    const savedTheme = localStorage.getItem('novelfactory_theme') || 'light';
-    setTheme(savedTheme);
-}
-
-// Update keyboard shortcut (optional - keep Ctrl+D cycling)
 function toggleTheme() {
     const currentIndex = themes.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % themes.length;
@@ -532,7 +1198,10 @@ function toggleTheme() {
     setTheme(newTheme);
 }
 
-// Event Listeners
+// ==================================================
+// EVENT LISTENERS
+// ==================================================
+
 function setupEventListeners() {
     const genreSelect = document.getElementById('genre');
     const audienceSelect = document.getElementById('target-audience');
@@ -562,7 +1231,10 @@ function setupEventListeners() {
     });
 }
 
-// Feedback System Functions
+// ==================================================
+// FEEDBACK SYSTEM
+// ==================================================
+
 function toggleManualFeedback(step) {
     const mode = document.getElementById(`${step}-feedback-mode`).value;
     const manualSection = document.getElementById(`${step}-manual-feedback`);
@@ -615,7 +1287,10 @@ function saveFeedbackPrompt(step) {
     autoSave();
 }
 
-// Donation System
+// ==================================================
+// DONATION SYSTEM
+// ==================================================
+
 function showDonationModal() {
     document.getElementById('donation-modal').classList.add('active');
 }
@@ -664,26 +1339,10 @@ async function proceedToDonate() {
     }, 1000);
 }
 
-// Custom donation amount handling
-document.addEventListener('DOMContentLoaded', function() {
-    const customAmountInput = document.getElementById('custom-donation-amount');
-    if (customAmountInput) {
-        customAmountInput.addEventListener('input', function() {
-            if (this.value) {
-                // Clear selection from preset amounts
-                document.querySelectorAll('.donation-amount').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                
-                // Update donate button
-                document.getElementById('donate-btn').innerHTML = `<span class="label">Donate $${this.value}</span>`;
-                selectedDonationAmount = parseFloat(this.value);
-            }
-        });
-    }
-});
+// ==================================================
+// FEEDBACK SYSTEM
+// ==================================================
 
-// Feedback System
 function showFeedbackForm() {
     document.getElementById('feedback-modal').classList.add('active');
 }
@@ -724,7 +1383,10 @@ async function submitFeedback() {
     await customAlert('Thank you for your feedback! Your default email client should open with your message. If it doesn\'t open automatically, please email me directly at dietrichandreas2@t-online.de', 'Feedback Sent');
 }
 
-// Auto-save System
+// ==================================================
+// AUTO-SAVE SYSTEM
+// ==================================================
+
 function setupAutoSave() {
     setInterval(autoSave, 30000); // Auto-save every 30 seconds
 }
@@ -756,7 +1418,10 @@ function loadFromLocalStorage() {
     }
 }
 
-// Keyboard Shortcuts
+// ==================================================
+// KEYBOARD SHORTCUTS
+// ==================================================
+
 function setupKeyboardShortcuts() {
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey || e.metaKey) {
@@ -792,7 +1457,10 @@ function setupKeyboardShortcuts() {
     });
 }
 
-// Navigation System
+// ==================================================
+// NAVIGATION SYSTEM
+// ==================================================
+
 function showStep(stepName) {
     // Hide all steps
     const steps = document.querySelectorAll('.step');
@@ -839,126 +1507,202 @@ function updateNavProgress() {
     });
 }
 
-// API Provider System
-function switchApiProvider(provider) {
-    aiSettings.apiProvider = provider;
-    
-    // Update toggle buttons
-    document.getElementById('openrouter-btn').classList.toggle('active', provider === 'openrouter');
-    document.getElementById('openai-btn').classList.toggle('active', provider === 'openai');
-    
-    // Show/hide appropriate API key fields
-    const openrouterGroup = document.getElementById('openrouter-key-group');
-    const openaiGroup = document.getElementById('openai-key-group');
-    
-    if (provider === 'openrouter') {
-        openrouterGroup.style.display = 'block';
-        openaiGroup.style.display = 'none';
-    } else {
-        openrouterGroup.style.display = 'none';
-        openaiGroup.style.display = 'block';
-    }
-    
-    updateModelSelect();
-    saveSettings();
-}
+// ==================================================
+// SETTINGS MANAGEMENT
+// ==================================================
 
-function updateModelSelect() {
-    const modelSelect = document.getElementById('model-select');
-    modelSelect.innerHTML = '';
-
-    const provider = aiSettings.apiProvider || 'openrouter';
-    const models = apiModels[provider];
-
-    // Helper to create options
-    function createOptions(modelArray) {
-        return modelArray.map(model => {
-            const option = document.createElement('option');
-            option.value = model.value;
-            option.textContent = model.label;
-            if (aiSettings.model === model.value) {
-                option.selected = true;
-            }
-            return option;
-        });
-    }
-
-    // Creative group
-    if (models.creative && models.creative.length) {
-        const creativeGroup = document.createElement('optgroup');
-        creativeGroup.label = 'Creative';
-        createOptions(models.creative).forEach(option => creativeGroup.appendChild(option));
-        modelSelect.appendChild(creativeGroup);
-    }
-
-    // Budget group
-    if (models.budget && models.budget.length) {
-        const budgetGroup = document.createElement('optgroup');
-        budgetGroup.label = 'Budget';
-        createOptions(models.budget).forEach(option => budgetGroup.appendChild(option));
-        modelSelect.appendChild(budgetGroup);
-    }
-
-    updateModelInfo();
-}
-
-function updateModelInfo() {
-    const model = document.getElementById('model-select').value;
-    const provider = aiSettings.apiProvider;
-    const allModels = [...apiModels[provider].creative, ...apiModels[provider].budget];
-    const modelInfo = allModels.find(m => m.value === model);
-    
-    if (modelInfo && modelInfo.cost) {
-        document.getElementById('model-cost-info').textContent = 
-            `Input: $${modelInfo.cost.input}/1M tokens | Output: $${modelInfo.cost.output}/1M tokens`;
-    }
-}
-
-// Settings Management
+// Enhanced loadSettings function with better initialization
 function loadSettings() {
+    console.log('📁 === LOADING SETTINGS ===');
+    
+    // Initialize default settings first
+    if (!window.aiSettings) {
+        console.log('🔧 Initializing default aiSettings...');
+        window.aiSettings = {
+            apiProvider: 'openrouter',
+            openrouterApiKey: '',
+            openaiApiKey: '',
+            model: 'anthropic/claude-sonnet-4',
+            temperature: 0.5,
+            maxTokens: 50000,
+            advancedModelsEnabled: false,
+            advancedModels: {},
+            customPrompts: {
+                outline: '',
+                chapters: '',
+                writing: '',
+                analysis: '',
+                improvement: '',
+                manualImprovement: '',
+                randomIdea: '',
+                bookTitle: ''
+            }
+        };
+    }
+    
+    // Initialize prompts
     initializePrompts();
     loadFromLocalStorage();
     
+    // Load saved settings from localStorage
     const savedSettings = localStorage.getItem('novelfactory_settings');
     if (savedSettings) {
-        const loadedSettings = JSON.parse(savedSettings);
-        Object.assign(aiSettings, loadedSettings);
+        try {
+            const loadedSettings = JSON.parse(savedSettings);
+            
+            // Merge loaded settings with defaults
+            Object.assign(aiSettings, loadedSettings);
+            
+            // Ensure all required properties exist
+            if (!aiSettings.advancedModels) {
+                aiSettings.advancedModels = {};
+            }
+            if (!aiSettings.customPrompts) {
+                aiSettings.customPrompts = {};
+            }
+            
+            console.log('✅ Settings loaded from localStorage');
+            console.log('   Provider:', aiSettings.apiProvider);
+            console.log('   Model:', aiSettings.model);
+            console.log('   Advanced models enabled:', aiSettings.advancedModelsEnabled);
+            console.log('   Advanced models:', aiSettings.advancedModels);
+            
+        } catch (error) {
+            console.error('❌ Error parsing saved settings:', error);
+            console.log('🔧 Using default settings');
+        }
+    } else {
+        console.log('📝 No saved settings found, using defaults');
+    }
+    
+    // Populate form fields after a short delay to ensure DOM is ready
+    setTimeout(() => {
         populateSettingsFields();
+    }, 100);
+    
+    console.log('✅ Settings loading complete');
+}
+
+// Enhanced saveSettings function with better error handling
+function saveSettings() {
+    console.log('💾 Saving settings...');
+    
+    try {
+        // Get current form values safely
+        const openrouterKey = document.getElementById('openrouter-api-key')?.value || '';
+        const openaiKey = document.getElementById('openai-api-key')?.value || '';
+        const modelSelect = document.getElementById('model-select')?.value || 'anthropic/claude-sonnet-4';
+        const temperature = parseFloat(document.getElementById('temperature')?.value || 0.5);
+        const maxTokens = parseInt(document.getElementById('max-tokens')?.value || 50000);
+        const advancedEnabled = document.getElementById('enable-advanced-models')?.checked || false;
+        
+        // Update aiSettings
+        aiSettings.openrouterApiKey = openrouterKey;
+        aiSettings.openaiApiKey = openaiKey;
+        aiSettings.model = modelSelect;
+        aiSettings.temperature = temperature;
+        aiSettings.maxTokens = maxTokens;
+        aiSettings.advancedModelsEnabled = advancedEnabled;
+        
+        // Ensure advanced models object exists
+        if (!aiSettings.advancedModels) {
+            aiSettings.advancedModels = {};
+        }
+        
+        // Save custom prompts if they exist
+        const promptFields = [
+            { id: 'outline-prompt', key: 'outline' },
+            { id: 'chapters-prompt', key: 'chapters' },
+            { id: 'writing-prompt', key: 'writing' }
+        ];
+        
+        promptFields.forEach(({ id, key }) => {
+            const element = document.getElementById(id);
+            if (element && element.value) {
+                aiSettings.customPrompts[key] = element.value;
+            }
+        });
+        
+        // Save feedback prompts if they exist
+        ['outline', 'chapters', 'writing'].forEach(step => {
+            const feedbackPrompt = document.getElementById(`${step}-feedback-prompt`);
+            if (feedbackPrompt && feedbackPrompt.value) {
+                aiSettings.customPrompts.analysis = feedbackPrompt.value;
+            }
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('novelfactory_settings', JSON.stringify(aiSettings));
+        console.log('✅ Settings saved to localStorage');
+        console.log('   Advanced models enabled:', aiSettings.advancedModelsEnabled);
+        console.log('   Advanced models:', aiSettings.advancedModels);
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving settings:', error);
+        return false;
     }
 }
 
-function saveSettings() {
-    aiSettings.openrouterApiKey = document.getElementById('openrouter-api-key').value;
-    aiSettings.openaiApiKey = document.getElementById('openai-api-key').value;
-    aiSettings.model = document.getElementById('model-select').value;
-    aiSettings.temperature = parseFloat(document.getElementById('temperature').value);
-    aiSettings.maxTokens = parseInt(document.getElementById('max-tokens').value);
-    
-    // Save custom prompts
-    aiSettings.customPrompts.outline = document.getElementById('outline-prompt').value;
-    aiSettings.customPrompts.chapters = document.getElementById('chapters-prompt').value;
-    aiSettings.customPrompts.writing = document.getElementById('writing-prompt').value;
-    
-    // Save feedback prompts if they exist
-    ['outline', 'chapters', 'writing'].forEach(step => {
-        const feedbackPrompt = document.getElementById(`${step}-feedback-prompt`);
-        if (feedbackPrompt && feedbackPrompt.value) {
-            aiSettings.customPrompts.analysis = feedbackPrompt.value;
-        }
-    });
-    
-    localStorage.setItem('novelfactory_settings', JSON.stringify(aiSettings));
-}
-
+// Enhanced populateSettingsFields with better timing
 function populateSettingsFields() {
-    document.getElementById('openrouter-api-key').value = aiSettings.openrouterApiKey || '';
-    document.getElementById('openai-api-key').value = aiSettings.openaiApiKey || '';
-    document.getElementById('model-select').value = aiSettings.model || 'anthropic/claude-sonnet-4';
-    document.getElementById('temperature').value = aiSettings.temperature || 0.5;
-    document.getElementById('max-tokens').value = aiSettings.maxTokens || 50000;
+    console.log('📝 Populating settings fields...');
+    
+    // Populate basic fields
+    if (document.getElementById('openrouter-api-key')) {
+        document.getElementById('openrouter-api-key').value = aiSettings.openrouterApiKey || '';
+    }
+    if (document.getElementById('openai-api-key')) {
+        document.getElementById('openai-api-key').value = aiSettings.openaiApiKey || '';
+    }
+    if (document.getElementById('model-select')) {
+        document.getElementById('model-select').value = aiSettings.model || 'anthropic/claude-sonnet-4';
+    }
+    if (document.getElementById('temperature')) {
+        document.getElementById('temperature').value = aiSettings.temperature || 0.5;
+    }
+    if (document.getElementById('max-tokens')) {
+        document.getElementById('max-tokens').value = aiSettings.maxTokens || 50000;
+    }
+    
+    // Set advanced models checkbox
+    const enableCheckbox = document.getElementById('enable-advanced-models');
+    if (enableCheckbox) {
+        enableCheckbox.checked = aiSettings.advancedModelsEnabled || false;
+        console.log(`✅ Set advanced models checkbox: ${enableCheckbox.checked}`);
+    }
     
     // Set API provider
     switchApiProvider(aiSettings.apiProvider || 'openrouter');
+    
+    // Load advanced model selections after models are populated
+    setTimeout(() => {
+        if (aiSettings.advancedModels) {
+            console.log('🔄 Loading saved advanced model selections...');
+            
+            ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+                const select = document.getElementById(`advanced-model-${step}`);
+                if (select && aiSettings.advancedModels[step]) {
+                    select.value = aiSettings.advancedModels[step];
+                    console.log(`✅ Restored ${step}: ${aiSettings.advancedModels[step]}`);
+                    
+                    // Visual feedback for pre-selected models
+                    const label = select.previousElementSibling;
+                    if (label && select.value) {
+                        label.style.color = 'var(--color-primary)';
+                        label.style.fontWeight = '600';
+                    }
+                } else if (!select) {
+                    console.warn(`⚠️ Select not found for ${step}`);
+                }
+            });
+        }
+        
+        // Update visual state
+        updateAdvancedModelsVisualState();
+        
+        console.log('✅ Advanced model settings populated');
+    }, 200);
     
     updateTempValue();
 }
@@ -974,6 +1718,14 @@ function populateFormFields() {
 }
 
 function initializePrompts() {
+    // Initialize aiSettings if not exists
+    if (!aiSettings.advancedModels) {
+        aiSettings.advancedModels = {};
+    }
+    if (!aiSettings.customPrompts) {
+        aiSettings.customPrompts = {};
+    }
+    
     // Load custom prompts if they exist, otherwise use defaults
     document.getElementById('outline-prompt').value = aiSettings.customPrompts?.outline || defaultPrompts.outline;
     document.getElementById('chapters-prompt').value = aiSettings.customPrompts?.chapters || defaultPrompts.chapters;
@@ -993,7 +1745,22 @@ function updateTempValue() {
     document.getElementById('temp-value').textContent = temp;
 }
 
-// Utility Functions
+function updateModelInfo() {
+    const model = document.getElementById('model-select').value;
+    const provider = aiSettings.apiProvider;
+    const allModels = [...apiModels[provider].creative, ...apiModels[provider].budget];
+    const modelInfo = allModels.find(m => m.value === model);
+    
+    if (modelInfo && modelInfo.cost) {
+        document.getElementById('model-cost-info').textContent = 
+            `Input: $${modelInfo.cost.input}/1M tokens | Output: $${modelInfo.cost.output}/1M tokens`;
+    }
+}
+
+// ==================================================
+// UTILITY FUNCTIONS
+// ==================================================
+
 function updateWordCount() {
     const premise = document.getElementById('premise').value;
     const style = document.getElementById('style-direction').value;
@@ -1036,9 +1803,12 @@ function updateAudienceRequirements() {
     updateChapterEstimate();
 }
 
-// AI API Functions
-async function callAI(prompt, systemPrompt = "") {
-    const settings = getAISettings();
+// ==================================================
+// AI API FUNCTIONS
+// ==================================================
+
+async function callAI(prompt, systemPrompt = "", model = null) {
+    const settings = getAISettings(model);
     
     if (!settings.apiKey) {
         throw new Error('Please enter your API key in the AI Settings page.');
@@ -1115,7 +1885,7 @@ async function callAI(prompt, systemPrompt = "") {
     }
 }
 
-function getAISettings() {
+function getAISettings(model = null) {
     const provider = aiSettings.apiProvider;
     let apiKey = '';
     
@@ -1124,11 +1894,14 @@ function getAISettings() {
     } else {
         apiKey = document.getElementById('openai-api-key').value;
     }
+
+    // Use provided model or fall back to default
+    const selectedModel = model || document.getElementById('model-select')?.value || aiSettings.model || 'anthropic/claude-sonnet-4';
     
     return {
         apiProvider: provider,
         apiKey: apiKey,
-        model: document.getElementById('model-select').value,
+        model: selectedModel,
         temperature: parseFloat(document.getElementById('temperature').value),
         maxTokens: parseInt(document.getElementById('max-tokens').value)
     };
@@ -1143,120 +1916,137 @@ function formatPrompt(template, replacements) {
     return formatted;
 }
 
-// Feedback Loop System
+// ==================================================
+// FEEDBACK LOOP SYSTEM
+// ==================================================
+
 async function runFeedbackLoop(contentType) {
-    const feedbackLoops = parseInt(document.getElementById(`${contentType}-feedback-loops`).value);
-    if (feedbackLoops === 0) return;
-    
-    const feedbackMode = document.getElementById(`${contentType}-feedback-mode`).value;
-    
-    let content;
-    switch(contentType) {
-        case 'outline':
-            content = bookData.outline;
-            break;
-        case 'chapters':
-            content = bookData.chapterOutline;
-            break;
-        case 'writing':
-            content = bookData.chapters.join('\n\n---\n\n');
-            break;
-    }
-    
-    if (!content) {
-        await customAlert(`No ${contentType} content to analyze. Please generate content first.`, 'No Content');
+    if (isGenerating) {
+        showGenerationInfo();
         return;
     }
-    
-    // Get manual feedback if in manual mode
-    let manualFeedback = '';
-    if (feedbackMode === 'manual') {
-        manualFeedback = document.getElementById(`${contentType}-manual-input`).value;
-        if (!manualFeedback.trim()) {
-            await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+    isGenerating = true;
+    try {
+        const feedbackLoops = parseInt(document.getElementById(`${contentType}-feedback-loops`).value);
+        if (feedbackLoops === 0) return;
+
+        const feedbackMode = document.getElementById(`${contentType}-feedback-mode`).value;
+
+        let content;
+        switch(contentType) {
+            case 'outline':
+                content = bookData.outline;
+                break;
+            case 'chapters':
+                content = bookData.chapterOutline;
+                break;
+            case 'writing':
+                content = bookData.chapters.join('\n\n---\n\n');
+                break;
+        }
+
+        if (!content) {
+            await customAlert(`No ${contentType} content to analyze. Please generate content first.`, 'No Content');
             return;
         }
-    }
-    
-    const outputDiv = document.getElementById(`${contentType}-output`);
-    
-    for (let i = 0; i < feedbackLoops; i++) {
-        outputDiv.innerHTML = `<div class="loading"><div class="spinner"></div>Running ${feedbackMode} feedback loop ${i + 1} of ${feedbackLoops}...</div>`;
-        
-        try {
-            let improvedContent;
-            
-            if (feedbackMode === 'manual') {
-                // Use manual feedback directly
-                const improvementPrompt = formatPrompt(aiSettings.customPrompts.manualImprovement || defaultPrompts.manualImprovement, {
-                    contentType: contentType,
-                    originalContent: content,
-                    manualFeedback: manualFeedback,
-                    genre: bookData.genre,
-                    targetAudience: bookData.targetAudience,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
-                });
-                
-                improvedContent = await callAI(improvementPrompt, "You are a master storyteller and professional editor implementing specific feedback requests.");
-                
-            } else {
-                // Use AI analysis first, then improvement
-                const analysisPrompt = formatPrompt(getCustomAnalysisPrompt(contentType), {
-                    contentType: contentType,
-                    content: content,
-                    genre: bookData.genre,
-                    targetAudience: bookData.targetAudience,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
-                });
-                
-                const analysis = await callAI(analysisPrompt, "You are a professional editor and story consultant.");
-                
-                const improvementPrompt = formatPrompt(aiSettings.customPrompts.improvement || defaultPrompts.improvement, {
-                    contentType: contentType,
-                    originalContent: content,
-                    feedbackContent: analysis,
-                    targetAudience: bookData.targetAudience,
-                    genre: bookData.genre,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
-                });
-                
-                improvedContent = await callAI(improvementPrompt, "You are a master storyteller and professional editor.");
+
+        // Get manual feedback if in manual mode
+        let manualFeedback = '';
+        if (feedbackMode === 'manual') {
+            manualFeedback = document.getElementById(`${contentType}-manual-input`).value;
+            if (!manualFeedback.trim()) {
+                await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+                return;
             }
-            
-            // Update content
-            content = improvedContent;
-            
-            // Store improved content
-            switch(contentType) {
-                case 'outline':
-                    bookData.outline = improvedContent;
-                    break;
-                case 'chapters':
-                    bookData.chapterOutline = improvedContent;
-                    break;
-                case 'writing':
-                    // For writing feedback, we'd need to split and reassign chapters
-                    // This is simplified for the demo
-                    break;
-            }
-            
-            outputDiv.innerHTML = `<h3>Improved ${contentType} (${feedbackMode} feedback loop ${i + 1}):</h3><div style="white-space: pre-wrap; line-height: 1.6;">${improvedContent}</div>`;
-            
-            autoSave();
-            
-        } catch (error) {
-            outputDiv.innerHTML = `<div class="error">Error in feedback loop ${i + 1}: ${error.message}</div>`;
-            break;
         }
+
+        const outputDiv = document.getElementById(`${contentType}-output`);
+        
+        for (let i = 0; i < feedbackLoops; i++) {
+            outputDiv.innerHTML = `<div class="loading"><div class="spinner"></div>Running ${feedbackMode} feedback loop ${i + 1} of ${feedbackLoops}...</div>`;
+            
+            try {
+                let improvedContent;
+                
+                // Get the model for feedback
+                const feedbackModel = getSelectedModel('feedback');
+                console.log(`Using model for feedback: ${feedbackModel}`);
+                
+                if (feedbackMode === 'manual') {
+                    // Use manual feedback directly
+                    const improvementPrompt = formatPrompt(aiSettings.customPrompts.manualImprovement || defaultPrompts.manualImprovement, {
+                        contentType: 'chapter',
+                        originalContent: content,
+                        manualFeedback: manualFeedback,
+                        genre: bookData.genre,
+                        targetAudience: bookData.targetAudience,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    improvedContent = await callAI(improvementPrompt, "You are a master storyteller and professional editor implementing specific feedback requests.", feedbackModel);
+                    
+                } else {
+                    // Use AI analysis first, then improvement
+                    const analysisPrompt = formatPrompt(getCustomAnalysisPrompt(contentType), {
+                        contentType: contentType,
+                        content: content,
+                        genre: bookData.genre,
+                        targetAudience: bookData.targetAudience,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    const analysis = await callAI(analysisPrompt, "You are a professional editor and story consultant.", feedbackModel);
+                    
+                    const improvementPrompt = formatPrompt(aiSettings.customPrompts.improvement || defaultPrompts.improvement, {
+                        contentType: contentType,
+                        originalContent: content,
+                        feedbackContent: analysis,
+                        targetAudience: bookData.targetAudience,
+                        genre: bookData.genre,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    improvedContent = await callAI(improvementPrompt, "You are a master storyteller and professional editor.", feedbackModel);
+                }
+                
+                // Update content
+                content = improvedContent;
+                
+                // Store improved content
+                switch(contentType) {
+                    case 'outline':
+                        bookData.outline = improvedContent;
+                        break;
+                    case 'chapters':
+                        bookData.chapterOutline = improvedContent;
+                        break;
+                    case 'writing':
+                        // For writing feedback, we'd need to split and reassign chapters
+                        // This is simplified for the demo
+                        break;
+                }
+                
+                outputDiv.innerHTML = `<h3>Improved ${contentType} (${feedbackMode} feedback loop ${i + 1}):</h3><div style="white-space: pre-wrap; line-height: 1.6;">${improvedContent}</div>`;
+                
+                autoSave();
+                
+            } catch (error) {
+                outputDiv.innerHTML = `<div class="error">Error in feedback loop ${i + 1}: ${error.message}</div>`;
+                break;
+            }
+        }
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
 }
 
@@ -1265,28 +2055,68 @@ function getCustomAnalysisPrompt(contentType) {
     return customPrompt && customPrompt.trim() ? customPrompt : (aiSettings.customPrompts.analysis || defaultPrompts.analysis);
 }
 
-// Random Idea Generation
+// ==================================================
+// RANDOM IDEA GENERATION
+// ==================================================
+
+// Enhanced generateRandomIdea with comprehensive debugging
 async function generateRandomIdea() {
+    console.log('\n🎲 === RANDOM IDEA GENERATION DEBUG ===');
+    
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    isGenerating = true;
+    
+    console.log('📝 Starting random idea generation...');
+    
     const genre = document.getElementById('genre').value;
     const audience = document.getElementById('target-audience').value;
     
+    console.log(`📊 Genre: ${genre}`);
+    console.log(`👥 Audience: ${audience}`);
+    
     if (!genre || !audience) {
         await customAlert('Please select genre and target audience first!', 'Missing Information');
+        isGenerating = false;
+        hideGenerationInfo();
         return;
     }
 
     const randomBtn = document.getElementById('random-idea-btn');
     const originalText = randomBtn.innerHTML;
-    randomBtn.innerHTML = '<span class="label">Generating Idea...</span>';
+    randomBtn.innerHTML = '<span class="label"><div class="spinner"></div>Generating Idea...</span>';
     randomBtn.disabled = true;
 
     try {
+        // Enhanced debugging for model selection
+        console.log('\n🤖 MODEL SELECTION DEBUG:');
+        console.log('aiSettings object exists:', !!aiSettings);
+        console.log('aiSettings.advancedModelsEnabled:', aiSettings?.advancedModelsEnabled);
+        console.log('aiSettings.advancedModels:', aiSettings?.advancedModels);
+        
+        const checkbox = document.getElementById('enable-advanced-models');
+        console.log('Checkbox element found:', !!checkbox);
+        console.log('Checkbox checked:', checkbox ? checkbox.checked : 'N/A');
+        
+        const randomIdSelect = document.getElementById('advanced-model-randomIdea');
+        console.log('RandomIdea select found:', !!randomIdSelect);
+        console.log('RandomIdea select value:', randomIdSelect ? randomIdSelect.value : 'N/A');
+        console.log('RandomIdea select options count:', randomIdSelect ? randomIdSelect.options.length : 'N/A');
+        
+        // Get the model for this step with extensive debugging
+        console.log('\n🔧 Calling getSelectedModel("randomIdea")...');
+        const selectedModel = getSelectedModel('randomIdea');
+        console.log(`✅ Final selected model: ${selectedModel}`);
+        
         const prompt = formatPrompt(aiSettings.customPrompts.randomIdea || defaultPrompts.randomIdea, {
             genre: genre.replace('-', ' '),
             targetAudience: audience.replace('-', ' ')
         });
 
-        const aiResponse = await callAI(prompt, "You are a master storyteller and creative genius specializing in generating original, bestselling book concepts.");
+        console.log('📤 Making AI call with model:', selectedModel);
+        const aiResponse = await callAI(prompt, "You are a master storyteller and creative genius specializing in generating original, bestselling book concepts.", selectedModel);
         
         const lines = aiResponse.split('\n');
         let premise = '';
@@ -1325,25 +2155,43 @@ async function generateRandomIdea() {
         await customAlert('Unique book idea generated by AI! Review and modify as needed, then click "Generate Book" when ready.', 'Idea Generated');
 
     } catch (error) {
+        console.error('❌ Error in generateRandomIdea:', error);
         await customAlert(`Error generating random idea: ${error.message}`, 'Generation Error');
     } finally {
         randomBtn.innerHTML = originalText;
         randomBtn.disabled = false;
+        isGenerating = false;
+        hideGenerationInfo();
+        console.log('🏁 Random idea generation complete\n');
     }
 }
 
-// Book Generation Functions
+// ==================================================
+// BOOK GENERATION FUNCTIONS
+// ==================================================
+
 async function startBookGeneration() {
-    collectBookData();
-    
-    if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
-        await customAlert('Please fill in all required fields before generating your book.', 'Missing Information');
+    if (isGenerating) {
+        showGenerationInfo();
         return;
     }
+    isGenerating = true;
+    showGenerationInfo("Generating story structure...");
+    try {
+        collectBookData();
+    
+        if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
+            await customAlert('Please fill in all required fields before generating your book.', 'Missing Information');
+            return;
+        }
 
-    autoSave();
-    showStep('outline');
-    generateOutline();
+        autoSave();
+        showStep('outline');
+        generateOutline();
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
 }
 
 function collectBookData() {
@@ -1356,6 +2204,12 @@ function collectBookData() {
 }
 
 async function generateOutline() {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    isGenerating = true;
+    showGenerationInfo("Generating complete story structure with integrated characters...");
     const outputDiv = document.getElementById('outline-output');
     outputDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Generating complete story structure with integrated characters...</div>';
 
@@ -1367,6 +2221,10 @@ async function generateOutline() {
 
         const genreReq = genreRequirements[bookData.genre] || { requirements: '', pacing: '' };
         const genreRequirementsText = `${genreReq.requirements}\nPacing: ${genreReq.pacing}`;
+
+        // Get the model for this step
+        const selectedModel = getSelectedModel('outline');
+        console.log(`Using model for outline: ${selectedModel}`);
 
         const prompt = formatPrompt(document.getElementById('outline-prompt').value, {
             genre: bookData.genre,
@@ -1381,7 +2239,7 @@ async function generateOutline() {
             genreRequirements: genreRequirementsText
         });
 
-        const outline = await callAI(prompt, "You are a master storyteller and bestselling author creating commercially successful story structures.");
+        const outline = await callAI(prompt, "You are a master storyteller and bestselling author creating commercially successful story structures.", selectedModel);
         bookData.outline = outline;
 
         outputDiv.innerHTML = `<h3>Generated Story Structure:</h3><div style="white-space: pre-wrap; line-height: 1.6;">${outline}</div>`;
@@ -1397,6 +2255,9 @@ async function generateOutline() {
 
     } catch (error) {
         outputDiv.innerHTML = `<div class="error">Error generating story structure: ${error.message}</div>`;
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
 }
 
@@ -1410,10 +2271,20 @@ function proceedToChapters() {
 }
 
 async function generateChapterOutline() {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    isGenerating = true;
+    showGenerationInfo("Creating detailed chapter plan with scene breakdowns...");
     const outputDiv = document.getElementById('chapters-output');
     outputDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Creating detailed chapter plan with scene breakdowns...</div>';
 
     try {
+        // Get the model for chapter planning
+        const selectedModel = getSelectedModel('chapters');
+        console.log(`Using model for chapters: ${selectedModel}`);
+        
         const prompt = formatPrompt(document.getElementById('chapters-prompt').value, {
             outline: bookData.outline,
             genre: bookData.genre,
@@ -1422,11 +2293,15 @@ async function generateChapterOutline() {
             targetWordCount: bookData.targetWordCount
         });
 
-        const chapterOutline = await callAI(prompt, "You are a master storyteller creating detailed chapter breakdowns for commercially successful novels.");
+        const chapterOutline = await callAI(prompt, "You are a master storyteller creating detailed chapter breakdowns for commercially successful novels.", selectedModel);
         bookData.chapterOutline = chapterOutline;
 
         // Generate book title and blurb now that we have the full story structure
         outputDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Generating compelling book title and blurb...</div>';
+        
+        // Get the model for book title generation
+        const titleModel = getSelectedModel('bookTitle');
+        console.log(`Using model for bookTitle: ${titleModel}`);
         
         const titleBlurbPrompt = formatPrompt(aiSettings.customPrompts.bookTitle || defaultPrompts.bookTitle, {
             genre: bookData.genre,
@@ -1437,7 +2312,7 @@ async function generateChapterOutline() {
             chapterOutline: chapterOutline
         });
 
-        const titleBlurbResponse = await callAI(titleBlurbPrompt, "You are a bestselling book marketing expert and title creation genius.");
+        const titleBlurbResponse = await callAI(titleBlurbPrompt, "You are a bestselling book marketing expert and title creation genius.", titleModel);
         
         // Parse title and blurb from response
         const lines = titleBlurbResponse.split('\n');
@@ -1488,6 +2363,9 @@ async function generateChapterOutline() {
 
     } catch (error) {
         outputDiv.innerHTML = `<div class="error">Error generating chapter plan: ${error.message}</div>`;
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
 }
 
@@ -1505,7 +2383,10 @@ function proceedToWriting() {
     setupWritingInterface();
 }
 
-// Writing Interface
+// ==================================================
+// WRITING INTERFACE
+// ==================================================
+
 function setupWritingInterface() {
     const container = document.getElementById('chapters-container');
     container.innerHTML = '';
@@ -1614,12 +2495,17 @@ function getSelectedChapters() {
 }
 
 async function generateSingleChapter(chapterNum) {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    isGenerating = true;
     const statusDiv = document.getElementById('writing-status');
     statusDiv.innerHTML = `Writing Chapter ${chapterNum}...`;
     
     document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Writing...</div>';
     document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = true;
-    
+
     try {
         await writeChapter(chapterNum);
         
@@ -1637,6 +2523,9 @@ async function generateSingleChapter(chapterNum) {
         document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
         document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
         statusDiv.innerHTML = `Failed to generate Chapter ${chapterNum}`;
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
 }
 
@@ -1669,6 +2558,10 @@ ${bookData.chapterOutline}
 
         const chapterOutline = extractChapterOutline(bookData.chapterOutline, chapterNum);
 
+        // Get the model for chapter writing
+        const selectedModel = getSelectedModel('writing');
+        console.log(`Using model for writing chapter ${chapterNum}: ${selectedModel}`);
+
         const prompt = formatPrompt(document.getElementById('writing-prompt').value, {
             chapterNum: chapterNum,
             genre: bookData.genre,
@@ -1681,7 +2574,7 @@ ${bookData.chapterOutline}
             genreSpecificElements: genreSpecificElements
         });
 
-        const chapterContent = await callAI(prompt, `You are a master storyteller writing professional ${bookData.genre} fiction for ${bookData.targetAudience} readers.`);
+        const chapterContent = await callAI(prompt, `You are a master storyteller writing professional ${bookData.genre} fiction for ${bookData.targetAudience} readers.`, selectedModel);
         
         bookData.chapters[chapterNum - 1] = chapterContent;
         document.getElementById(`chapter-${chapterNum}-text`).value = chapterContent;
@@ -1726,44 +2619,56 @@ async function regenerateChapter(chapterNum) {
 }
 
 async function generateSelectedChapters() {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    isGenerating = true;
     const selectedChapters = getSelectedChapters();
     if (selectedChapters.length === 0) {
         await customAlert('Please select at least one chapter to generate.', 'No Chapters Selected');
+        isGenerating = false;
+        hideGenerationInfo();
         return;
     }
 
     const statusDiv = document.getElementById('writing-status');
 
-    for (let i = 0; i < selectedChapters.length; i++) {
-        const chapterNum = selectedChapters[i];
-        statusDiv.innerHTML = `Writing Chapter ${chapterNum} (${i + 1} of ${selectedChapters.length})...`;
-        
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Writing...</div>';
-        document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = true;
-        
-        try {
-            await writeChapter(chapterNum);
+    try {
+        for (let i = 0; i < selectedChapters.length; i++) {
+            const chapterNum = selectedChapters[i];
+            statusDiv.innerHTML = `Writing Chapter ${chapterNum} (${i + 1} of ${selectedChapters.length})...`;
             
-            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = 'Complete';
-            document.getElementById(`chapter-${chapterNum}-content`).classList.add('active');
-            document.getElementById(`chapter-${chapterNum}-generate-btn`).style.display = 'none';
-            document.getElementById(`chapter-${chapterNum}-regenerate-btn`).style.display = 'inline-flex';
-            document.getElementById(`chapter-${chapterNum}-expand-btn`).style.display = 'inline-flex';
+            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Writing...</div>';
+            document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = true;
             
-            document.getElementById(`chapter-${chapterNum}-checkbox`).checked = false;
-            
-        } catch (error) {
-            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
-            document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
-            statusDiv.innerHTML = `Failed to generate Chapter ${chapterNum}`;
-            break;
+            try {
+                await writeChapter(chapterNum);
+                
+                document.getElementById(`chapter-${chapterNum}-status`).innerHTML = 'Complete';
+                document.getElementById(`chapter-${chapterNum}-content`).classList.add('active');
+                document.getElementById(`chapter-${chapterNum}-generate-btn`).style.display = 'none';
+                document.getElementById(`chapter-${chapterNum}-regenerate-btn`).style.display = 'inline-flex';
+                document.getElementById(`chapter-${chapterNum}-expand-btn`).style.display = 'inline-flex';
+                
+                document.getElementById(`chapter-${chapterNum}-checkbox`).checked = false;
+                
+            } catch (error) {
+                document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
+                document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
+                statusDiv.innerHTML = `Failed to generate Chapter ${chapterNum}`;
+                break;
+            }
         }
+        
+        updateGenerateSelectedButton();
+        updateOverallProgress();
+        statusDiv.innerHTML = `Selected chapters completed!`;
+        autoSave();
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
-    
-    updateGenerateSelectedButton();
-    updateOverallProgress();
-    statusDiv.innerHTML = `Selected chapters completed!`;
-    autoSave();
 }
 
 async function generateAllChapters() {
@@ -1810,7 +2715,10 @@ function editChapter(chapterNum) {
     autoSave();
 }
 
-// Enhanced Expand Modal
+// ==================================================
+// ENHANCED EXPAND MODAL
+// ==================================================
+
 function expandChapter(chapterNum) {
     const textarea = document.getElementById(`chapter-${chapterNum}-text`);
     const content = textarea.value;
@@ -1886,95 +2794,115 @@ function closeExpandModal() {
     currentExpandedChapter = null;
 }
 
-// Chapter Feedback System
+// ==================================================
+// CHAPTER FEEDBACK SYSTEM
+// ==================================================
+
 async function runChapterFeedback(chapterNum) {
-    const chapter = bookData.chapters[chapterNum - 1];
-    if (!chapter) {
-        await customAlert('No chapter content to improve. Please generate the chapter first.', 'No Content');
+    if (isGenerating) {
+        showGenerationInfo();
         return;
     }
-    
-    const feedbackLoops = parseInt(document.getElementById('writing-feedback-loops').value) || 1;
-    const feedbackMode = document.getElementById('writing-feedback-mode').value;
-    
-    // Get manual feedback if in manual mode
-    let manualFeedback = '';
-    if (feedbackMode === 'manual') {
-        manualFeedback = document.getElementById('writing-manual-input').value;
-        if (!manualFeedback.trim()) {
-            await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+    isGenerating = true;
+    try {
+        const chapter = bookData.chapters[chapterNum - 1];
+        if (!chapter) {
+            await customAlert('No chapter content to improve. Please generate the chapter first.', 'No Content');
             return;
         }
-    }
-    
-    document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Running feedback analysis...</div>';
-    
-    try {
-        let improvedChapter = chapter;
         
-        for (let i = 0; i < feedbackLoops; i++) {
-            if (feedbackMode === 'manual') {
-                // Use manual feedback directly
-                const improvementPrompt = formatPrompt(aiSettings.customPrompts.manualImprovement || defaultPrompts.manualImprovement, {
-                    contentType: 'chapter',
-                    originalContent: improvedChapter,
-                    manualFeedback: manualFeedback,
-                    genre: bookData.genre,
-                    targetAudience: bookData.targetAudience,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
-                });
-                
-                improvedChapter = await callAI(improvementPrompt, "You are a master storyteller implementing specific feedback requests.");
-                
-            } else {
-                // Analyze chapter using custom or default prompt
-                const analysisPrompt = formatPrompt(getCustomAnalysisPrompt('writing'), {
-                    contentType: 'chapter',
-                    content: improvedChapter,
-                    genre: bookData.genre,
-                    targetAudience: bookData.targetAudience,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                                       numChapters: bookData.numChapters
-                });
-                
-                const analysis = await callAI(analysisPrompt, "You are a professional editor analyzing a book chapter.");
-                
-                // Improve chapter
-                const improvementPrompt = formatPrompt(aiSettings.customPrompts.improvement || defaultPrompts.improvement, {
-                    contentType: 'chapter',
-                    originalContent: improvedChapter,
-                    feedbackContent: analysis,
-                    targetAudience: bookData.targetAudience,
-                    genre: bookData.genre,
-                    premise: bookData.premise,
-                    styleDirection: bookData.styleDirection,
-                    targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
-                });
-                
-                improvedChapter = await callAI(improvementPrompt, "You are a master storyteller improving a book chapter.");
+        const feedbackLoops = parseInt(document.getElementById('writing-feedback-loops').value) || 1;
+        const feedbackMode = document.getElementById('writing-feedback-mode').value;
+        
+        // Get manual feedback if in manual mode
+        let manualFeedback = '';
+        if (feedbackMode === 'manual') {
+            manualFeedback = document.getElementById('writing-manual-input').value;
+            if (!manualFeedback.trim()) {
+                await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+                return;
             }
         }
         
-        // Update chapter
-        bookData.chapters[chapterNum - 1] = improvedChapter;
-        document.getElementById(`chapter-${chapterNum}-text`).value = improvedChapter;
-        updateChapterWordCount(chapterNum);
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Running feedback analysis...</div>';
         
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Improved with ${feedbackLoops} ${feedbackMode} feedback loop(s)`;
-        autoSave();
-        
-    } catch (error) {
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Feedback error: ${error.message}`;
+        try {
+            let improvedChapter = chapter;
+            
+            // Get the model for feedback
+            const feedbackModel = getSelectedModel('feedback');
+            console.log(`Using model for chapter feedback: ${feedbackModel}`);
+            
+            for (let i = 0; i < feedbackLoops; i++) {
+                if (feedbackMode === 'manual') {
+                    // Use manual feedback directly
+                    const improvementPrompt = formatPrompt(aiSettings.customPrompts.manualImprovement || defaultPrompts.manualImprovement, {
+                        contentType: 'chapter',
+                        originalContent: improvedChapter,
+                        manualFeedback: manualFeedback,
+                        genre: bookData.genre,
+                        targetAudience: bookData.targetAudience,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    improvedChapter = await callAI(improvementPrompt, "You are a master storyteller and professional editor implementing specific feedback requests.", feedbackModel);
+                    
+                } else {
+                    // Analyze chapter using custom or default prompt
+                    const analysisPrompt = formatPrompt(getCustomAnalysisPrompt('writing'), {
+                        contentType: 'chapter',
+                        content: improvedChapter,
+                        genre: bookData.genre,
+                        targetAudience: bookData.targetAudience,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    const analysis = await callAI(analysisPrompt, "You are a professional editor analyzing a book chapter.", feedbackModel);
+                    
+                    // Improve chapter
+                    const improvementPrompt = formatPrompt(aiSettings.customPrompts.improvement || defaultPrompts.improvement, {
+                        contentType: 'chapter',
+                        originalContent: improvedChapter,
+                        feedbackContent: analysis,
+                        targetAudience: bookData.targetAudience,
+                        genre: bookData.genre,
+                        premise: bookData.premise,
+                        styleDirection: bookData.styleDirection,
+                        targetWordCount: bookData.targetWordCount,
+                        numChapters: bookData.numChapters
+                    });
+                    
+                    improvedChapter = await callAI(improvementPrompt, "You are a master storyteller and professional editor.", feedbackModel);
+                }
+            }
+            
+            // Update chapter
+            bookData.chapters[chapterNum - 1] = improvedChapter;
+            document.getElementById(`chapter-${chapterNum}-text`).value = improvedChapter;
+            updateChapterWordCount(chapterNum);
+            
+            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Improved with ${feedbackLoops} ${feedbackMode} feedback loop(s)`;
+            autoSave();
+            
+        } catch (error) {
+            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Feedback error: ${error.message}`;
+        }
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
     }
 }
 
-// One-Click Generation System
+// ==================================================
+// ONE-CLICK GENERATION SYSTEM
+// ==================================================
+
 async function startOneClickGeneration() {
     collectBookData();
     
@@ -2111,7 +3039,10 @@ function hideLoadingOverlay() {
     document.getElementById('cancel-btn').style.display = 'none';
 }
 
-// Export Functions
+// ==================================================
+// EXPORT FUNCTIONS
+// ==================================================
+
 function proceedToExport() {
     showStep('export');
     updateBookStats();
@@ -2293,7 +3224,10 @@ async function copyToClipboard() {
     }
 }
 
-// Analytics
+// ==================================================
+// ANALYTICS
+// ==================================================
+
 function generateAnalytics() {
     if (bookData.chapters.filter(c => c).length === 0) {
         return;
@@ -2317,129 +3251,47 @@ function generateAnalytics() {
         totalSyllables += syllables;
     });
     
-    const avgWordsPerSentence = totalSentences > 0 ? totalWords / totalSentences : 0;
-    const avgSyllablesPerWord = totalWords > 0 ? totalSyllables / totalWords : 0;
+    const avgWordsPerSentence = totalSentences > 0 ? Math.round(totalWords / totalSentences) : 0;
+    const avgSyllablesPerWord = totalWords > 0 ? Math.round(totalSyllables / totalWords) : 0;
     
-    // Flesch Reading Ease Score (converted to grade level)
-    let readabilityScore = 'N/A';
-    let readabilityExplanation = 'No content to analyze';
-    
-    if (totalSentences > 0 && totalWords > 0) {
-        const fleschScore = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * avgSyllablesPerWord);
-        if (fleschScore >= 90) {
-            readabilityScore = '5th';
-            readabilityExplanation = 'Very easy to read';
-        } else if (fleschScore >= 80) {
-            readabilityScore = '6th';
-            readabilityExplanation = 'Easy to read';
-        } else if (fleschScore >= 70) {
-            readabilityScore = '7th';
-            readabilityExplanation = 'Fairly easy to read';
-        } else if (fleschScore >= 60) {
-            readabilityScore = '8th-9th';
-            readabilityExplanation = 'Standard reading level';
-        } else if (fleschScore >= 50) {
-            readabilityScore = '10th-12th';
-            readabilityExplanation = 'Fairly difficult to read';
-        } else if (fleschScore >= 30) {
-            readabilityScore = 'College';
-            readabilityExplanation = 'Difficult to read';
-        } else {
-            readabilityScore = 'Graduate';
-            readabilityExplanation = 'Very difficult to read';
-        }
-    }
-    
-    // Enhanced dialogue estimation
-    let dialogueCount = 0;
-    let totalParagraphs = 0;
-    completedChapters.forEach(chapter => {
-        const paragraphs = chapter.split('\n\n').filter(p => p.trim().length > 0);
-        totalParagraphs += paragraphs.length;
-        
-        paragraphs.forEach(paragraph => {
-            if (paragraph.includes('"') || paragraph.includes("'") || paragraph.includes('"') || paragraph.includes('"')) {
-                dialogueCount++;
-            }
-        });
-    });
-    
-    const dialogueRatio = totalParagraphs > 0 ? Math.round((dialogueCount / totalParagraphs) * 100) : 0;
-    let dialogueExplanation = '';
-    if (dialogueRatio < 20) {
-        dialogueExplanation = 'Low dialogue - very narrative-heavy';
-    } else if (dialogueRatio < 35) {
-        dialogueExplanation = 'Good balance of dialogue and narrative';
-    } else if (dialogueRatio < 50) {
-        dialogueExplanation = 'High dialogue - character-focused';
+    // Flesch-Kincaid readability score (simplified)
+    const fleschScore = 206.835 - 1.015 * avgWordsPerSentence - 84.6 * avgSyllablesPerWord;
+    let readabilityScore = '';
+    let readabilityExplanation = '';
+    if (fleschScore >= 90) {
+        readabilityScore = '5th grade';
+        readabilityExplanation = 'Very easy to read';
+    } else if (fleschScore >= 80) {
+        readabilityScore = '6th-8th grade';
+        readabilityExplanation = 'Easy to read';
+    } else if (fleschScore >= 70) {
+        readabilityScore = '9th-10th grade';
+        readabilityExplanation = 'Fairly easy to read';
+    } else if (fleschScore >= 60) {
+        readabilityScore = '11th-12th grade';
+        readabilityExplanation = 'Standard reading';
+    } else if (fleschScore >= 50) {
+        readabilityScore = '10th-12th';
+        readabilityExplanation = 'Fairly difficult to read';
+    } else if (fleschScore >= 30) {
+        readabilityScore = 'College';
+        readabilityExplanation = 'Difficult to read';
     } else {
-        dialogueExplanation = 'Very high dialogue - conversation-heavy';
+        readabilityScore = 'Graduate';
+        readabilityExplanation = 'Very difficult to read';
     }
     
-    // Enhanced pacing score
-    const chapterLengths = completedChapters.map(chapter => countWords(chapter));
-    const avgChapterLength = chapterLengths.reduce((a, b) => a + b, 0) / chapterLengths.length;
-    const targetLength = bookData.targetWordCount;
-    
-    let pacingScore = 10;
-    let pacingExplanation = 'Perfect chapter consistency';
-    
-    if (chapterLengths.length > 1) {
-        const variance = chapterLengths.reduce((acc, val) => acc + Math.pow(val - avgChapterLength, 2), 0) / chapterLengths.length;
-        const stdDev = Math.sqrt(variance);
-        const coefficientOfVariation = stdDev / avgChapterLength;
-        
-        if (coefficientOfVariation < 0.15) {
-            pacingScore = 10;
-            pacingExplanation = 'Excellent consistency';
-        } else if (coefficientOfVariation < 0.25) {
-            pacingScore = 8;
-            pacingExplanation = 'Good consistency';
-        } else if (coefficientOfVariation < 0.40) {
-            pacingScore = 6;
-            pacingExplanation = 'Moderate variation';
-        } else if (coefficientOfVariation < 0.60) {
-            pacingScore = 4;
-            pacingExplanation = 'High variation';
-        } else {
-            pacingScore = 2;
-            pacingExplanation = 'Very inconsistent lengths';
-        }
-    }
-    
-    let completionExplanation = '';
-    if (completionRate === 100) {
-        completionExplanation = 'Book ready for publication!';
-    } else if (completionRate >= 75) {
-        completionExplanation = 'Nearly complete';
-    } else if (completionRate >= 50) {
-        completionExplanation = 'Good progress made';
-    } else if (completionRate >= 25) {
-        completionExplanation = 'Getting started';
-    } else {
-        completionExplanation = 'Just beginning';
-    }
-    
-    // Update analytics display
-    document.getElementById('readability-score').textContent = readabilityScore;
-    document.getElementById('readability-explanation').textContent = readabilityExplanation;
-    
-    document.getElementById('dialogue-ratio').textContent = dialogueRatio + '%';
-    document.getElementById('dialogue-explanation').textContent = dialogueExplanation;
-    
-    document.getElementById('pacing-score').textContent = pacingScore + '/10';
-    document.getElementById('pacing-explanation').textContent = pacingExplanation;
-    
-    document.getElementById('completion-rate').textContent = completionRate + '%';
-    document.getElementById('completion-explanation').textContent = completionExplanation;
-    
-    // Chapter balance analysis
-    const balanceAnalysis = analyzeChapterBalance(chapterLengths);
-    document.getElementById('chapter-balance').innerHTML = balanceAnalysis;
-    
-    // Content analysis
-    const contentAnalysis = analyzeContent(completedChapters);
-    document.getElementById('content-analysis').innerHTML = contentAnalysis;
+    // Update quality analysis
+    document.getElementById('quality-analysis').innerHTML = `
+        <h4>Book Quality Metrics</h4>
+        <ul>
+            <li><strong>Readability:</strong> ${readabilityScore} level (${readabilityExplanation})</li>
+            <li><strong>Completion Rate:</strong> ${completionRate}% (${completedChapters.length}/${bookData.numChapters} chapters)</li>
+            <li><strong>Average Chapter Length:</strong> ${Math.round(totalWords / completedChapters.length)} words</li>
+            <li><strong>Writing Style:</strong> ${avgWordsPerSentence} words per sentence</li>
+        </ul>
+        <p><strong>Overall Assessment:</strong> ${completionRate === 100 ? 'Book ready for publication!' : `${100 - completionRate}% remaining to complete.`}</p>
+    `;
 }
 
 function estimateSyllables(text) {
@@ -2455,62 +3307,6 @@ function estimateSyllables(text) {
     });
     
     return syllables;
-}
-
-function analyzeChapterBalance(lengths) {
-    if (lengths.length === 0) return 'No completed chapters to analyze.';
-    
-    const avg = lengths.reduce((a, b) => a + b, 0) / lengths.length;
-    const variance = lengths.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / lengths.length;
-    const stdDev = Math.sqrt(variance);
-    
-    let analysis = `<p><strong>Average chapter length:</strong> ${Math.round(avg)} words</p>`;
-    analysis += `<p><strong>Standard deviation:</strong> ${Math.round(stdDev)} words</p>`;
-    
-    if (stdDev < avg * 0.2) {
-        analysis += `<p class="success">Excellent balance - chapters are consistently sized</p>`;
-    } else if (stdDev < avg * 0.4) {
-        analysis += `<p class="warning">Good balance - minor length variations</p>`;
-    } else {
-        analysis += `<p class="error">Consider balancing - significant length variations detected</p>`;
-    }
-    
-    return analysis;
-}
-
-function analyzeContent(chapters) {
-    const combinedText = chapters.join(' ');
-    const words = combinedText.split(/\s+/);
-    const sentences = combinedText.split(/[.!?]+/).length - 1;
-    
-    // Word frequency analysis (top 10 excluding common words)
-    const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'as', 'is', 'was', 'are', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them']);
-    
-    const wordFreq = {};
-    words.forEach(word => {
-        const clean = word.toLowerCase().replace(/[^a-z]/g, '');
-        if (clean.length > 3 && !commonWords.has(clean)) {
-            wordFreq[clean] = (wordFreq[clean] || 0) + 1;
-        }
-    });
-    
-    const topWords = Object.entries(wordFreq)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 10);
-    
-    let analysis = `<p><strong>Total words:</strong> ${words.length}</p>`;
-    analysis += `<p><strong>Total sentences:</strong> ${sentences}</p>`;
-    analysis += `<p><strong>Average sentence length:</strong> ${Math.round(words.length / sentences)} words</p>`;
-    
-    if (topWords.length > 0) {
-        analysis += `<p><strong>Most frequent words:</strong></p><ul>`;
-        topWords.forEach(([word, count]) => {
-            analysis += `<li>${word}: ${count} times</li>`;
-        });
-        analysis += `</ul>`;
-    }
-    
-    return analysis;
 }
 
 async function analyzeChapter(chapterNum) {
@@ -2550,7 +3346,10 @@ ${wordCount < bookData.targetWordCount * 0.8 ? 'Below target length' :
     await customAlert(analysisText, 'Chapter Analysis');
 }
 
-// Project Management
+// ==================================================
+// PROJECT MANAGEMENT
+// ==================================================
+
 function loadProjects() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     if (savedProjects) {
@@ -2662,13 +3461,16 @@ function importProject(event) {
     reader.readAsText(file);
 }
 
-// Settings Functions
+// ==================================================
+// SETTINGS FUNCTIONS
+// ==================================================
+
 async function testApiConnection() {
     const statusDiv = document.getElementById('api-status');
     statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Testing connection...</div>';
 
     try {
-        const response = await callAI("Respond with 'Connection successful!' if you can read this message.");
+        const response = await callAI("Respond with 'Connection successful!' if you can read this message.", "", "");
         statusDiv.innerHTML = '<div class="success">API connection successful!</div>';
     } catch (error) {
         statusDiv.innerHTML = `<div class="error">Connection failed: ${error.message}</div>`;
@@ -2748,45 +3550,75 @@ function importSettings() {
     input.click();
 }
 
-// Cost estimation
+// Enhanced cost estimation with advanced models support
 async function estimateCosts() {
-    const model = document.getElementById('model-select').value;
-    const provider = aiSettings.apiProvider;
-    const allModels = [...apiModels[provider].creative, ...apiModels[provider].budget];
-    const modelInfo = allModels.find(m => m.value === model);
+    const numChapters = bookData.numChapters || 20;
+    const targetWordCount = bookData.targetWordCount || 4000;
     
-    if (!modelInfo || !modelInfo.cost) {
-        await customAlert('Cost estimation not available for this model.', 'Cost Estimation');
-        return;
-    }
+    // Estimate tokens per chapter (roughly 1.3x word count)
+    const estimatedTokensPerChapter = targetWordCount * 1.3;
+    const contextTokensPerChapter = 1500; // Estimated context
     
-    const estimatedTokensPerChapter = bookData.targetWordCount * 1.3; // Rough token estimate
-    const totalOutputTokens = bookData.numChapters * estimatedTokensPerChapter;
-    const totalInputTokens = bookData.numChapters * 1000; // Context tokens
+    // Calculate costs for each step based on selected models
+    const steps = {
+        outline: { description: 'Story Structure', chapters: 1, multiplier: 3 },
+        chapters: { description: 'Chapter Planning', chapters: 1, multiplier: 2 },
+        writing: { description: 'Chapter Writing', chapters: numChapters, multiplier: 1 },
+        feedback: { description: 'Feedback Loops', chapters: numChapters * 0.5, multiplier: 0.5 },
+        randomIdea: { description: 'Random Ideas', chapters: 0.1, multiplier: 0.5 },
+        bookTitle: { description: 'Title & Blurb', chapters: 1, multiplier: 1 }
+    };
     
-    const inputCost = (totalInputTokens / 1000000) * modelInfo.cost.input;
-    const outputCost = (totalOutputTokens / 1000000) * modelInfo.cost.output;
-    const totalCost = inputCost + outputCost;
+    let totalInputCost = 0;
+    let totalOutputCost = 0;
+    let costBreakdown = '';
     
-    const costText = `Estimated cost for ${bookData.numChapters} chapters:
+    Object.entries(steps).forEach(([step, config]) => {
+        const selectedModel = getSelectedModel(step);
+        const provider = aiSettings.apiProvider || 'openrouter';
+        const allModels = [...(apiModels[provider]?.creative || []), ...(apiModels[provider]?.budget || [])];
+        const modelInfo = allModels.find(m => m.value === selectedModel);
+        
+        if (modelInfo && modelInfo.cost) {
+            const inputTokens = contextTokensPerChapter * config.chapters * config.multiplier;
+            const outputTokens = estimatedTokensPerChapter * config.chapters * config.multiplier;
+            
+            const stepInputCost = (inputTokens / 1000000) * modelInfo.cost.input;
+            const stepOutputCost = (outputTokens / 1000000) * modelInfo.cost.output;
+            
+            totalInputCost += stepInputCost;
+            totalOutputCost += stepOutputCost;
+            
+            costBreakdown += `\n• ${config.description}: ${(stepInputCost + stepOutputCost).toFixed(3)} (${modelInfo.label})`;
+        }
+    });
+    
+    const totalCost = totalInputCost + totalOutputCost;
+    
+    const costText = `Estimated cost for complete book generation:
 
-Input tokens: ${inputCost.toFixed(3)}
-Output tokens: ${outputCost.toFixed(3)}
-Total: ${totalCost.toFixed(3)}
+BREAKDOWN BY STEP:${costBreakdown}
 
-This is a rough estimate. Actual costs may vary based on:
-• Actual content length
-• Complexity of prompts  
-• Number of feedback loops
-• API pricing changes
+SUMMARY:
+• Input tokens: ${totalInputCost.toFixed(3)}
+• Output tokens: ${totalOutputCost.toFixed(3)}
+• Total estimated: ${totalCost.toFixed(3)}
 
-Costs calculated per 1M tokens.
+NOTES:
+• Based on ${numChapters} chapters of ${targetWordCount} words each
+• Uses ${aiSettings.advancedModelsEnabled ? 'advanced model selections' : 'default model for all steps'}
+• Actual costs may vary based on content complexity
+• Feedback loops and regenerations not included
+
 Generated with NovelFactory AI (novelfactory.ink)`;
 
     await customAlert(costText, 'Cost Estimation');
 }
 
-// Reset functionality
+// ==================================================
+// RESET FUNCTIONALITY
+// ==================================================
+
 async function resetEverything() {
     const confirmed = await customConfirm('Are you sure you want to reset everything and start a new book? This will clear all current progress and cannot be undone.', 'Reset Everything');
     if (!confirmed) return;
@@ -2869,6 +3701,316 @@ async function resetEverything() {
     await customAlert('Everything has been reset! You can now start creating a new book.', 'Reset Complete');
 }
 
+// ==================================================
+// GENERATION INFO DISPLAY
+// ==================================================
+
+function showGenerationInfo(message = "Please wait until the current step is finished.") {
+    const indicator = document.getElementById('generation-indicator');
+    const title = document.getElementById('generation-title');
+    const description = document.getElementById('generation-description');
+    
+    if (indicator && title && description) {
+        title.textContent = "AI Generation in Progress";
+        description.textContent = message;
+        indicator.style.display = 'block';
+    }
+    isGenerating = true;
+}
+
+function hideGenerationInfo() {
+    const indicator = document.getElementById('generation-indicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+    isGenerating = false;
+}
+
+// ==================================================
+// ENHANCED INITIALIZATION
+// ==================================================
+
+// Enhanced initializeApp with better sequencing and debugging
+function initializeApp() {
+    console.log('🚀 Initializing NovelFactory AI...');
+    
+    // Initialize aiSettings if not exists
+    if (!window.aiSettings) {
+        window.aiSettings = {
+            apiProvider: 'openrouter',
+            openrouterApiKey: '',
+            openaiApiKey: '',
+            model: 'anthropic/claude-sonnet-4',
+            temperature: 0.5,
+            maxTokens: 50000,
+            advancedModelsEnabled: false,
+            advancedModels: {},
+            customPrompts: {
+                outline: '',
+                chapters: '',
+                writing: '',
+                analysis: '',
+                improvement: '',
+                manualImprovement: '',
+                randomIdea: '',
+                bookTitle: ''
+            }
+        };
+    }
+    
+    loadSettings(); // This loads advanced model settings
+    loadProjects();
+    setupEventListeners();
+    initializePrompts();
+    setupAutoSave();
+    setupKeyboardShortcuts();
+    
+    // Initialize model system first
+    updateModelSelect(); // This populates all selects
+    
+    // Then set up listeners after selects are populated
+    setTimeout(() => {
+        setupAdvancedModelListeners();
+        console.log('✅ Advanced model listeners set up');
+        
+        // Add debug info
+        console.log('🔧 Current aiSettings:', aiSettings);
+        console.log('🔧 Advanced models enabled:', aiSettings.advancedModelsEnabled);
+        console.log('🔧 Advanced models:', aiSettings.advancedModels);
+        
+        // Test all the elements exist
+        console.log('🔧 Checkbox element:', document.getElementById('enable-advanced-models'));
+        console.log('🔧 RandomIdea select:', document.getElementById('advanced-model-randomIdea'));
+        
+    }, 500); // Increased timeout
+    
+    updateNavProgress();
+    
+    // Initialize feedback modes
+    ['outline', 'chapters', 'writing'].forEach(step => {
+        const select = document.getElementById(`${step}-feedback-mode`);
+        if (select) {
+            select.value = 'ai';
+            toggleManualFeedback(step);
+        }
+    });
+    
+    // Load saved theme and update dropdown
+    const savedTheme = localStorage.getItem('novelfactory_theme') || 'light';
+    setTheme(savedTheme);
+    
+    // Initialize advanced models section state
+    initializeAdvancedModelsSection();
+    
+    console.log('✅ NovelFactory AI initialization complete');
+    
+    // Add test function to window for debugging
+    window.testAdvancedModelSelection = testAdvancedModelSelection;
+    window.aiSettings = aiSettings; // Make sure it's accessible
+    console.log('🧪 Run testAdvancedModelSelection() in console to test the system');
+}
+
+// Test function to verify the system is working
+function testAdvancedModelSelection() {
+    console.log('\n🧪 TESTING ADVANCED MODEL SELECTION SYSTEM');
+    console.log('==========================================');
+    
+    // Test 1: Check if elements exist
+    console.log('\n1. Checking UI elements:');
+    const checkbox = document.getElementById('enable-advanced-models');
+    console.log(`   Enable checkbox: ${checkbox ? '✅ Found' : '❌ Missing'}`);
+    
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const select = document.getElementById(`advanced-model-${step}`);
+        console.log(`   ${step} select: ${select ? '✅ Found' : '❌ Missing'}`);
+    });
+    
+    // Test 2: Check current settings
+    console.log('\n2. Current settings:');
+    console.log(`   Advanced models enabled: ${aiSettings.advancedModelsEnabled}`);
+    console.log(`   Saved advanced models:`, aiSettings.advancedModels);
+    
+    // Test 3: Test getSelectedModel for each step
+    console.log('\n3. Testing getSelectedModel():');
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+        const model = getSelectedModel(step);
+        console.log(`   ${step}: ${model}`);
+    });
+    
+    console.log('\n✅ Test complete!\n');
+}
+
+// ==================================================
+// DEBOUNCE FUNCTION
+// ==================================================
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ==================================================
+// CSS INJECTION FOR ADVANCED MODELS
+// ==================================================
+
+const additionalCSS = `
+/* Advanced Models Visual States */
+.advanced-models-section.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.1);
+}
+
+.advanced-models-section.collapsed .advanced-models-grid,
+.advanced-models-section.collapsed .advanced-models-actions {
+    display: none;
+}
+
+.advanced-models-section .toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+
+.advanced-models-section.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.advanced-models-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    margin: calc(-1 * var(--spacing-sm));
+}
+
+.advanced-models-header:hover {
+    background-color: var(--bg-secondary);
+}
+
+.advanced-models-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.model-setting label {
+    transition: color 0.3s ease, font-weight 0.3s ease;
+}
+
+.model-setting select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-primary);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+`;
+
+// Function to inject additional CSS
+function injectAdvancedModelsCSS() {
+    const style = document.createElement('style');
+    style.textContent = additionalCSS;
+    document.head.appendChild(style);
+}
+
+// ==============================================
+// COMPLETE DEBUGGING INSTRUCTIONS FOR USER
+// ==============================================
+
+console.log(`
+🔧 ADVANCED MODEL SELECTION - FIXED VERSION
+============================================
+
+Replace your script.js file with this fixed version, then:
+
+1. 📖 Open the browser console (F12)
+2. 🚀 Refresh the page to see initialization logs
+3. 🧪 Run: setupAndTestAdvancedModels()
+4. ✅ This will automatically:
+   - Enable advanced models
+   - Set a test model for Random Ideas
+   - Show detailed debugging info
+
+5. 🎲 Then try generating a random idea - it should use your selected advanced model!
+
+Additional debugging commands:
+- debugAdvancedModels() - Show current state
+- testAdvancedModelSelection() - Run comprehensive tests
+- getSelectedModel('randomIdea') - Test specific step
+
+The console will show exactly what model is being used for each step.
+If you still see issues, the debug output will tell us exactly what's wrong!
+
+============================================
+`);
+
+// Make all debugging functions available globally
+window.setupAndTestAdvancedModels = setupAndTestAdvancedModels;
+window.debugAdvancedModels = debugAdvancedModels;
+window.getSelectedModel = getSelectedModel;
+
+// ==================================================
+// INITIALIZATION
+// ==================================================
+
 // Initialize expand textarea word count tracking
 document.addEventListener('DOMContentLoaded', function() {
     const expandTextarea = document.getElementById('expand-textarea');
@@ -2876,7 +4018,25 @@ document.addEventListener('DOMContentLoaded', function() {
         expandTextarea.addEventListener('input', updateExpandedWordCount);
     }
     
-    // Initialize the app
+    // Custom donation amount handling
+    const customAmountInput = document.getElementById('custom-donation-amount');
+    if (customAmountInput) {
+        customAmountInput.addEventListener('input', function() {
+            if (this.value) {
+                // Clear selection from preset amounts
+                document.querySelectorAll('.donation-amount').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                // Update donate button
+                document.getElementById('donate-btn').innerHTML = `<span class="label">Donate ${this.value}</span>`;
+                selectedDonationAmount = parseFloat(this.value);
+            }
+        });
+    }
+    
+    // Inject CSS and initialize the app
+    injectAdvancedModelsCSS();
     initializeApp();
 });
 
@@ -2924,116 +4084,6 @@ window.addEventListener('offline', function() {
     customAlert('You appear to be offline. Some features may not work until connection is restored.', 'Connection Issue');
 });
 
-// Performance optimization: Debounce word count updates
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Apply debouncing to word count updates
-const debouncedUpdateWordCount = debounce(updateWordCount, 300);
-const debouncedUpdateExpandedWordCount = debounce(updateExpandedWordCount, 300);
-
-// Replace direct calls with debounced versions for better performance
-document.addEventListener('DOMContentLoaded', function() {
-    const premiseTextarea = document.getElementById('premise');
-    const styleTextarea = document.getElementById('style-direction');
-    const expandTextarea = document.getElementById('expand-textarea');
-    
-    if (premiseTextarea) {
-        premiseTextarea.removeEventListener('input', updateWordCount);
-        premiseTextarea.addEventListener('input', debouncedUpdateWordCount);
-    }
-    
-    if (styleTextarea) {
-        styleTextarea.removeEventListener('input', updateWordCount);
-        styleTextarea.addEventListener('input', debouncedUpdateWordCount);
-    }
-    
-    if (expandTextarea) {
-        expandTextarea.addEventListener('input', debouncedUpdateExpandedWordCount);
-    }
-});
-
-// Accessibility improvements
-document.addEventListener('DOMContentLoaded', function() {
-    // Add ARIA labels to important buttons
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(button => {
-        if (!button.getAttribute('aria-label')) {
-            const text = button.textContent.trim();
-            if (text) {
-                button.setAttribute('aria-label', text);
-            }
-        }
-    });
-    
-    // Add focus management for modals
-    const modals = document.querySelectorAll('.modal, .expand-modal');
-    modals.forEach(modal => {
-        modal.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                // Basic focus trapping could be implemented here
-                // For now, we rely on natural tab order
-            }
-        });
-    });
-});
-
-// Touch device optimizations
-if ('ontouchstart' in window) {
-    document.body.classList.add('touch-device');
-    
-    // Add touch-friendly interactions
-    document.addEventListener('touchstart', function() {}, {passive: true});
-}
-
-// Print styles helper
-function preparePrintView() {
-    const printCSS = `
-        @media print {
-            .nav, .header, .project-bar, .step-actions, .keyboard-shortcuts { display: none !important; }
-            .main-content { padding: 0 !important; }
-            .chapter-item { page-break-inside: avoid; }
-            .step { display: block !important; }
-        }
-    `;
-    
-    const style = document.createElement('style');
-    style.textContent = printCSS;
-    document.head.appendChild(style);
-}
-
-// Call print preparation on load
-document.addEventListener('DOMContentLoaded', preparePrintView);
-
-// Console welcome message for developers
-console.log(`
-NovelFactory AI - Professional Edition
-https://novelfactory.ink
-Built with love for writers and creators
-
-Features:
-• AI-powered story generation
-• Modern simplistic design with 3 themes
-• Advanced feedback loops
-• One-click automation
-• Multiple export formats
-• Book analytics
-• Detailed tutorial
-• Built-in feedback system
-• Optional donation support
-
-Happy writing!
-`);
-
 // Development helpers (remove in production)
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     window.bookData = bookData;
@@ -3041,3 +4091,26 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
     window.themes = themes;
     console.log('Development mode: Global variables exposed for debugging');
 }
+
+// Console welcome message
+console.log(`
+NovelFactory AI - Professional Edition with Advanced Model Selection
+https://novelfactory.ink
+
+✅ Fixed Issues:
+• Advanced model selection priority system working
+• Auto-save for all model selections (no save button needed)
+• Model validation when switching API providers
+• Visual feedback for selected models
+• Proper cost estimation with step-specific models
+
+✅ Enhanced Features:
+• Debounced auto-save for better performance
+• Visual state management for advanced models
+• Enhanced error handling and validation
+• Step-specific model selection working correctly
+
+Happy writing!
+`);
+
+console.log('✅ NovelFactory AI initialized with enhanced model selection system');

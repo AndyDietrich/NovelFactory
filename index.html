@@ -33,7 +33,7 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "NovelFactory AI",
-        "description": "Professional AI-powered book generator for creating complete novels and stories",
+        "description": "Fully automated AI-powered book generator for crafting complete novels and creating stories",
         "url": "https://novelfactory.ink",
         "applicationCategory": "Writing Tool",
         "operatingSystem": "Web Browser",
@@ -49,8 +49,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="favicon.ico" sizes="any"> <!-- fallback -->
+    <link rel="icon" href="favicon.ico" sizes="any">
 	
 </head>
 <body data-theme="light">
@@ -60,7 +59,7 @@
             <div class="header-content">
                 <div class="header-left">
                     <h1 class="app-title">NovelFactory AI</h1>
-                    <p class="app-subtitle">Create complete books with the power of AI</p>
+                    <p class="app-subtitle">Craft bestselling novels</p>
                 </div>
                 <div class="header-right">
                     <div class="theme-selector-container">
@@ -132,10 +131,6 @@
                 </button>
                 <button class="nav-item" onclick="showStep('export')" data-step="export">
                     <span class="nav-label">Export</span>
-                    <span class="nav-status"></span>
-                </button>
-                <button class="nav-item" onclick="showStep('analytics')" data-step="analytics">
-                    <span class="nav-label">Analytics</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('tutorial')" data-step="tutorial">
@@ -575,7 +570,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="model-select">AI Model</label>
+                                <label for="model-select">Default AI Model</label>
                                 <select id="model-select" onchange="updateModelInfo()">
                                     <!-- Models will be populated by JavaScript -->
                                 </select>
@@ -594,6 +589,84 @@
                                 <label for="max-tokens">Max Tokens per Request</label>
                                 <input type="number" id="max-tokens" min="1000" max="1000000" value="50000">
                                 <div class="form-hint">Maximum length of each AI response</div>
+                            </div>
+                        </div>
+
+                        <!-- Updated Advanced Model Selection -->
+                        <div class="advanced-models-section collapsed">
+                            <div class="advanced-models-header">
+                                <span class="toggle-icon">▼</span>
+                                <h4>Advanced Model Selection</h4>
+                                <div class="advanced-models-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enable-advanced-models">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Enable Advanced Models</span>
+                                </div>
+                            </div>
+                            
+                            <p class="form-hint">
+                                Customize which AI model to use for each generation step. Leave empty to use the default model. 
+                                <strong>Changes are saved automatically.</strong> 
+                                Different models excel at different tasks - creative models for quality, budget models for cost efficiency.
+                            </p>
+                            
+                            <div class="advanced-models-grid">
+                                <div class="model-setting">
+                                    <label for="advanced-model-outline">Story Structure Generation</label>
+                                    <select id="advanced-model-outline">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="model-setting">
+                                    <label for="advanced-model-chapters">Chapter Planning</label>
+                                    <select id="advanced-model-chapters">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="model-setting">
+                                    <label for="advanced-model-writing">Chapter Writing</label>
+                                    <select id="advanced-model-writing">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="model-setting">
+                                    <label for="advanced-model-feedback">Feedback & Analysis</label>
+                                    <select id="advanced-model-feedback">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="model-setting">
+                                    <label for="advanced-model-randomIdea">Random Ideas</label>
+                                    <select id="advanced-model-randomIdea">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                
+                                <div class="model-setting">
+                                    <label for="advanced-model-bookTitle">Book Title & Blurb</label>
+                                    <select id="advanced-model-bookTitle">
+                                        <option value="">Use Default Model</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Simplified actions - only reset button -->
+                            <div class="advanced-models-actions">
+                                <button class="btn btn-ghost btn-sm" onclick="resetAdvancedModelSettings()">
+                                    <span class="label">Reset All to Default</span>
+                                </button>
                             </div>
                         </div>
 
@@ -617,57 +690,6 @@
                 </div>
             </div>
 
-            <!-- Analytics Step -->
-            <div id="analytics" class="step">
-                <div class="step-header">
-                    <h2 class="step-title">Writing Analytics</h2>
-                    <p class="step-description">Detailed analysis of your book's structure, pacing, and quality</p>
-                </div>
-
-                <div class="step-content">
-                    <div class="stats-grid">
-                        <div class="stat-card" title="Flesch-Kincaid reading grade level. Lower scores indicate easier reading. Ideal range: 6-12 for most audiences.">
-                            <div class="stat-number" id="readability-score">N/A</div>
-                            <div class="stat-label">Readability Grade</div>
-                            <div class="stat-explanation" id="readability-explanation">Measures reading difficulty</div>
-                        </div>
-                        <div class="stat-card" title="Percentage of text that is dialogue. Good fiction typically has 20-40% dialogue for engaging storytelling.">
-                            <div class="stat-number" id="dialogue-ratio">N/A</div>
-                            <div class="stat-label">Dialogue %</div>
-                            <div class="stat-explanation" id="dialogue-explanation">Shows character interaction</div>
-                        </div>
-                        <div class="stat-card" title="How well chapter lengths match your target. 10/10 means perfect consistency. Lower scores suggest uneven pacing.">
-                            <div class="stat-number" id="pacing-score">N/A</div>
-                            <div class="stat-label">Pacing Score</div>
-                            <div class="stat-explanation" id="pacing-explanation">Chapter length consistency</div>
-                        </div>
-                        <div class="stat-card" title="Percentage of chapters completed. 100% means your book is ready for export and publishing.">
-                            <div class="stat-number" id="completion-rate">0%</div>
-                            <div class="stat-label">Completion</div>
-                            <div class="stat-explanation" id="completion-explanation">Book progress status</div>
-                        </div>
-                    </div>
-
-                    <div class="analysis-section">
-                        <div class="output-section">
-                            <h3>Chapter Balance Analysis</h3>
-                            <div id="chapter-balance">Generate some chapters to see balance analysis...</div>
-                        </div>
-
-                        <div class="output-section">
-                            <h3>Content Analysis</h3>
-                            <div id="content-analysis">Complete writing to see detailed content analysis...</div>
-                        </div>
-                    </div>
-
-                    <div class="analytics-actions">
-                        <button class="btn btn-primary" onclick="generateAnalytics()">
-                            <span class="label">Refresh Analytics</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Tutorial Step -->
             <div id="tutorial" class="step">
                 <div class="step-header">
@@ -680,18 +702,30 @@
                         <h3>Getting Started</h3>
 
                         <div class="tutorial-card">
-                            <h4>1. AI Settings</h4>
+                            <h4>Data storage</h4>
+                            <p>Connect & customize AI behavior and output:</p>
+                            <ul>
+                                <li><strong>Auto Save:</strong> All projects are stored locally in your browser cache</li>
+                                <li><strong>Data Protection:</strong> No data is sent to any external servers</li>
+                                <li><strong>Security:</strong> Your API keys are stored securely in local storage</li>
+                                <li><strong>Transparency:</strong> Your API keys are used only for AI generation and you control all AI interactions</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="tutorial-card">
+                            <h4>AI Settings</h4>
                             <p>Connect & customize AI behavior and output:</p>
                             <ul>
                                 <li><strong>API Providers:</strong> Enter your OpenRouter and/or OpenAI API key</li>
                                 <li><strong>Model Selection:</strong> Pick from various AI models for different needs</li>
+                                <li><strong>Advanced Models:</strong> Customize which model to use for each generation step</li>
                                 <li><strong>Temperature:</strong> Control creativity vs. consistency (0-1)</li>
                                 <li><strong>Custom Prompts:</strong> Modify generation prompts for specific results</li>
                             </ul>
                         </div>
 
                         <div class="tutorial-card">
-                            <h4>2. Book Setup</h4>
+                            <h4>Book Setup</h4>
                             <p>Start by selecting your <strong>genre</strong> and <strong>target audience</strong>. This helps the AI understand the style and conventions your book should follow.</p>
                             <ul>
                                 <li><strong>Premise:</strong> Describe your book's main concept, conflict, or journey in 2-3 sentences</li>
@@ -703,7 +737,7 @@
                         </div>
 
                         <div class="tutorial-card">
-                            <h4>3. Story Structure</h4>
+                            <h4>Story Structure</h4>
                             <p>The AI creates a complete narrative framework following proven storytelling formulas:</p>
                             <ul>
                                 <li><strong>Three-Act Structure:</strong> Setup, confrontation, and resolution</li>
@@ -715,7 +749,7 @@
                         </div>
 
                         <div class="tutorial-card">
-                            <h4>4. Chapter Planning</h4>
+                            <h4>Chapter Planning</h4>
                             <p>Detailed breakdown of each chapter with scene structure:</p>
                             <ul>
                                 <li><strong>Chapter Titles:</strong> Compelling and genre-appropriate</li>
@@ -726,7 +760,7 @@
                         </div>
 
                         <div class="tutorial-card">
-                            <h4>5. Writing Process</h4>
+                            <h4>Writing Process</h4>
                             <p>Generate high-quality prose for each chapter:</p>
                             <ul>
                                 <li><strong>Individual Generation:</strong> Write chapters one at a time for control</li>
@@ -751,6 +785,17 @@
                         </div>
 
                         <div class="tutorial-card">
+                            <h4>Advanced Model Selection</h4>
+                            <p>Optimize AI performance for different tasks:</p>
+                            <ul>
+                                <li><strong>Step-specific Models:</strong> Use different models for different generation steps</li>
+                                <li><strong>Creative vs Budget:</strong> Choose based on quality needs and cost considerations</li>
+                                <li><strong>Specialized Models:</strong> Some models excel at specific tasks (writing vs planning)</li>
+                                <li><strong>Cost Optimization:</strong> Use budget models for drafts, creative models for final versions</li>
+                            </ul>
+                        </div>
+
+                        <div class="tutorial-card">
                             <h4>One-Click Generation</h4>
                             <p>Fully automated book creation:</p>
                             <ul>
@@ -764,18 +809,8 @@
                     </div>
 
                     <div class="tutorial-section">
-                        <h3>Analytics & Export</h3>
-                        <div class="tutorial-card">
-                            <h4>Writing Analytics</h4>
-                            <p>Analyze your book's quality and structure:</p>
-                            <ul>
-                                <li><strong>Readability Score:</strong> Flesch-Kincaid grade level analysis</li>
-                                <li><strong>Dialogue Ratio:</strong> Balance of dialogue vs. narrative</li>
-                                <li><strong>Pacing Score:</strong> Chapter length consistency</li>
-                                <li><strong>Content Analysis:</strong> Word frequency and structure metrics</li>
-                            </ul>
-                        </div>
-
+                        <h3>Export</h3>
+                        
                         <div class="tutorial-card">
                             <h4>Export Options</h4>
                             <p>Download your book in multiple formats:</p>
@@ -802,6 +837,17 @@
                         </div>
 
                         <div class="tutorial-card">
+                            <h4>AI Request Management</h4>
+                            <ul>
+                                <li>Only one AI request can run at a time - wait for completion</li>
+                                <li>Watch for visual generation indicators and animations</li>
+                                <li>Use advanced model selection to optimize quality and cost</li>
+                                <li>Test different models to find what works best for your style</li>
+                                <li>Budget models for drafts, creative models for final versions</li>
+                            </ul>
+                        </div>
+
+                        <div class="tutorial-card">
                             <h4>Project Management</h4>
                             <ul>
                                 <li>Save projects regularly with descriptive names</li>
@@ -823,6 +869,7 @@
                                 <li><strong>Quality Issues:</strong> Use more feedback loops or manual feedback</li>
                                 <li><strong>Inconsistent Style:</strong> Review and refine your style direction</li>
                                 <li><strong>Lost Work:</strong> Check auto-save in browser storage</li>
+                                <li><strong>Blocked Requests:</strong> Wait for current AI generation to complete</li>
                             </ul>
                         </div>
 
@@ -841,6 +888,16 @@
             </div>
         </main>
     </div>
+
+    <!-- Generation Progress Indicator -->
+    <div class="generation-indicator" id="generation-indicator">
+        <div class="generation-animation"></div>
+        <h3 id="generation-title">AI Generation in Progress</h3>
+        <p id="generation-description">Please wait while the AI processes your request...</p>
+    </div>
+
+    <!-- AI Request Block Overlay -->
+    <div class="ai-request-blocked" id="ai-request-blocked"></div>
 
     <!-- Auto-save Indicator -->
     <div id="auto-save-indicator" class="auto-save-indicator">Auto-saved</div>
@@ -1047,1722 +1104,5 @@
     </div>
 
     <script src="script.js"></script>
-
-    <style>
-/* Apple-Inspired Design System with Fun Theme */
-:root {
-    /* Colors - Light Theme */
-    --color-primary: #007AFF;
-    --color-primary-hover: #0056CC;
-    --color-success: #34C759;
-    --color-danger: #FF3B30;
-    --color-warning: #FF9500;
-    --color-secondary: #8E8E93;
-    
-    /* Backgrounds */
-    --bg-primary: #FFFFFF;
-    --bg-secondary: #F2F2F7;
-    --bg-tertiary: #FFFFFF;
-    --bg-quaternary: #F2F2F7;
-    
-    /* Text Colors */
-    --text-primary: #000000;
-    --text-secondary: #3C3C43;
-    --text-tertiary: #3C3C4399;
-    --text-quaternary: #3C3C4360;
-    
-    /* Borders & Separators */
-    --separator: #3C3C4329;
-    --border-primary: #D1D1D6;
-    --border-secondary: #E5E5EA;
-    
-    /* Shadows */
-    --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.12);
-    
-    /* Blur Effects */
-    --blur-light: rgba(255, 255, 255, 0.8);
-    --blur-dark: rgba(0, 0, 0, 0.3);
-    
-    /* Spacing */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
-    --spacing-2xl: 48px;
-    
-    /* Border Radius */
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
-    
-    /* Typography */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-size-xs: 11px;
-    --font-size-sm: 13px;
-    --font-size-base: 15px;
-    --font-size-lg: 17px;
-    --font-size-xl: 19px;
-    --font-size-2xl: 22px;
-    --font-size-3xl: 28px;
-    --font-size-4xl: 36px;
-    
-    /* Transitions */
-    --transition-fast: 0.2s ease;
-    --transition-medium: 0.3s ease;
-    --transition-slow: 0.5s ease;
-}
-
-/* Dark Theme */
-[data-theme="dark"] {
-    --color-primary: #0A84FF;
-    --color-primary-hover: #409CFF;
-    --color-success: #30D158;
-    --color-danger: #FF453A;
-    --color-warning: #FF9F0A;
-    --color-secondary: #98989D;
-    
-    --bg-primary: #000000;
-    --bg-secondary: #1C1C1E;
-    --bg-tertiary: #2C2C2E;
-    --bg-quaternary: #3A3A3C;
-    
-    --text-primary: #FFFFFF;
-    --text-secondary: #EBEBF5;
-    --text-tertiary: #EBEBF599;
-    --text-quaternary: #EBEBF560;
-    
-    --separator: #54545899;
-    --border-primary: #38383A;
-    --border-secondary: #48484A;
-    
-    --blur-light: rgba(0, 0, 0, 0.8);
-    --blur-dark: rgba(255, 255, 255, 0.1);
-}
-
-/* Fun Theme */
-[data-theme="fun"] {
-    --color-primary: #FF6B6B;
-    --color-primary-hover: #FF5252;
-    --color-success: #4ECDC4;
-    --color-danger: #FF8A80;
-    --color-warning: #FFD54F;
-    --color-secondary: #9C27B0;
-    
-    --bg-primary: #FFF8E1;
-    --bg-secondary: #F3E5F5;
-    --bg-tertiary: #E1F5FE;
-    --bg-quaternary: #FCE4EC;
-    
-    --text-primary: #2E2E2E;
-    --text-secondary: #5E35B1;
-    --text-tertiary: #7986CB;
-    --text-quaternary: #9575CD;
-    
-    --separator: #E1BEE7;
-    --border-primary: #F8BBD9;
-    --border-secondary: #C8E6C9;
-    
-    --shadow-small: 0 1px 3px rgba(156, 39, 176, 0.2);
-    --shadow-medium: 0 4px 12px rgba(255, 107, 107, 0.3);
-    --shadow-large: 0 8px 30px rgba(78, 205, 196, 0.2);
-    
-    --blur-light: rgba(255, 248, 225, 0.9);
-    --blur-dark: rgba(156, 39, 176, 0.1);
-}
-
-/* Theme Selector Dropdown */
-.theme-selector-container {
-    display: flex;
-    align-items: center;
-}
-
-.theme-selector {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    min-width: 100px;
-}
-
-.theme-selector:hover {
-    background: var(--bg-quaternary);
-    border-color: var(--border-primary);
-    color: var(--text-primary);
-}
-
-.theme-selector:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-/* Responsive adjustment */
-@media (max-width: 768px) {
-    .theme-selector {
-        min-width: 80px;
-        font-size: var(--font-size-xs);
-    }
-}
-
-/* Reset & Base Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-body {
-    font-family: var(--font-family);
-    font-size: var(--font-size-base);
-    color: var(--text-primary);
-    background-color: var(--bg-secondary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: background-color var(--transition-medium), color var(--transition-medium);
-}
-
-/* App Container */
-.app-container {
-    min-height: 100vh;
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: var(--bg-primary);
-    box-shadow: var(--shadow-large);
-    position: relative;
-}
-
-/* Header */
-.header {
-    background: var(--blur-light);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--separator);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-xl);
-}
-
-.header-left {
-    flex: 1;
-}
-
-.app-title {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-}
-
-.app-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    font-weight: 400;
-}
-
-.header-right {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-}
-
-.header-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    text-decoration: none;
-}
-
-.header-btn:hover {
-    background: var(--bg-quaternary);
-    border-color: var(--border-primary);
-    color: var(--text-primary);
-    transform: translateY(-1px);
-}
-
-/* Project Bar */
-.project-bar {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--separator);
-    padding: var(--spacing-md) var(--spacing-xl);
-}
-
-.project-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.project-selector {
-    flex: 1;
-    max-width: 300px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-}
-
-.project-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-}
-
-/* Navigation */
-.navigation {
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--separator);
-    position: relative;
-}
-
-.nav-progress {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--bg-secondary);
-}
-
-.progress-line {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-success));
-    width: 0%;
-    transition: width var(--transition-medium);
-}
-
-.nav-items {
-    display: flex;
-    padding: 0 var(--spacing-xl);
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.nav-items::-webkit-scrollbar {
-    display: none;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-md) var(--spacing-sm);
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    min-width: 80px;
-    transition: all var(--transition-fast);
-    color: var(--text-secondary);
-}
-
-.nav-item:hover {
-    color: var(--text-primary);
-    background: var(--bg-secondary);
-}
-
-.nav-item.active {
-    color: var(--color-primary);
-}
-
-.nav-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 2px;
-    background: var(--color-primary);
-    border-radius: var(--radius-sm);
-}
-
-.nav-item.completed .nav-status::after {
-    content: '✓';
-    color: var(--color-success);
-    font-weight: 600;
-}
-
-.nav-icon {
-    font-size: var(--font-size-base);
-    opacity: 0.8;
-}
-
-.nav-label {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-align: center;
-}
-
-/* Main Content */
-.main-content {
-    padding: var(--spacing-2xl) var(--spacing-xl);
-    min-height: calc(100vh - 200px);
-}
-
-.step {
-    display: none;
-    animation: fadeInUp 0.4s ease-out;
-}
-
-.step.active {
-    display: block;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.step-header {
-    text-align: center;
-    margin-bottom: var(--spacing-2xl);
-}
-
-.step-title {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
-}
-
-.step-description {
-    font-size: var(--font-size-lg);
-    color: var(--text-secondary);
-    font-weight: 400;
-}
-
-.step-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-/* Custom Alert Modal */
-.custom-alert-modal {
-    z-index: 9999;
-}
-
-.alert-content {
-    max-width: 450px;
-    width: 90%;
-}
-
-.alert-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--separator);
-    text-align: center;
-}
-
-.alert-header h3 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.alert-body {
-    padding: var(--spacing-xl);
-    text-align: center;
-}
-
-.alert-body #alert-message {
-    font-size: var(--font-size-base);
-    line-height: 1.6;
-    color: var(--text-primary);
-    white-space: pre-wrap;
-}
-
-.alert-footer {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 1px solid var(--separator);
-}
-
-.alert-footer .btn {
-    min-width: 80px;
-}
-
-/* Form Elements */
-.form-group {
-    margin-bottom: var(--spacing-lg);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-}
-
-label {
-    display: block;
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: var(--spacing-md);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-md);
-    color: var(--text-primary);
-    font-size: var(--font-size-base);
-    font-family: inherit;
-    transition: all var(--transition-fast);
-}
-
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 120px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    line-height: 1.6;
-}
-
-.textarea-container {
-    position: relative;
-}
-
-.word-count {
-    position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    background: var(--bg-secondary);
-    color: var(--text-tertiary);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    pointer-events: none;
-}
-
-.form-hint {
-    margin-top: var(--spacing-xs);
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    line-height: 1.4;
-}
-
-.form-hint a {
-    color: var(--color-primary);
-    text-decoration: none;
-}
-
-.form-hint a:hover {
-    text-decoration: underline;
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.btn:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-medium);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-sm {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-sm);
-}
-
-.btn-ghost {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-secondary);
-}
-
-.btn-ghost:hover {
-    background: var(--bg-quaternary);
-    border-color: var(--border-primary);
-}
-
-.btn-secondary {
-    background: var(--color-secondary);
-}
-
-.btn-secondary:hover {
-    background: #7A7A85;
-}
-
-.btn-success {
-    background: var(--color-success);
-}
-
-.btn-success:hover {
-    background: #28A745;
-}
-
-.btn-danger {
-    background: var(--color-danger);
-}
-
-.btn-danger:hover {
-    background: #E6342A;
-}
-
-.label {
-    font-size: inherit;
-    font-weight: inherit;
-}
-
-/* Cards */
-.info-card, .output-section {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.info-card h4, .output-section h3 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-/* Tutorial Styles */
-.tutorial-section {
-    margin-bottom: var(--spacing-2xl);
-}
-
-.tutorial-section h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: var(--spacing-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.tutorial-card {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-    transition: all var(--transition-fast);
-}
-
-.tutorial-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-medium);
-    transform: translateY(-1px);
-}
-
-.tutorial-card h4 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.tutorial-card p {
-    margin-bottom: var(--spacing-md);
-    line-height: 1.6;
-}
-
-.tutorial-card ul {
-    margin-left: var(--spacing-lg);
-    margin-bottom: var(--spacing-md);
-}
-
-.tutorial-card li {
-    margin-bottom: var(--spacing-xs);
-    line-height: 1.5;
-}
-
-.tutorial-card strong {
-    color: var(--color-primary);
-}
-
-/* Donation Modal Styles */
-.donation-content {
-    text-align: center;
-}
-
-.donation-content p {
-    margin-bottom: var(--spacing-md);
-    line-height: 1.6;
-}
-
-.donation-content ul {
-    text-align: left;
-    margin: var(--spacing-md) 0;
-    padding-left: var(--spacing-lg);
-}
-
-.donation-content li {
-    margin-bottom: var(--spacing-xs);
-}
-
-.donation-options {
-    margin: var(--spacing-xl) 0;
-}
-
-.donation-options h4 {
-    margin-bottom: var(--spacing-md);
-    color: var(--text-primary);
-}
-
-.donation-buttons {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
-}
-
-.donation-amount {
-    flex-direction: column;
-    padding: var(--spacing-md);
-    font-size: var(--font-size-sm);
-    gap: var(--spacing-xs);
-}
-
-.donation-amount:hover {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
-}
-
-.donation-amount.selected {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
-}
-
-.custom-amount {
-    margin-top: var(--spacing-lg);
-}
-
-.custom-amount label {
-    display: block;
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-}
-
-.custom-amount input {
-    max-width: 200px;
-    margin: 0 auto;
-}
-
-.donation-note {
-    font-style: italic;
-    color: var(--text-secondary);
-    margin-top: var(--spacing-lg);
-}
-
-/* Random Idea Section */
-.random-idea-section {
-    text-align: center;
-    padding: var(--spacing-xl);
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.random-idea-hint {
-    margin-top: var(--spacing-md);
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-}
-
-/* Step Actions */
-.step-actions {
-    display: flex;
-    gap: var(--spacing-md);
-    justify-content: center;
-    margin-top: var(--spacing-2xl);
-    flex-wrap: wrap;
-}
-
-/* Feedback Controls */
-.feedback-controls {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-}
-
-.feedback-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-}
-
-.feedback-header h3 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.feedback-options {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-}
-
-.feedback-options label {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin: 0;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-secondary);
-}
-
-.feedback-options select {
-    min-width: 120px;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
-}
-
-.feedback-buttons {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
-}
-
-.dropdown {
-    position: relative;
-}
-
-.dropdown-toggle::after {
-    content: '▼';
-    font-size: var(--font-size-xs);
-    margin-left: var(--spacing-xs);
-}
-
-.manual-feedback-section {
-    margin-top: var(--spacing-lg);
-    padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--separator);
-}
-
-.manual-feedback-section label {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
-}
-
-.manual-feedback-section textarea {
-    width: 100%;
-    min-height: 100px;
-    font-size: var(--font-size-sm);
-    line-height: 1.6;
-}
-
-.feedback-prompt-editor {
-    margin-top: var(--spacing-lg);
-    padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--separator);
-}
-
-.feedback-prompt-editor label {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
-}
-
-.feedback-prompt-editor textarea {
-    width: 100%;
-    min-height: 150px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: var(--font-size-sm);
-    line-height: 1.6;
-    margin-bottom: var(--spacing-md);
-}
-
-.prompt-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-    justify-content: flex-end;
-}
-
-/* Prompt Editor */
-.prompt-editor {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.prompt-editor label {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.prompt-textarea {
-    min-height: 200px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-    font-size: var(--font-size-sm);
-    line-height: 1.6;
-    margin-bottom: var(--spacing-md);
-}
-
-/* Progress Section */
-.progress-section {
-    margin: var(--spacing-lg) 0;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    margin-bottom: var(--spacing-md);
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-success));
-    width: 0%;
-    transition: width var(--transition-medium);
-}
-
-#writing-status {
-    text-align: center;
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-/* Chapter Controls */
-.chapter-controls {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-}
-
-.chapter-controls h4 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
-}
-
-.controls-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    align-items: center;
-}
-
-.writing-hint {
-    text-align: center;
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-    margin-bottom: var(--spacing-md);
-}
-
-.writing-footer {
-    text-align: center;
-    margin-top: var(--spacing-2xl);
-    padding-top: var(--spacing-xl);
-    border-top: 1px solid var(--separator);
-}
-
-/* Chapter Items */
-.chapter-item {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-md) 0;
-    transition: all var(--transition-fast);
-}
-
-.chapter-item:hover {
-    border-color: var(--border-primary);
-    box-shadow: var(--shadow-small);
-}
-
-.chapter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-}
-
-.chapter-info {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-}
-
-.chapter-info h4 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.chapter-word-count {
-    background: var(--bg-secondary);
-    color: var(--text-tertiary);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-}
-
-.chapter-actions {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-}
-
-.chapter-status {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-md);
-}
-
-.chapter-content {
-    display: none;
-}
-
-.chapter-content.active {
-    display: block;
-}
-
-.chapter-textarea {
-    width: 100%;
-    min-height: 200px;
-    font-family: 'Georgia', serif;
-    font-size: var(--font-size-base);
-    line-height: 1.6;
-    margin-bottom: var(--spacing-md);
-}
-
-.chapter-footer {
-    display: flex;
-    gap: var(--spacing-sm);
-    flex-wrap: wrap;
-}
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.stat-card {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    text-align: center;
-    cursor: help;
-    transition: all var(--transition-fast);
-}
-
-.stat-card:hover {
-    border-color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-}
-
-.stat-number {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: var(--spacing-xs);
-}
-
-.stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.stat-explanation {
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    margin-top: var(--spacing-xs);
-    font-style: italic;
-}
-
-/* Book Title & Blurb Display */
-.book-title-section {
-    background: var(--bg-tertiary);
-    border: 2px solid var(--color-primary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
-}
-
-.book-title-section h3 {
-    color: var(--color-primary);
-    text-align: center;
-    margin-bottom: var(--spacing-lg);
-    font-size: var(--font-size-xl);
-}
-
-.title-display, .blurb-display {
-    margin-bottom: var(--spacing-lg);
-}
-
-.title-display h4, .blurb-display h4 {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-sm);
-}
-
-.book-title {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text-primary);
-    text-align: center;
-    margin: var(--spacing-md) 0;
-    padding: var(--spacing-md);
-    background: var(--bg-primary);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--color-primary);
-}
-
-.book-blurb {
-    font-size: var(--font-size-base);
-    line-height: 1.7;
-    color: var(--text-primary);
-    padding: var(--spacing-lg);
-    background: var(--bg-primary);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--color-success);
-    font-style: italic;
-}
-
-/* Export Grid */
-.export-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.export-card {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    text-align: center;
-    transition: all var(--transition-fast);
-}
-
-.export-card:hover {
-    border-color: var(--border-primary);
-    box-shadow: var(--shadow-medium);
-    transform: translateY(-2px);
-}
-
-.export-icon {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: var(--spacing-md);
-    background: var(--bg-secondary);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    display: inline-block;
-}
-
-.export-card h4 {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-sm);
-}
-
-.export-card p {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin-bottom: var(--spacing-lg);
-}
-
-/* Settings */
-.settings-section {
-    margin-bottom: var(--spacing-2xl);
-}
-
-.settings-section h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-lg);
-}
-
-.api-provider-toggle {
-    margin-bottom: var(--spacing-lg);
-}
-
-.toggle-group {
-    display: inline-flex;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xs);
-}
-
-.toggle-btn {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background: none;
-    border: none;
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.toggle-btn.active {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-small);
-}
-
-.settings-actions {
-    display: flex;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-    margin-top: var(--spacing-lg);
-}
-
-/* Analysis Section */
-.analysis-section {
-    margin-top: var(--spacing-xl);
-}
-
-.analytics-actions {
-    text-align: center;
-    margin-top: var(--spacing-xl);
-}
-
-/* Enhanced Expand Modal */
-.expand-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    display: none;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.expand-modal.active {
-    display: flex;
-    flex-direction: column;
-}
-
-.expand-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--separator);
-    flex-shrink: 0;
-}
-
-.expand-title h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-}
-
-.expand-info {
-    display: flex;
-    gap: var(--spacing-md);
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-}
-
-.expand-controls {
-    display: flex;
-    gap: var(--spacing-sm);
-}
-
-.expand-content {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
-
-.expand-editor, .expand-reader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.expand-editor textarea {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    padding: var(--spacing-2xl);
-    font-family: 'Georgia', serif;
-    font-size: var(--font-size-lg);
-    line-height: 1.8;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    resize: none;
-}
-
-.expand-reader {
-    padding: var(--spacing-2xl);
-    overflow-y: auto;
-    background: var(--bg-primary);
-}
-
-.expand-reader-content {
-    max-width: 700px;
-    margin: 0 auto;
-    font-family: 'Georgia', serif;
-    font-size: var(--font-size-lg);
-    line-height: 1.8;
-    color: var(--text-primary);
-}
-
-/* Modal Styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 2000;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background: var(--bg-primary);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-large);
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--separator);
-}
-
-.modal-header h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.modal-body {
-    padding: var(--spacing-xl);
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-md);
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 1px solid var(--separator);
-}
-
-/* One-Click Configuration */
-.one-click-config {
-    margin-top: var(--spacing-lg);
-}
-
-.config-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-}
-
-.config-row label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.config-row select {
-    min-width: 150px;
-}
-
-/* Loading Overlay */
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--blur-dark);
-    z-index: 3000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.loading-content {
-    text-align: center;
-    background: var(--bg-primary);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-large);
-    max-width: 400px;
-    width: 90%;
-}
-
-.loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid var(--border-secondary);
-    border-top: 4px solid var(--color-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto var(--spacing-lg);
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-lg);
-}
-
-/* Auto-save Indicator */
-.auto-save-indicator {
-    position: fixed;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
-    background: var(--color-success);
-    color: white;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity var(--transition-medium);
-    z-index: 1000;
-    box-shadow: var(--shadow-medium);
-}
-
-.auto-save-indicator.show {
-    opacity: 1;
-}
-
-/* Loading States */
-.loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-2xl);
-}
-
-.loading .loading-spinner {
-    width: 40px;
-    height: 40px;
-    margin-bottom: var(--spacing-md);
-}
-
-.loading-text-small {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-}
-
-/* Status Messages */
-.success {
-    background: rgba(52, 199, 89, 0.1);
-    color: var(--color-success);
-    border: 1px solid rgba(52, 199, 89, 0.2);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin: var(--spacing-md) 0;
-}
-
-.error {
-    background: rgba(255, 59, 48, 0.1);
-    color: var(--color-danger);
-    border: 1px solid rgba(255, 59, 48, 0.2);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin: var(--spacing-md) 0;
-}
-
-.warning {
-    background: rgba(255, 149, 0, 0.1);
-    color: var(--color-warning);
-    border: 1px solid rgba(255, 149, 0, 0.2);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin: var(--spacing-md) 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .app-container {
-        box-shadow: none;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md);
-    }
-    
-    .header-right {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .project-controls {
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-    
-    .project-selector {
-        max-width: none;
-    }
-    
-    .nav-items {
-        padding: 0 var(--spacing-md);
-    }
-    
-    .nav-item {
-        min-width: 70px;
-        padding: var(--spacing-sm) var(--spacing-xs);
-    }
-    
-    .main-content {
-        padding: var(--spacing-lg) var(--spacing-md);
-    }
-    
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid, .export-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .step-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .controls-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .chapter-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .expand-header {
-        flex-direction: column;
-        gap: var(--spacing-md);
-        align-items: flex-start;
-    }
-    
-    .expand-controls {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .expand-editor textarea, .expand-reader {
-        padding: var(--spacing-lg);
-    }
-    
-    .modal-content {
-        margin: var(--spacing-md);
-        width: calc(100% - 2 * var(--spacing-md));
-    }
-    
-    .config-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .feedback-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .feedback-buttons {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .book-title {
-        font-size: var(--font-size-xl);
-    }
-    
-    .book-title-section {
-        padding: var(--spacing-lg);
-    }
-    
-    .settings-actions {
-        flex-direction: column;
-    }
-    
-    .donation-buttons {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .step-title {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .app-title {
-        font-size: var(--font-size-xl);
-    }
-    
-    .nav-item {
-        min-width: 60px;
-        padding: var(--spacing-sm) var(--spacing-xs);
-    }
-    
-    .nav-icon {
-        font-size: var(--font-size-sm);
-    }
-    
-    .nav-label {
-        font-size: 10px;
-    }
-    
-    .donation-buttons {
-        grid-template-columns: 1fr;
-    }
-}
-    </style>
-
 </body>
 </html>
