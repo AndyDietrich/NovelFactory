@@ -1,5 +1,65 @@
 // NovelFactory AI - Professional Edition
-// Apple-Inspired Design with Advanced Features
+// Clean Design without Emojis
+
+// Custom Alert System
+let alertCallback = null;
+
+function customAlert(message, title = 'Notification') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-alert-modal');
+        const titleElement = document.getElementById('alert-title');
+        const messageElement = document.getElementById('alert-message');
+        const okBtn = document.getElementById('alert-ok-btn');
+        const cancelBtn = document.getElementById('alert-cancel-btn');
+        
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        // Show only OK button for simple alerts
+        okBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'none';
+        
+        alertCallback = resolve;
+        modal.classList.add('active');
+        okBtn.focus();
+    });
+}
+
+function customConfirm(message, title = 'Confirmation') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-alert-modal');
+        const titleElement = document.getElementById('alert-title');
+        const messageElement = document.getElementById('alert-message');
+        const okBtn = document.getElementById('alert-ok-btn');
+        const cancelBtn = document.getElementById('alert-cancel-btn');
+        
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+        
+        // Show both buttons for confirm dialogs
+        okBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'inline-flex';
+        okBtn.textContent = 'Yes';
+        cancelBtn.textContent = 'No';
+        
+        alertCallback = resolve;
+        modal.classList.add('active');
+        cancelBtn.focus();
+    });
+}
+
+function closeCustomAlert(result = true) {
+    const modal = document.getElementById('custom-alert-modal');
+    const okBtn = document.getElementById('alert-ok-btn');
+    
+    modal.classList.remove('active');
+    okBtn.textContent = 'OK';
+    
+    if (alertCallback) {
+        alertCallback(result);
+        alertCallback = null;
+    }
+}
 
 // Global State
 let bookData = {
@@ -50,24 +110,24 @@ let selectedDonationAmount = 5;
 const apiModels = {
     openrouter: {
         creative: [
-            { value: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4 ⭐', cost: { input: 3, output: 15 }},
-            { value: 'anthropic/claude-opus-4.1', label: 'Claude Opus 4.1 ⭐⭐', cost: { input: 15, output: 75 }},
-            { value: 'openai/gpt-4o', label: 'GPT-4o', cost: { input: 5, output: 15 }},
-            { value: 'openai/gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10 }},
-            { value: 'anthropic/claude-3.7-sonnet:thinking', label: 'Claude Sonnet 3.7 (Thinking)', cost: { input: 3, output: 15 }},
-            { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', cost: { input: 1.25, output: 10 }}
+            { value: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4', cost: { input: 3.00, output: 15.00 }},
+            { value: 'anthropic/claude-opus-4.1', label: 'Claude Opus 4.1', cost: { input: 15.00, output: 75.00 }},
+            { value: 'openai/gpt-4o', label: 'GPT-4o', cost: { input: 5.00, output: 15.00 }},
+            { value: 'openai/gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10.00 }},
+            { value: 'anthropic/claude-3.7-sonnet:thinking', label: 'Claude Sonnet 3.7 (Thinking)', cost: { input: 3.00, output: 15.00 }},
+            { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', cost: { input: 1.25, output: 10.00 }}
         ],
         budget: [
-            { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini 💵', cost: { input: 0.25, output: 2 }},
-            { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.6 }},
-            { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano 💵💵', cost: { input: 0.05, output: 0.4 }},
-            { value: 'openai/google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.3, output: 2.5 }},
+            { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini', cost: { input: 0.25, output: 2.00 }},
+            { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.60 }},
+            { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', cost: { input: 0.05, output: 0.40 }},
+            { value: 'openai/google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.30, output: 2.50 }},
             { value: 'deepseek/deepseek-chat-v3-0324', label: 'DeepSeek Chat V3', cost: { input: 0.18, output: 0.72 }}
         ]
     },
     openai: {
         creative: [
-            { value: 'gpt-5', label: 'GPT-5 ⭐', cost: { input: 1.25, output: 10 }},
+            { value: 'gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10 }},
             { value: 'gpt-4o', label: 'GPT-4o', cost: { input: 5, output: 15 }},
         ],
         budget: [
@@ -530,8 +590,9 @@ function toggleFeedbackPromptEditor(step) {
     }
 }
 
-function resetFeedbackPrompt(step) {
-    if (confirm('Reset feedback prompt to default?')) {
+async function resetFeedbackPrompt(step) {
+    const confirmed = await customConfirm('Reset feedback prompt to default?', 'Reset Prompt');
+    if (confirmed) {
         document.getElementById(`${step}-feedback-prompt`).value = defaultPrompts.analysis;
         aiSettings.customPrompts.analysis = '';
         saveSettings();
@@ -546,7 +607,7 @@ function saveFeedbackPrompt(step) {
     // Visual feedback
     const btn = event.target;
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="icon">✅</span>Saved!';
+    btn.innerHTML = '<span class="label">Saved!</span>';
     setTimeout(() => {
         btn.innerHTML = originalText;
     }, 2000);
@@ -573,18 +634,18 @@ function setDonationAmount(amount) {
     event.target.classList.add('selected');
     
     // Update donate button
-    document.getElementById('donate-btn').innerHTML = `<span class="icon">💖</span>Donate $${amount}`;
+    document.getElementById('donate-btn').innerHTML = `<span class="label">Donate $${amount}</span>`;
     
     // Clear custom amount
     document.getElementById('custom-donation-amount').value = '';
 }
 
-function proceedToDonate() {
+async function proceedToDonate() {
     const customAmount = document.getElementById('custom-donation-amount').value;
     const amount = customAmount || selectedDonationAmount;
     
     if (!amount || amount < 1) {
-        alert('Please select or enter a valid donation amount.');
+        await customAlert('Please select or enter a valid donation amount.', 'Invalid Amount');
         return;
     }
     
@@ -598,8 +659,8 @@ function proceedToDonate() {
     closeDonationModal();
     
     // Show thank you message
-    setTimeout(() => {
-        alert('🙏 Thank you so much for supporting NovelFactory AI! Your generosity helps keep this tool free for everyone.');
+    setTimeout(async () => {
+        await customAlert('Thank you so much for supporting NovelFactory AI! Your generosity helps keep this tool free for everyone.', 'Thank You!');
     }, 1000);
 }
 
@@ -615,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 // Update donate button
-                document.getElementById('donate-btn').innerHTML = `<span class="icon">💖</span>Donate $${this.value}`;
+                document.getElementById('donate-btn').innerHTML = `<span class="label">Donate $${this.value}</span>`;
                 selectedDonationAmount = parseFloat(this.value);
             }
         });
@@ -636,13 +697,13 @@ function closeFeedbackModal() {
     document.getElementById('feedback-email').value = '';
 }
 
-function submitFeedback() {
+async function submitFeedback() {
     const type = document.getElementById('feedback-type').value;
     const message = document.getElementById('feedback-message').value;
     const email = document.getElementById('feedback-email').value;
     
     if (!message.trim()) {
-        alert('Please enter your feedback message.');
+        await customAlert('Please enter your feedback message.', 'Missing Information');
         return;
     }
     
@@ -660,7 +721,7 @@ function submitFeedback() {
     closeFeedbackModal();
     
     // Show confirmation
-    alert('📧 Thank you for your feedback! Your default email client should open with your message. If it doesn\'t open automatically, please email me directly at dietrichandreas2@t-online.de');
+    await customAlert('Thank you for your feedback! Your default email client should open with your message. If it doesn\'t open automatically, please email me directly at dietrichandreas2@t-online.de', 'Feedback Sent');
 }
 
 // Auto-save System
@@ -726,6 +787,7 @@ function setupKeyboardShortcuts() {
             closeOneClickModal();
             closeFeedbackModal();
             closeDonationModal();
+            closeCustomAlert(false);
         }
     });
 }
@@ -804,22 +866,39 @@ function switchApiProvider(provider) {
 function updateModelSelect() {
     const modelSelect = document.getElementById('model-select');
     modelSelect.innerHTML = '';
-    let provider = aiSettings.apiProvider || 'openrouter';
-    let models = apiModels[provider]?.creative.concat(apiModels[provider]?.budget) || [];
-    models.forEach(model => {
-        const option = document.createElement('option');
-        option.value = model.value;
-        option.textContent = model.label;
-        if (aiSettings.model === model.value) {
-            option.selected = true;
-        }
-        modelSelect.appendChild(option);
-    });
-    // If no model is selected, select the default
-    if (!modelSelect.value) {
-        modelSelect.value = 'anthropic/claude-sonnet-4';
-        aiSettings.model = 'anthropic/claude-sonnet-4';
+
+    const provider = aiSettings.apiProvider || 'openrouter';
+    const models = apiModels[provider];
+
+    // Helper to create options
+    function createOptions(modelArray) {
+        return modelArray.map(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            if (aiSettings.model === model.value) {
+                option.selected = true;
+            }
+            return option;
+        });
     }
+
+    // Creative group
+    if (models.creative && models.creative.length) {
+        const creativeGroup = document.createElement('optgroup');
+        creativeGroup.label = 'Creative';
+        createOptions(models.creative).forEach(option => creativeGroup.appendChild(option));
+        modelSelect.appendChild(creativeGroup);
+    }
+
+    // Budget group
+    if (models.budget && models.budget.length) {
+        const budgetGroup = document.createElement('optgroup');
+        budgetGroup.label = 'Budget';
+        createOptions(models.budget).forEach(option => budgetGroup.appendChild(option));
+        modelSelect.appendChild(budgetGroup);
+    }
+
     updateModelInfo();
 }
 
@@ -1085,7 +1164,7 @@ async function runFeedbackLoop(contentType) {
     }
     
     if (!content) {
-        alert(`No ${contentType} content to analyze. Please generate content first.`);
+        await customAlert(`No ${contentType} content to analyze. Please generate content first.`, 'No Content');
         return;
     }
     
@@ -1094,7 +1173,7 @@ async function runFeedbackLoop(contentType) {
     if (feedbackMode === 'manual') {
         manualFeedback = document.getElementById(`${contentType}-manual-input`).value;
         if (!manualFeedback.trim()) {
-            alert('Please provide manual feedback instructions before running the feedback loop.');
+            await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
             return;
         }
     }
@@ -1192,13 +1271,13 @@ async function generateRandomIdea() {
     const audience = document.getElementById('target-audience').value;
     
     if (!genre || !audience) {
-        alert('Please select genre and target audience first!');
+        await customAlert('Please select genre and target audience first!', 'Missing Information');
         return;
     }
 
     const randomBtn = document.getElementById('random-idea-btn');
     const originalText = randomBtn.innerHTML;
-    randomBtn.innerHTML = '<span class="icon">🎲</span>Generating Idea...';
+    randomBtn.innerHTML = '<span class="label">Generating Idea...</span>';
     randomBtn.disabled = true;
 
     try {
@@ -1243,10 +1322,10 @@ async function generateRandomIdea() {
         updateChapterEstimate();
         autoSave();
 
-        alert('🎲 Unique book idea generated by AI! Review and modify as needed, then click "Generate Book" when ready.');
+        await customAlert('Unique book idea generated by AI! Review and modify as needed, then click "Generate Book" when ready.', 'Idea Generated');
 
     } catch (error) {
-        alert(`Error generating random idea: ${error.message}`);
+        await customAlert(`Error generating random idea: ${error.message}`, 'Generation Error');
     } finally {
         randomBtn.innerHTML = originalText;
         randomBtn.disabled = false;
@@ -1254,11 +1333,11 @@ async function generateRandomIdea() {
 }
 
 // Book Generation Functions
-function startBookGeneration() {
+async function startBookGeneration() {
     collectBookData();
     
     if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
-        alert('Please fill in all required fields before generating your book.');
+        await customAlert('Please fill in all required fields before generating your book.', 'Missing Information');
         return;
     }
 
@@ -1383,7 +1462,7 @@ async function generateChapterOutline() {
 
         outputDiv.innerHTML = `
             <div class="book-title-section">
-                <h3>📚 Book Title & Description</h3>
+                <h3>Book Title & Description</h3>
                 <div class="title-display">
                     <h4>Title:</h4>
                     <div class="book-title">"${bookData.title}"</div>
@@ -1439,23 +1518,19 @@ function setupWritingInterface() {
         <h4>Chapter Generation Options</h4>
         <div class="controls-row">
             <button class="btn btn-ghost btn-sm" onclick="selectAllChapters()">
-                <span class="icon">☑️</span>
-                Select All
+                <span class="label">Select All</span>
             </button>
             <button class="btn btn-ghost btn-sm" onclick="deselectAllChapters()">
-                <span class="icon">☐</span>
-                Deselect All
+                <span class="label">Deselect All</span>
             </button>
             <button class="btn btn-primary btn-sm" onclick="generateSelectedChapters()" id="generate-selected-btn">
-                <span class="icon">✍️</span>
-                Generate Selected
+                <span class="label">Generate Selected</span>
             </button>
             <button class="btn btn-primary btn-sm" onclick="generateAllChapters()">
-                <span class="icon">🚀</span>
-                Generate All Chapters
+                <span class="label">Generate All Chapters</span>
             </button>
         </div>
-        <p class="writing-hint">💡 Tip: Generate chapters individually for maximum control, or select multiple chapters to batch process them.</p>
+        <p class="writing-hint">Tip: Generate chapters individually for maximum control, or select multiple chapters to batch process them.</p>
     `;
     container.appendChild(controlsDiv);
 
@@ -1472,16 +1547,13 @@ function setupWritingInterface() {
                 </div>
                 <div class="chapter-actions">
                     <button class="btn btn-primary btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
-                        <span class="icon">✍️</span>
-                        Generate
+                        <span class="label">Generate</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="regenerateChapter(${i})" id="chapter-${i}-regenerate-btn" style="display: none;">
-                        <span class="icon">🔄</span>
-                        Regenerate
+                        <span class="label">Regenerate</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="expandChapter(${i})" id="chapter-${i}-expand-btn" style="display: none;">
-                        <span class="icon">📖</span>
-                        Expand
+                        <span class="label">Expand</span>
                     </button>
                 </div>
             </div>
@@ -1490,16 +1562,13 @@ function setupWritingInterface() {
                 <textarea class="chapter-textarea" id="chapter-${i}-text" placeholder="Chapter content will appear here..." oninput="updateChapterWordCount(${i})"></textarea>
                 <div class="chapter-footer">
                     <button class="btn btn-success btn-sm" onclick="editChapter(${i})">
-                        <span class="icon">✅</span>
-                        Save Edits
+                        <span class="label">Save Edits</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="analyzeChapter(${i})">
-                        <span class="icon">🔍</span>
-                        Analyze
+                        <span class="label">Analyze</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="runChapterFeedback(${i})">
-                        <span class="icon">🔄</span>
-                        Improve with Feedback
+                        <span class="label">Improve with Feedback</span>
                     </button>
                 </div>
             </div>
@@ -1526,10 +1595,10 @@ function updateGenerateSelectedButton() {
     const selectedCount = getSelectedChapters().length;
     const btn = document.getElementById('generate-selected-btn');
     if (selectedCount > 0) {
-        btn.innerHTML = `<span class="icon">✍️</span>Generate Selected (${selectedCount})`;
+        btn.innerHTML = `<span class="label">Generate Selected (${selectedCount})</span>`;
         btn.disabled = false;
     } else {
-        btn.innerHTML = '<span class="icon">✍️</span>Generate Selected';
+        btn.innerHTML = '<span class="label">Generate Selected</span>';
         btn.disabled = true;
     }
 }
@@ -1554,20 +1623,20 @@ async function generateSingleChapter(chapterNum) {
     try {
         await writeChapter(chapterNum);
         
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '✅ Complete';
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = 'Complete';
         document.getElementById(`chapter-${chapterNum}-content`).classList.add('active');
         document.getElementById(`chapter-${chapterNum}-generate-btn`).style.display = 'none';
         document.getElementById(`chapter-${chapterNum}-regenerate-btn`).style.display = 'inline-flex';
         document.getElementById(`chapter-${chapterNum}-expand-btn`).style.display = 'inline-flex';
         
-        statusDiv.innerHTML = `✅ Chapter ${chapterNum} completed!`;
+        statusDiv.innerHTML = `Chapter ${chapterNum} completed!`;
         updateOverallProgress();
         autoSave();
         
     } catch (error) {
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `❌ Error: ${error.message}`;
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
         document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
-        statusDiv.innerHTML = `❌ Failed to generate Chapter ${chapterNum}`;
+        statusDiv.innerHTML = `Failed to generate Chapter ${chapterNum}`;
     }
 }
 
@@ -1643,9 +1712,8 @@ function extractChapterOutline(fullOutline, chapterNum) {
 }
 
 async function regenerateChapter(chapterNum) {
-    if (!confirm(`Are you sure you want to regenerate Chapter ${chapterNum}? This will overwrite the current content.`)) {
-        return;
-    }
+    const confirmed = await customConfirm(`Are you sure you want to regenerate Chapter ${chapterNum}? This will overwrite the current content.`, 'Regenerate Chapter');
+    if (!confirmed) return;
     
     bookData.chapters[chapterNum - 1] = null;
     document.getElementById(`chapter-${chapterNum}-content`).classList.remove('active');
@@ -1660,7 +1728,7 @@ async function regenerateChapter(chapterNum) {
 async function generateSelectedChapters() {
     const selectedChapters = getSelectedChapters();
     if (selectedChapters.length === 0) {
-        alert('Please select at least one chapter to generate.');
+        await customAlert('Please select at least one chapter to generate.', 'No Chapters Selected');
         return;
     }
 
@@ -1676,7 +1744,7 @@ async function generateSelectedChapters() {
         try {
             await writeChapter(chapterNum);
             
-            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '✅ Complete';
+            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = 'Complete';
             document.getElementById(`chapter-${chapterNum}-content`).classList.add('active');
             document.getElementById(`chapter-${chapterNum}-generate-btn`).style.display = 'none';
             document.getElementById(`chapter-${chapterNum}-regenerate-btn`).style.display = 'inline-flex';
@@ -1685,16 +1753,16 @@ async function generateSelectedChapters() {
             document.getElementById(`chapter-${chapterNum}-checkbox`).checked = false;
             
         } catch (error) {
-            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `❌ Error: ${error.message}`;
+            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
             document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
-            statusDiv.innerHTML = `❌ Failed to generate Chapter ${chapterNum}`;
+            statusDiv.innerHTML = `Failed to generate Chapter ${chapterNum}`;
             break;
         }
     }
     
     updateGenerateSelectedButton();
     updateOverallProgress();
-    statusDiv.innerHTML = `✅ Selected chapters completed!`;
+    statusDiv.innerHTML = `Selected chapters completed!`;
     autoSave();
 }
 
@@ -1731,7 +1799,7 @@ function editChapter(chapterNum) {
     
     const button = event.target;
     const originalText = button.innerHTML;
-    button.innerHTML = '<span class="icon">✅</span>Saved!';
+    button.innerHTML = '<span class="label">Saved!</span>';
     button.style.background = 'var(--color-success)';
     
     setTimeout(() => {
@@ -1805,7 +1873,7 @@ function saveExpandedChapter() {
         // Visual feedback
         const saveBtn = event.target;
         const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<span class="icon">✅</span>Saved!';
+        saveBtn.innerHTML = '<span class="label">Saved!</span>';
         setTimeout(() => {
             saveBtn.innerHTML = originalText;
         }, 2000);
@@ -1822,7 +1890,7 @@ function closeExpandModal() {
 async function runChapterFeedback(chapterNum) {
     const chapter = bookData.chapters[chapterNum - 1];
     if (!chapter) {
-        alert('No chapter content to improve. Please generate the chapter first.');
+        await customAlert('No chapter content to improve. Please generate the chapter first.', 'No Content');
         return;
     }
     
@@ -1834,7 +1902,7 @@ async function runChapterFeedback(chapterNum) {
     if (feedbackMode === 'manual') {
         manualFeedback = document.getElementById('writing-manual-input').value;
         if (!manualFeedback.trim()) {
-            alert('Please provide manual feedback instructions before running the feedback loop.');
+            await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
             return;
         }
     }
@@ -1871,7 +1939,7 @@ async function runChapterFeedback(chapterNum) {
                     premise: bookData.premise,
                     styleDirection: bookData.styleDirection,
                     targetWordCount: bookData.targetWordCount,
-                    numChapters: bookData.numChapters
+                                       numChapters: bookData.numChapters
                 });
                 
                 const analysis = await callAI(analysisPrompt, "You are a professional editor analyzing a book chapter.");
@@ -1898,20 +1966,20 @@ async function runChapterFeedback(chapterNum) {
         document.getElementById(`chapter-${chapterNum}-text`).value = improvedChapter;
         updateChapterWordCount(chapterNum);
         
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `✅ Improved with ${feedbackLoops} ${feedbackMode} feedback loop(s)`;
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Improved with ${feedbackLoops} ${feedbackMode} feedback loop(s)`;
         autoSave();
         
     } catch (error) {
-        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `❌ Feedback error: ${error.message}`;
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Feedback error: ${error.message}`;
     }
 }
 
 // One-Click Generation System
-function startOneClickGeneration() {
+async function startOneClickGeneration() {
     collectBookData();
     
     if (!bookData.genre || !bookData.targetAudience || !bookData.premise) {
-        alert('Please fill in all required fields before starting one-click generation.');
+        await customAlert('Please fill in all required fields before starting one-click generation.', 'Missing Information');
         return;
     }
     
@@ -2008,18 +2076,18 @@ async function startOneClickProcess() {
         generateAnalytics();
         
         hideLoadingOverlay();
-        alert(`🎉 One-click generation completed! 
+        await customAlert(`One-click generation completed! 
 
-📚 Your book "${bookData.title}" is ready for export!
+Your book "${bookData.title}" is ready for export!
 
-📊 Final Stats:
+Final Stats:
 • ${bookData.chapters.filter(c => c).length} chapters completed
 • ${bookData.chapters.filter(c => c).reduce((total, chapter) => total + countWords(chapter), 0).toLocaleString()} total words
-• Ready for publishing!`);
+• Ready for publishing!`, 'Generation Complete');
         
     } catch (error) {
         hideLoadingOverlay();
-        alert(`One-click generation failed: ${error.message}`);
+        await customAlert(`One-click generation failed: ${error.message}`, 'Generation Failed');
     }
 }
 
@@ -2074,9 +2142,9 @@ function updateBookStats() {
     document.getElementById('reading-time').textContent = readingTime;
 }
 
-function downloadBook(format) {
+async function downloadBook(format) {
     if (bookData.chapters.length === 0) {
-        alert('No chapters to download. Please complete the writing process first.');
+        await customAlert('No chapters to download. Please complete the writing process first.', 'No Content');
         return;
     }
 
@@ -2209,19 +2277,20 @@ function downloadFile(content, filename, mimeType) {
     URL.revokeObjectURL(url);
 }
 
-function copyToClipboard() {
+async function copyToClipboard() {
     if (bookData.chapters.length === 0) {
-        alert('No content to copy. Please complete the writing process first.');
+        await customAlert('No content to copy. Please complete the writing process first.', 'No Content');
         return;
     }
 
     const title = bookData.title || bookData.premise;
     const content = generateTxtContent(title);
-    navigator.clipboard.writeText(content).then(() => {
-        alert('Book content copied to clipboard!');
-    }).catch(err => {
-        alert('Failed to copy to clipboard. Please try downloading instead.');
-    });
+    try {
+        await navigator.clipboard.writeText(content);
+        await customAlert('Book content copied to clipboard!', 'Copied');
+    } catch (err) {
+        await customAlert('Failed to copy to clipboard. Please try downloading instead.', 'Copy Failed');
+    }
 }
 
 // Analytics
@@ -2399,11 +2468,11 @@ function analyzeChapterBalance(lengths) {
     analysis += `<p><strong>Standard deviation:</strong> ${Math.round(stdDev)} words</p>`;
     
     if (stdDev < avg * 0.2) {
-        analysis += `<p class="success">✅ Excellent balance - chapters are consistently sized</p>`;
+        analysis += `<p class="success">Excellent balance - chapters are consistently sized</p>`;
     } else if (stdDev < avg * 0.4) {
-        analysis += `<p class="warning">⚠️ Good balance - minor length variations</p>`;
+        analysis += `<p class="warning">Good balance - minor length variations</p>`;
     } else {
-        analysis += `<p class="error">⚠️ Consider balancing - significant length variations detected</p>`;
+        analysis += `<p class="error">Consider balancing - significant length variations detected</p>`;
     }
     
     return analysis;
@@ -2444,10 +2513,10 @@ function analyzeContent(chapters) {
     return analysis;
 }
 
-function analyzeChapter(chapterNum) {
+async function analyzeChapter(chapterNum) {
     const chapter = bookData.chapters[chapterNum - 1];
     if (!chapter) {
-        alert('No content to analyze for this chapter.');
+        await customAlert('No content to analyze for this chapter.', 'No Content');
         return;
     }
     
@@ -2463,9 +2532,9 @@ function analyzeChapter(chapterNum) {
     // Reading time
     const readingTime = Math.round(wordCount / 250);
     
-    alert(`Chapter ${chapterNum} Analysis:
+    const analysisText = `Chapter ${chapterNum} Analysis:
 
-📊 Statistics:
+Statistics:
 • Word count: ${wordCount}
 • Sentences: ${sentences}
 • Paragraphs: ${paragraphs}
@@ -2473,10 +2542,12 @@ function analyzeChapter(chapterNum) {
 • Estimated dialogue: ${dialogueEstimate}%
 • Reading time: ${readingTime} minutes
 
-🎯 Target: ${bookData.targetWordCount} words
-${wordCount < bookData.targetWordCount * 0.8 ? '⚠️ Below target length' : 
-  wordCount > bookData.targetWordCount * 1.2 ? '⚠️ Above target length' : 
-  '✅ Good length'}`);
+Target: ${bookData.targetWordCount} words
+${wordCount < bookData.targetWordCount * 0.8 ? 'Below target length' : 
+  wordCount > bookData.targetWordCount * 1.2 ? 'Above target length' : 
+  'Good length'}`;
+
+    await customAlert(analysisText, 'Chapter Analysis');
 }
 
 // Project Management
@@ -2501,11 +2572,10 @@ function updateProjectSelector() {
     });
 }
 
-function newProject() {
+async function newProject() {
     if (bookData.premise || bookData.outline) {
-        if (!confirm('Starting a new project will clear your current work. Continue?')) {
-            return;
-        }
+        const confirmed = await customConfirm('Starting a new project will clear your current work. Continue?', 'New Project');
+        if (!confirmed) return;
     }
     
     const projectId = 'project_' + Date.now();
@@ -2528,12 +2598,12 @@ function newProject() {
     };
     
     resetEverything();
-    alert('New project created!');
+    await customAlert('New project created!', 'Project Created');
 }
 
-function saveProject() {
+async function saveProject() {
     if (!bookData.premise) {
-        alert('Please add some content before saving the project.');
+        await customAlert('Please add some content before saving the project.', 'No Content');
         return;
     }
     
@@ -2543,7 +2613,7 @@ function saveProject() {
         projects[bookData.id] = { ...bookData };
         localStorage.setItem('novelfactory_projects', JSON.stringify(projects));
         updateProjectSelector();
-        alert('Project saved successfully!');
+        await customAlert('Project saved successfully!', 'Project Saved');
     }
 }
 
@@ -2551,7 +2621,7 @@ function loadProject() {
     document.getElementById('project-file').click();
 }
 
-function switchProject() {
+async function switchProject() {
     const selector = document.getElementById('project-select');
     const projectId = selector.value;
     
@@ -2559,7 +2629,8 @@ function switchProject() {
     
     if (projects[projectId]) {
         if (bookData.premise || bookData.outline) {
-            if (!confirm('Loading a project will replace your current work. Continue?')) {
+            const confirmed = await customConfirm('Loading a project will replace your current work. Continue?', 'Load Project');
+            if (!confirmed) {
                 selector.value = 'current';
                 return;
             }
@@ -2568,7 +2639,7 @@ function switchProject() {
         bookData = { ...projects[projectId] };
         populateFormFields();
         showStep(bookData.currentStep);
-        alert('Project loaded successfully!');
+        await customAlert('Project loaded successfully!', 'Project Loaded');
     }
 }
 
@@ -2577,36 +2648,36 @@ function importProject(event) {
     if (!file) return;
     
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const imported = JSON.parse(e.target.result);
             bookData = imported;
             populateFormFields();
             showStep(bookData.currentStep);
-            alert('Project imported successfully!');
+            await customAlert('Project imported successfully!', 'Project Imported');
         } catch (error) {
-            alert('Error importing project: Invalid file format');
+            await customAlert('Error importing project: Invalid file format', 'Import Error');
         }
     };
     reader.readAsText(file);
 }
 
 // Settings Functions
-function testApiConnection() {
+async function testApiConnection() {
     const statusDiv = document.getElementById('api-status');
     statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Testing connection...</div>';
 
-    callAI("Respond with 'Connection successful!' if you can read this message.")
-        .then(response => {
-            statusDiv.innerHTML = '<div class="success">✅ API connection successful!</div>';
-        })
-        .catch(error => {
-            statusDiv.innerHTML = `<div class="error">❌ Connection failed: ${error.message}</div>`;
-        });
+    try {
+        const response = await callAI("Respond with 'Connection successful!' if you can read this message.");
+        statusDiv.innerHTML = '<div class="success">API connection successful!</div>';
+    } catch (error) {
+        statusDiv.innerHTML = `<div class="error">Connection failed: ${error.message}</div>`;
+    }
 }
 
-function resetPrompts() {
-    if (confirm('Are you sure you want to reset all prompts to their default values?')) {
+async function resetPrompts() {
+    const confirmed = await customConfirm('Are you sure you want to reset all prompts to their default values?', 'Reset Prompts');
+    if (confirmed) {
         initializePrompts();
         // Clear custom prompts from settings
         aiSettings.customPrompts = {
@@ -2620,7 +2691,7 @@ function resetPrompts() {
             bookTitle: ''
         };
         saveSettings();
-        alert('All prompts have been reset to default values.');
+        await customAlert('All prompts have been reset to default values.', 'Prompts Reset');
     }
 }
 
@@ -2649,12 +2720,12 @@ function importSettings() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = function(e) {
+    input.onchange = async function(e) {
         const file = e.target.files[0];
         if (!file) return;
         
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             try {
                 const settings = JSON.parse(e.target.result);
                 if (settings.aiSettings) {
@@ -2667,9 +2738,9 @@ function importSettings() {
                     document.getElementById('writing-prompt').value = settings.prompts.writing || defaultPrompts.writing;
                 }
                 saveSettings();
-                alert('Settings imported successfully!');
+                await customAlert('Settings imported successfully!', 'Settings Imported');
             } catch (error) {
-                alert('Error importing settings: Invalid file format');
+                await customAlert('Error importing settings: Invalid file format', 'Import Error');
             }
         };
         reader.readAsText(file);
@@ -2678,14 +2749,14 @@ function importSettings() {
 }
 
 // Cost estimation
-function estimateCosts() {
+async function estimateCosts() {
     const model = document.getElementById('model-select').value;
     const provider = aiSettings.apiProvider;
     const allModels = [...apiModels[provider].creative, ...apiModels[provider].budget];
     const modelInfo = allModels.find(m => m.value === model);
     
     if (!modelInfo || !modelInfo.cost) {
-        alert('Cost estimation not available for this model.');
+        await customAlert('Cost estimation not available for this model.', 'Cost Estimation');
         return;
     }
     
@@ -2697,58 +2768,28 @@ function estimateCosts() {
     const outputCost = (totalOutputTokens / 1000000) * modelInfo.cost.output;
     const totalCost = inputCost + outputCost;
     
-    alert(`💰 Estimated cost for ${bookData.numChapters} chapters:
+    const costText = `Estimated cost for ${bookData.numChapters} chapters:
 
-📥 Input tokens: ${inputCost.toFixed(3)}
-📤 Output tokens: ${outputCost.toFixed(3)}
-💰 Total: ${totalCost.toFixed(3)}
+Input tokens: ${inputCost.toFixed(3)}
+Output tokens: ${outputCost.toFixed(3)}
+Total: ${totalCost.toFixed(3)}
 
-⚠️ This is a rough estimate. Actual costs may vary based on:
+This is a rough estimate. Actual costs may vary based on:
 • Actual content length
 • Complexity of prompts  
 • Number of feedback loops
 • API pricing changes
 
-💡 Costs calculated per 1M tokens.
-🔗 Generated with NovelFactory AI (novelfactory.ink)`);
-}
+Costs calculated per 1M tokens.
+Generated with NovelFactory AI (novelfactory.ink)`;
 
-// Keyboard shortcuts info
-function showKeyboardShortcuts() {
-    alert(`⌨️ Keyboard Shortcuts:
-
-📱 General:
-• Ctrl+S (⌘+S): Auto-save current work
-• Ctrl+G (⌘+G): Generate current step
-• Ctrl+F (⌘+F): Enter focus mode / Expand chapter
-• Ctrl+D (⌘+D): Toggle theme (Light → Dark → Fun)
-• Escape: Close modals
-
-🖱️ Navigation:
-• Tab: Move between fields
-• Enter: Activate buttons
-• Escape: Close modals and overlays
-
-✍️ Writing Tips:
-• Use expand mode for distraction-free writing
-• Auto-save runs every 30 seconds
-• Export regularly to backup your work
-• Use feedback loops to improve quality
-• Try 1-click generation for automation
-
-🎨 Themes:
-• Light: Classic clean interface
-• Dark: Easy on the eyes for long sessions  
-• Fun: Colorful and playful design
-
-🔗 Generated with NovelFactory AI (novelfactory.ink)`);
+    await customAlert(costText, 'Cost Estimation');
 }
 
 // Reset functionality
-function resetEverything() {
-    if (!confirm('🚫 Are you sure you want to reset everything and start a new book? This will clear all current progress and cannot be undone.')) {
-        return;
-    }
+async function resetEverything() {
+    const confirmed = await customConfirm('Are you sure you want to reset everything and start a new book? This will clear all current progress and cannot be undone.', 'Reset Everything');
+    if (!confirmed) return;
     
     // Reset book data
     bookData = {
@@ -2825,7 +2866,7 @@ function resetEverything() {
     oneClickCancelled = false;
     currentExpandedChapter = null;
     
-    alert('✅ Everything has been reset! You can now start creating a new book.');
+    await customAlert('Everything has been reset! You can now start creating a new book.', 'Reset Complete');
 }
 
 // Initialize expand textarea word count tracking
@@ -2834,6 +2875,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (expandTextarea) {
         expandTextarea.addEventListener('input', updateExpandedWordCount);
     }
+    
+    // Initialize the app
+    initializeApp();
 });
 
 // Initialize on load
@@ -2867,7 +2911,7 @@ window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
     if (document.getElementById('loading-overlay').style.display !== 'none') {
         hideLoadingOverlay();
-        alert('An unexpected error occurred. Please try again.');
+        customAlert('An unexpected error occurred. Please try again.', 'Error');
     }
 });
 
@@ -2877,7 +2921,7 @@ window.addEventListener('online', function() {
 });
 
 window.addEventListener('offline', function() {
-    alert('You appear to be offline. Some features may not work until connection is restored.');
+    customAlert('You appear to be offline. Some features may not work until connection is restored.', 'Connection Issue');
 });
 
 // Performance optimization: Debounce word count updates
@@ -2972,22 +3016,22 @@ document.addEventListener('DOMContentLoaded', preparePrintView);
 
 // Console welcome message for developers
 console.log(`
-🚀 NovelFactory AI - Professional Edition
-🔗 https://novelfactory.ink
-Built with ❤️ for writers and creators
+NovelFactory AI - Professional Edition
+https://novelfactory.ink
+Built with love for writers and creators
 
 Features:
-✨ AI-powered story generation
-🎨 Modern simplistic design with 3 themes
-🔄 Advanced feedback loops
-⚡ One-click automation
-📤 Multiple export formats
-📊 Book analytics
-🎓 Detailed tutorial
-💬 Built-in feedback system
-☕ Optional donation support
+• AI-powered story generation
+• Modern simplistic design with 3 themes
+• Advanced feedback loops
+• One-click automation
+• Multiple export formats
+• Book analytics
+• Detailed tutorial
+• Built-in feedback system
+• Optional donation support
 
-Happy writing! 📚✨
+Happy writing!
 `);
 
 // Development helpers (remove in production)
@@ -2995,6 +3039,5 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
     window.bookData = bookData;
     window.aiSettings = aiSettings;
     window.themes = themes;
-    console.log('🔧 Development mode: Global variables exposed for debugging');
+    console.log('Development mode: Global variables exposed for debugging');
 }
-

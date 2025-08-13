@@ -65,25 +65,18 @@
                 <div class="header-right">
                     <div class="theme-selector-container">
                         <select class="theme-selector" id="theme-select" onchange="changeTheme()">
-                            <option value="light">🌞 Light</option>
-                            <option value="dark">🌙 Dark</option>
-                            <option value="fun">🎨 Color</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="fun">Color</option>
                         </select>
                     </div>
-                    <!--<button class="header-btn" onclick="showKeyboardShortcuts()">
-                        <span class="icon">⌨️</span>
-                        <span class="label">Shortcuts</span>
-                    </button>-->
                     <button class="header-btn" onclick="estimateCosts()">
-                        <span class="icon">💰</span>
                         <span class="label">Cost Estimate</span>
                     </button>
                     <button class="header-btn" onclick="showFeedbackForm()">
-                        <span class="icon">💬</span>
                         <span class="label">Feedback</span>
                     </button>
                     <button class="header-btn" onclick="showDonationModal()">
-                        <span class="icon">☕</span>
                         <span class="label">Donate</span>
                     </button>
                 </div>
@@ -98,16 +91,13 @@
                 </select>
                 <div class="project-actions">
                     <button class="btn btn-ghost btn-sm" onclick="newProject()">
-                        <span class="icon">📝</span>
-                        New
+                        <span class="label">New</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="saveProject()">
-                        <span class="icon">💾</span>
-                        Save
+                        <span class="label">Save</span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="loadProject()">
-                        <span class="icon">📁</span>
-                        Load
+                        <span class="label">Load</span>
                     </button>
                 </div>
                 <input type="file" id="project-file" style="display: none;" accept=".json" onchange="importProject(event)">
@@ -121,42 +111,34 @@
             </div>
             <div class="nav-items">
                 <button class="nav-item" onclick="showStep('settings')" data-step="settings">
-                    <span class="nav-icon">⚙️</span>
                     <span class="nav-label">Settings</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item active" onclick="showStep('setup')" data-step="setup">
-                    <span class="nav-icon">📝</span>
                     <span class="nav-label">Book Setup</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('outline')" data-step="outline">
-                    <span class="nav-icon">📋</span>
                     <span class="nav-label">Story Structure</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('chapters')" data-step="chapters">
-                    <span class="nav-icon">📑</span>
-                    <span class="nav-label">Chapter Planning</span>
+                       <span class="nav-label">Chapter Planning</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('writing')" data-step="writing">
-                    <span class="nav-icon">✍️</span>
                     <span class="nav-label">Writing</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('export')" data-step="export">
-                    <span class="nav-icon">💾</span>
                     <span class="nav-label">Export</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('analytics')" data-step="analytics">
-                    <span class="nav-icon">📊</span>
                     <span class="nav-label">Analytics</span>
                     <span class="nav-status"></span>
                 </button>
                 <button class="nav-item" onclick="showStep('tutorial')" data-step="tutorial">
-                    <span class="nav-icon">📚</span>
                     <span class="nav-label">Tutorial</span>
                     <span class="nav-status"></span>
                 </button>
@@ -244,24 +226,20 @@
 
                     <div class="random-idea-section">
                         <button class="btn btn-secondary" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
-                            <span class="icon">🎲</span>
-                            Generate Random Idea
+                            <span class="label">Generate Random Idea</span>
                         </button>
                         <p class="random-idea-hint">Select genre and target audience first, then generate a random book idea!</p>
                     </div>
 
                     <div class="step-actions">
                         <button class="btn btn-primary" onclick="startBookGeneration()">
-                            <span class="icon">→</span>
-                            Next: Story Structure
+                            <span class="label">Next: Story Structure</span>
                         </button>
                         <button class="btn btn-secondary" onclick="startOneClickGeneration()">
-                            <span class="icon">⚡</span>
-                            1-Click Generation
+                            <span class="label">1-Click Generation</span>
                         </button>
                         <button class="btn btn-danger" onclick="resetEverything()">
-                            <span class="icon">🔄</span>
-                            Reset & Start New
+                            <span class="label">Reset & Start New</span>
                         </button>
                     </div>
                 </div>
@@ -298,13 +276,11 @@
                                 </label>
                                 <div class="feedback-buttons">
                                     <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('outline')">
-                                        <span class="icon">🔄</span>
-                                        Run Feedback Loop
+                                        <span class="label">Run Feedback Loop</span>
                                     </button>
                                     <div class="dropdown">
                                         <button class="btn btn-ghost btn-sm dropdown-toggle" onclick="toggleFeedbackPromptEditor('outline')">
-                                            <span class="icon">✏️</span>
-                                            Edit Prompt
+                                            <span class="label">Edit Prompt</span>
                                         </button>
                                     </div>
                                 </div>
@@ -328,8 +304,7 @@
                         <label for="outline-prompt">Story Structure Generation Prompt</label>
                         <textarea id="outline-prompt" class="prompt-textarea"></textarea>
                         <button class="btn btn-ghost btn-sm" onclick="regenerateOutline()">
-                            <span class="icon">🔄</span>
-                            Regenerate Structure
+                            <span class="label">Regenerate Structure</span>
                         </button>
                     </div>
 
@@ -339,12 +314,10 @@
 
                     <div class="step-actions">
                         <button class="btn btn-primary" onclick="generateOutline()">
-                            <span class="icon">📋</span>
-                            Generate Story Structure
+                            <span class="label">Generate Story Structure</span>
                         </button>
                         <button class="btn btn-success" onclick="proceedToChapters()" style="display: none;" id="outline-next">
-                            <span class="icon">→</span>
-                            Next: Chapter Planning
+                            <span class="label">Next: Chapter Planning</span>
                         </button>
                     </div>
                 </div>
@@ -381,13 +354,11 @@
                                 </label>
                                 <div class="feedback-buttons">
                                     <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('chapters')">
-                                        <span class="icon">🔄</span>
-                                        Run Feedback Loop
+                                        <span class="label">Run Feedback Loop</span>
                                     </button>
                                     <div class="dropdown">
                                         <button class="btn btn-ghost btn-sm dropdown-toggle" onclick="toggleFeedbackPromptEditor('chapters')">
-                                            <span class="icon">✏️</span>
-                                            Edit Prompt
+                                            <span class="label">Edit Prompt</span>
                                         </button>
                                     </div>
                                 </div>
@@ -411,8 +382,7 @@
                         <label for="chapters-prompt">Chapter Planning Prompt</label>
                         <textarea id="chapters-prompt" class="prompt-textarea"></textarea>
                         <button class="btn btn-ghost btn-sm" onclick="regenerateChapterOutline()">
-                            <span class="icon">🔄</span>
-                            Regenerate Chapter Plan
+                            <span class="label">Regenerate Chapter Plan</span>
                         </button>
                     </div>
 
@@ -422,12 +392,10 @@
 
                     <div class="step-actions">
                         <button class="btn btn-primary" onclick="generateChapterOutline()">
-                            <span class="icon">📑</span>
-                            Generate Chapter Plan
+                            <span class="label">Generate Chapter Plan</span>
                         </button>
                         <button class="btn btn-success" onclick="proceedToWriting()" style="display: none;" id="chapters-next">
-                            <span class="icon">→</span>
-                            Next: Writing
+                            <span class="label">Next: Writing</span>
                         </button>
                     </div>
                 </div>
@@ -464,13 +432,11 @@
                                 </label>
                                 <div class="feedback-buttons">
                                     <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('writing')">
-                                        <span class="icon">🔄</span>
-                                        Run Feedback Loop
+                                        <span class="label">Run Feedback Loop</span>
                                     </button>
                                     <div class="dropdown">
                                         <button class="btn btn-ghost btn-sm dropdown-toggle" onclick="toggleFeedbackPromptEditor('writing')">
-                                            <span class="icon">✏️</span>
-                                            Edit Prompt
+                                            <span class="label">Edit Prompt</span>
                                         </button>
                                     </div>
                                 </div>
@@ -505,10 +471,9 @@
                     <div id="chapters-container"></div>
 
                     <div class="writing-footer">
-                        <p class="writing-hint">💡 Use the controls above each chapter list to generate chapters individually or in batches</p>
+                        <p class="writing-hint">Tip: Use the controls above each chapter list to generate chapters individually or in batches</p>
                         <button class="btn btn-success" onclick="proceedToExport()" style="display: none;" id="writing-next">
-                            <span class="icon">→</span>
-                            Next: Export
+                            <span class="label">Next: Export</span>
                         </button>
                     </div>
                 </div>
@@ -543,25 +508,25 @@
 
                     <div class="export-grid">
                         <div class="export-card">
-                            <div class="export-icon">📖</div>
+                            <div class="export-icon">TXT</div>
                             <h4>Text Format</h4>
                             <p>Simple text file for basic reading</p>
                             <button class="btn btn-primary" onclick="downloadBook('txt')">Download TXT</button>
                         </div>
                         <div class="export-card">
-                            <div class="export-icon">🌐</div>
+                            <div class="export-icon">HTML</div>
                             <h4>HTML Format</h4>
                             <p>Web-ready format with styling</p>
                             <button class="btn btn-primary" onclick="downloadBook('html')">Download HTML</button>
                         </div>
                         <div class="export-card">
-                            <div class="export-icon">📄</div>
+                            <div class="export-icon">MD</div>
                             <h4>Markdown Format</h4>
                             <p>Universal format for publishing platforms</p>
                             <button class="btn btn-primary" onclick="downloadBook('md')">Download Markdown</button>
                         </div>
                         <div class="export-card">
-                            <div class="export-icon">📋</div>
+                            <div class="export-icon">COPY</div>
                             <h4>Copy to Clipboard</h4>
                             <p>Quick copy for pasting elsewhere</p>
                             <button class="btn btn-primary" onclick="copyToClipboard()">Copy Text</button>
@@ -614,7 +579,7 @@
                                 <select id="model-select" onchange="updateModelInfo()">
                                     <!-- Models will be populated by JavaScript -->
                                 </select>
-                                <div id="model-cost-info" class="form-hint">⭐ = Best quality | 💵 = Most economical</div>
+                                <div id="model-cost-info" class="form-hint">Best quality models marked with stars | Budget models marked with dollar signs</div>
                             </div>
                         </div>
 
@@ -634,20 +599,16 @@
 
                         <div class="settings-actions">
                             <button class="btn btn-primary" onclick="testApiConnection()">
-                                <span class="icon">🔍</span>
-                                Test Connection
+                                <span class="label">Test Connection</span>
                             </button>
                             <button class="btn btn-ghost" onclick="resetPrompts()">
-                                <span class="icon">🔄</span>
-                                Reset Prompts
+                                <span class="label">Reset Prompts</span>
                             </button>
                             <button class="btn btn-ghost" onclick="exportSettings()">
-                                <span class="icon">📤</span>
-                                Export Settings
+                                <span class="label">Export Settings</span>
                             </button>
                             <button class="btn btn-ghost" onclick="importSettings()">
-                                <span class="icon">📥</span>
-                                Import Settings
+                                <span class="label">Import Settings</span>
                             </button>
                         </div>
 
@@ -701,8 +662,7 @@
 
                     <div class="analytics-actions">
                         <button class="btn btn-primary" onclick="generateAnalytics()">
-                            <span class="icon">🔄</span>
-                            Refresh Analytics
+                            <span class="label">Refresh Analytics</span>
                         </button>
                     </div>
                 </div>
@@ -717,7 +677,7 @@
 
                 <div class="step-content">
                     <div class="tutorial-section">
-                        <h3>🚀 Getting Started</h3>
+                        <h3>Getting Started</h3>
 
                         <div class="tutorial-card">
                             <h4>1. AI Settings</h4>
@@ -739,7 +699,7 @@
                                 <li><strong>Chapter Count:</strong> Choose between 5-50 chapters based on your desired book length</li>
                                 <li><strong>Words per Chapter:</strong> Set target length (2000-4000 words recommended)</li>
                             </ul>
-                            <p><strong>💡 Pro Tip:</strong> Use the "Generate Random Idea" button for inspiration!</p>
+                            <p><strong>Pro Tip:</strong> Use the "Generate Random Idea" button for inspiration!</p>
                         </div>
 
                         <div class="tutorial-card">
@@ -751,7 +711,7 @@
                                 <li><strong>Plot Points:</strong> Key moments and turning points</li>
                                 <li><strong>Pacing Guidelines:</strong> Tension management and emotional beats</li>
                             </ul>
-                            <p><strong>🎯 Quality Enhancement:</strong> Use feedback loops to refine the structure</p>
+                            <p><strong>Quality Enhancement:</strong> Use feedback loops to refine the structure</p>
                         </div>
 
                         <div class="tutorial-card">
@@ -778,7 +738,7 @@
                     </div>
 
                     <div class="tutorial-section">
-                        <h3>⚙️ Advanced Features</h3>
+                        <h3>Advanced Features</h3>
                         <div class="tutorial-card">
                             <h4>Feedback Loop System</h4>
                             <p>Enhance quality through iterative improvement:</p>
@@ -804,7 +764,7 @@
                     </div>
 
                     <div class="tutorial-section">
-                        <h3>📊 Analytics & Export</h3>
+                        <h3>Analytics & Export</h3>
                         <div class="tutorial-card">
                             <h4>Writing Analytics</h4>
                             <p>Analyze your book's quality and structure:</p>
@@ -829,7 +789,7 @@
                     </div>
 
                     <div class="tutorial-section">
-                        <h3>💡 Tips & Best Practices</h3>
+                        <h3>Tips & Best Practices</h3>
                         <div class="tutorial-card">
                             <h4>Writing Quality</h4>
                             <ul>
@@ -840,17 +800,6 @@
                                 <li>Export regularly to backup your work</li>
                             </ul>
                         </div>
-
-                        <!--<div class="tutorial-card">
-                            <h4>Keyboard Shortcuts</h4>
-                            <ul>
-                                <li><strong>Ctrl+S:</strong> Auto-save current work</li>
-                                <li><strong>Ctrl+G:</strong> Generate current step</li>
-                                <li><strong>Ctrl+F:</strong> Enter focus mode / Expand chapter</li>
-                                <li><strong>Ctrl+D:</strong> Toggle dark/light mode</li>
-                                <li><strong>Escape:</strong> Close modals</li>
-                            </ul>
-                        </div>-->
 
                         <div class="tutorial-card">
                             <h4>Project Management</h4>
@@ -865,7 +814,7 @@
                     </div>
 
                     <div class="tutorial-section">
-                        <h3>❓ Troubleshooting</h3>
+                        <h3>Troubleshooting</h3>
                         <div class="tutorial-card">
                             <h4>Common Issues</h4>
                             <ul>
@@ -896,6 +845,22 @@
     <!-- Auto-save Indicator -->
     <div id="auto-save-indicator" class="auto-save-indicator">Auto-saved</div>
 
+    <!-- Custom Alert Modal -->
+    <div id="custom-alert-modal" class="modal custom-alert-modal">
+        <div class="modal-content alert-content">
+            <div class="alert-header">
+                <h3 id="alert-title">Notification</h3>
+            </div>
+            <div class="alert-body">
+                <div id="alert-message">Alert message will appear here</div>
+            </div>
+            <div class="alert-footer">
+                <button class="btn btn-primary" id="alert-ok-btn" onclick="closeCustomAlert()">OK</button>
+                <button class="btn btn-ghost" id="alert-cancel-btn" onclick="closeCustomAlert(false)" style="display: none;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Enhanced Expand Modal -->
     <div id="expand-modal" class="expand-modal">
         <div class="expand-header">
@@ -908,16 +873,13 @@
             </div>
             <div class="expand-controls">
                 <button class="btn btn-ghost btn-sm" onclick="toggleExpandedReadMode()">
-                    <span class="icon">👁️</span>
                     <span id="read-mode-label">Read Mode</span>
                 </button>
                 <button class="btn btn-success btn-sm" onclick="saveExpandedChapter()">
-                    <span class="icon">💾</span>
-                    Save Changes
+                    <span class="label">Save Changes</span>
                 </button>
                 <button class="btn btn-danger btn-sm" onclick="closeExpandModal()">
-                    <span class="icon">✕</span>
-                    Close
+                    <span class="label">Close</span>
                 </button>
             </div>
         </div>
@@ -937,7 +899,7 @@
             <div class="modal-header">
                 <h3>1-Click Generation Configuration</h3>
                 <button class="btn btn-ghost btn-sm" onclick="closeOneClickModal()">
-                    <span class="icon">✕</span>
+                    <span class="label">Close</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -976,8 +938,7 @@
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeOneClickModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="startOneClickProcess()">
-                    <span class="icon">⚡</span>
-                    Start Generation
+                    <span class="label">Start Generation</span>
                 </button>
             </div>
         </div>
@@ -989,7 +950,7 @@
             <div class="modal-header">
                 <h3>Send Feedback</h3>
                 <button class="btn btn-ghost btn-sm" onclick="closeFeedbackModal()">
-                    <span class="icon">✕</span>
+                    <span class="label">Close</span>
                 </button>
             </div>
             <div class="modal-body">
@@ -1016,8 +977,7 @@
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeFeedbackModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="submitFeedback()">
-                    <span class="icon">📤</span>
-                    Send Feedback
+                    <span class="label">Send Feedback</span>
                 </button>
             </div>
         </div>
@@ -1029,13 +989,13 @@
             <div class="modal-header">
                 <h3>Support NovelFactory AI</h3>
                 <button class="btn btn-ghost btn-sm" onclick="closeDonationModal()">
-                    <span class="icon">✕</span>
+                    <span class="label">Close</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="donation-content">
-                    <p>🎉 <strong>NovelFactory AI is completely free to use!</strong></p>
-                    <p>If you find this tool helpful and would like to support its development, consider buying me a coffee. Your support helps me a lot:</p>
+                    <p><strong>NovelFactory AI is completely free to use!</strong></p>
+                    <p>If you find this tool helpful and would like to support its development, consider buying me a coffee. Your support helps me:</p>
                     <ul>
                         <li>Keep the service free for everyone</li>
                         <li>Add new features and improvements</li>
@@ -1046,21 +1006,14 @@
                     <div class="donation-options">
                         <h4>Choose an amount:</h4>
                         <div class="donation-buttons">
-                            <button class="btn btn-ghost donation-amount" onclick="setDonationAmount(3)">
-                                <span class="icon">☕</span>
-                                $3 Coffee
-                            </button>
                             <button class="btn btn-ghost donation-amount" onclick="setDonationAmount(5)">
-                                <span class="icon">🥪</span>
-                                $5 Snack
+                                <span class="label">$5 Coffee</span>
                             </button>
                             <button class="btn btn-ghost donation-amount" onclick="setDonationAmount(10)">
-                                <span class="icon">🍕</span>
-                                $10 Meal
+                                <span class="label">$10 Meal</span>
                             </button>
                             <button class="btn btn-ghost donation-amount" onclick="setDonationAmount(25)">
-                                <span class="icon">💝</span>
-                                $25 Generous
+                                <span class="label">$25 Generous</span>
                             </button>
                         </div>
                         
@@ -1070,14 +1023,13 @@
                         </div>
                     </div>
                     
-                    <p class="donation-note">💝 <em>Every contribution, no matter how small, means the world to us!</em></p>
+                    <p class="donation-note"><em>Every contribution, no matter how small, means the world to us!</em></p>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeDonationModal()">Maybe Later</button>
                 <button class="btn btn-primary" onclick="proceedToDonate()" id="donate-btn">
-                    <span class="icon">💖</span>
-                    Donate $5
+                    <span class="label">Donate $5</span>
                 </button>
             </div>
         </div>
@@ -1089,18 +1041,1728 @@
             <div class="loading-spinner"></div>
             <div class="loading-text" id="loading-text">Processing...</div>
             <button class="btn btn-danger btn-sm" onclick="cancelOneClickGeneration()" id="cancel-btn" style="display: none;">
-                <span class="icon">⏹️</span>
-                Cancel
+                <span class="label">Cancel</span>
             </button>
         </div>
     </div>
 
-    <!-- Keyboard Shortcuts Info
-    <div class="keyboard-shortcuts">
-        <strong>Shortcuts:</strong> Ctrl+S (Save) | Ctrl+G (Generate) | Ctrl+F (Focus) | Ctrl+D (Dark Mode)
-    </div>-->
-
     <script src="script.js"></script>
+
+    <style>
+/* Apple-Inspired Design System with Fun Theme */
+:root {
+    /* Colors - Light Theme */
+    --color-primary: #007AFF;
+    --color-primary-hover: #0056CC;
+    --color-success: #34C759;
+    --color-danger: #FF3B30;
+    --color-warning: #FF9500;
+    --color-secondary: #8E8E93;
+    
+    /* Backgrounds */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F2F2F7;
+    --bg-tertiary: #FFFFFF;
+    --bg-quaternary: #F2F2F7;
+    
+    /* Text Colors */
+    --text-primary: #000000;
+    --text-secondary: #3C3C43;
+    --text-tertiary: #3C3C4399;
+    --text-quaternary: #3C3C4360;
+    
+    /* Borders & Separators */
+    --separator: #3C3C4329;
+    --border-primary: #D1D1D6;
+    --border-secondary: #E5E5EA;
+    
+    /* Shadows */
+    --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.12);
+    
+    /* Blur Effects */
+    --blur-light: rgba(255, 255, 255, 0.8);
+    --blur-dark: rgba(0, 0, 0, 0.3);
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-xs: 11px;
+    --font-size-sm: 13px;
+    --font-size-base: 15px;
+    --font-size-lg: 17px;
+    --font-size-xl: 19px;
+    --font-size-2xl: 22px;
+    --font-size-3xl: 28px;
+    --font-size-4xl: 36px;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --color-primary: #0A84FF;
+    --color-primary-hover: #409CFF;
+    --color-success: #30D158;
+    --color-danger: #FF453A;
+    --color-warning: #FF9F0A;
+    --color-secondary: #98989D;
+    
+    --bg-primary: #000000;
+    --bg-secondary: #1C1C1E;
+    --bg-tertiary: #2C2C2E;
+    --bg-quaternary: #3A3A3C;
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: #EBEBF5;
+    --text-tertiary: #EBEBF599;
+    --text-quaternary: #EBEBF560;
+    
+    --separator: #54545899;
+    --border-primary: #38383A;
+    --border-secondary: #48484A;
+    
+    --blur-light: rgba(0, 0, 0, 0.8);
+    --blur-dark: rgba(255, 255, 255, 0.1);
+}
+
+/* Fun Theme */
+[data-theme="fun"] {
+    --color-primary: #FF6B6B;
+    --color-primary-hover: #FF5252;
+    --color-success: #4ECDC4;
+    --color-danger: #FF8A80;
+    --color-warning: #FFD54F;
+    --color-secondary: #9C27B0;
+    
+    --bg-primary: #FFF8E1;
+    --bg-secondary: #F3E5F5;
+    --bg-tertiary: #E1F5FE;
+    --bg-quaternary: #FCE4EC;
+    
+    --text-primary: #2E2E2E;
+    --text-secondary: #5E35B1;
+    --text-tertiary: #7986CB;
+    --text-quaternary: #9575CD;
+    
+    --separator: #E1BEE7;
+    --border-primary: #F8BBD9;
+    --border-secondary: #C8E6C9;
+    
+    --shadow-small: 0 1px 3px rgba(156, 39, 176, 0.2);
+    --shadow-medium: 0 4px 12px rgba(255, 107, 107, 0.3);
+    --shadow-large: 0 8px 30px rgba(78, 205, 196, 0.2);
+    
+    --blur-light: rgba(255, 248, 225, 0.9);
+    --blur-dark: rgba(156, 39, 176, 0.1);
+}
+
+/* Theme Selector Dropdown */
+.theme-selector-container {
+    display: flex;
+    align-items: center;
+}
+
+.theme-selector {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 100px;
+}
+
+.theme-selector:hover {
+    background: var(--bg-quaternary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+.theme-selector:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+    .theme-selector {
+        min-width: 80px;
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--transition-medium), color var(--transition-medium);
+}
+
+/* App Container */
+.app-container {
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: var(--bg-primary);
+    box-shadow: var(--shadow-large);
+    position: relative;
+}
+
+/* Header */
+.header {
+    background: var(--blur-light);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--separator);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.header-left {
+    flex: 1;
+}
+
+.app-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.app-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.header-right {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.header-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.header-btn:hover {
+    background: var(--bg-quaternary);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+/* Project Bar */
+.project-bar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--separator);
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+.project-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-selector {
+    flex: 1;
+    max-width: 300px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.project-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+/* Navigation */
+.navigation {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--separator);
+    position: relative;
+}
+
+.nav-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--bg-secondary);
+}
+
+.progress-line {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+    width: 0%;
+    transition: width var(--transition-medium);
+}
+
+.nav-items {
+    display: flex;
+    padding: 0 var(--spacing-xl);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-items::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-sm);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    min-width: 80px;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.nav-item:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.nav-item.active {
+    color: var(--color-primary);
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: var(--color-primary);
+    border-radius: var(--radius-sm);
+}
+
+.nav-item.completed .nav-status::after {
+    content: '✓';
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.nav-icon {
+    font-size: var(--font-size-base);
+    opacity: 0.8;
+}
+
+.nav-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Main Content */
+.main-content {
+    padding: var(--spacing-2xl) var(--spacing-xl);
+    min-height: calc(100vh - 200px);
+}
+
+.step {
+    display: none;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.step.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.step-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.step-description {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.step-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Custom Alert Modal */
+.custom-alert-modal {
+    z-index: 9999;
+}
+
+.alert-content {
+    max-width: 450px;
+    width: 90%;
+}
+
+.alert-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--separator);
+    text-align: center;
+}
+
+.alert-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.alert-body {
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.alert-body #alert-message {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+.alert-footer {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--separator);
+}
+
+.alert-footer .btn {
+    min-width: 80px;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    line-height: 1.6;
+}
+
+.textarea-container {
+    position: relative;
+}
+
+.word-count {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.form-hint {
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    line-height: 1.4;
+}
+
+.form-hint a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.form-hint a:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-sm {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.btn-ghost {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-secondary);
+}
+
+.btn-ghost:hover {
+    background: var(--bg-quaternary);
+    border-color: var(--border-primary);
+}
+
+.btn-secondary {
+    background: var(--color-secondary);
+}
+
+.btn-secondary:hover {
+    background: #7A7A85;
+}
+
+.btn-success {
+    background: var(--color-success);
+}
+
+.btn-success:hover {
+    background: #28A745;
+}
+
+.btn-danger {
+    background: var(--color-danger);
+}
+
+.btn-danger:hover {
+    background: #E6342A;
+}
+
+.label {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+/* Cards */
+.info-card, .output-section {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.info-card h4, .output-section h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Tutorial Styles */
+.tutorial-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.tutorial-section h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.tutorial-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    transition: all var(--transition-fast);
+}
+
+.tutorial-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+}
+
+.tutorial-card h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.tutorial-card p {
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.tutorial-card ul {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.tutorial-card li {
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.5;
+}
+
+.tutorial-card strong {
+    color: var(--color-primary);
+}
+
+/* Donation Modal Styles */
+.donation-content {
+    text-align: center;
+}
+
+.donation-content p {
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.donation-content ul {
+    text-align: left;
+    margin: var(--spacing-md) 0;
+    padding-left: var(--spacing-lg);
+}
+
+.donation-content li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.donation-options {
+    margin: var(--spacing-xl) 0;
+}
+
+.donation-options h4 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.donation-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.donation-amount {
+    flex-direction: column;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-xs);
+}
+
+.donation-amount:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.donation-amount.selected {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.custom-amount {
+    margin-top: var(--spacing-lg);
+}
+
+.custom-amount label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.custom-amount input {
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+.donation-note {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-lg);
+}
+
+/* Random Idea Section */
+.random-idea-section {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.random-idea-hint {
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+/* Step Actions */
+.step-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-top: var(--spacing-2xl);
+    flex-wrap: wrap;
+}
+
+/* Feedback Controls */
+.feedback-controls {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.feedback-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.feedback-options {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.feedback-options label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.feedback-options select {
+    min-width: 120px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.feedback-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    content: '▼';
+    font-size: var(--font-size-xs);
+    margin-left: var(--spacing-xs);
+}
+
+.manual-feedback-section {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--separator);
+}
+
+.manual-feedback-section label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.manual-feedback-section textarea {
+    width: 100%;
+    min-height: 100px;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+}
+
+.feedback-prompt-editor {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--separator);
+}
+
+.feedback-prompt-editor label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.feedback-prompt-editor textarea {
+    width: 100%;
+    min-height: 150px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+}
+
+.prompt-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+/* Prompt Editor */
+.prompt-editor {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.prompt-editor label {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.prompt-textarea {
+    min-height: 200px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+}
+
+/* Progress Section */
+.progress-section {
+    margin: var(--spacing-lg) 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+    width: 0%;
+    transition: width var(--transition-medium);
+}
+
+#writing-status {
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Chapter Controls */
+.chapter-controls {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.chapter-controls h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.writing-hint {
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    margin-bottom: var(--spacing-md);
+}
+
+.writing-footer {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--separator);
+}
+
+/* Chapter Items */
+.chapter-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md) 0;
+    transition: all var(--transition-fast);
+}
+
+.chapter-item:hover {
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-small);
+}
+
+.chapter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.chapter-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.chapter-info h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.chapter-word-count {
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.chapter-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.chapter-status {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.chapter-content {
+    display: none;
+}
+
+.chapter-content.active {
+    display: block;
+}
+
+.chapter-textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Georgia', serif;
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+}
+
+.chapter-footer {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.stat-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    cursor: help;
+    transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.stat-number {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stat-explanation {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-xs);
+    font-style: italic;
+}
+
+/* Book Title & Blurb Display */
+.book-title-section {
+    background: var(--bg-tertiary);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.book-title-section h3 {
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-xl);
+}
+
+.title-display, .blurb-display {
+    margin-bottom: var(--spacing-lg);
+}
+
+.title-display h4, .blurb-display h4 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.book-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-primary);
+}
+
+.book-blurb {
+    font-size: var(--font-size-base);
+    line-height: 1.7;
+    color: var(--text-primary);
+    padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-success);
+    font-style: italic;
+}
+
+/* Export Grid */
+.export-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.export-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.export-card:hover {
+    border-color: var(--border-primary);
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.export-icon {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+    background: var(--bg-secondary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    display: inline-block;
+}
+
+.export-card h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.export-card p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Settings */
+.settings-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.settings-section h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.api-provider-toggle {
+    margin-bottom: var(--spacing-lg);
+}
+
+.toggle-group {
+    display: inline-flex;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs);
+}
+
+.toggle-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.toggle-btn.active {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-small);
+}
+
+.settings-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-lg);
+}
+
+/* Analysis Section */
+.analysis-section {
+    margin-top: var(--spacing-xl);
+}
+
+.analytics-actions {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+}
+
+/* Enhanced Expand Modal */
+.expand-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.expand-modal.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.expand-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--separator);
+    flex-shrink: 0;
+}
+
+.expand-title h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.expand-info {
+    display: flex;
+    gap: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.expand-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.expand-content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.expand-editor, .expand-reader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.expand-editor textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    padding: var(--spacing-2xl);
+    font-family: 'Georgia', serif;
+    font-size: var(--font-size-lg);
+    line-height: 1.8;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    resize: none;
+}
+
+.expand-reader {
+    padding: var(--spacing-2xl);
+    overflow-y: auto;
+    background: var(--bg-primary);
+}
+
+.expand-reader-content {
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: 'Georgia', serif;
+    font-size: var(--font-size-lg);
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-large);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--separator);
+}
+
+.modal-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: var(--spacing-xl);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--separator);
+}
+
+/* One-Click Configuration */
+.one-click-config {
+    margin-top: var(--spacing-lg);
+}
+
+.config-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.config-row label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.config-row select {
+    min-width: 150px;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--blur-dark);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.loading-content {
+    text-align: center;
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-large);
+    max-width: 400px;
+    width: 90%;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--border-secondary);
+    border-top: 4px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--spacing-lg);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Auto-save Indicator */
+.auto-save-indicator {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: var(--color-success);
+    color: white;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity var(--transition-medium);
+    z-index: 1000;
+    box-shadow: var(--shadow-medium);
+}
+
+.auto-save-indicator.show {
+    opacity: 1;
+}
+
+/* Loading States */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+}
+
+.loading .loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--spacing-md);
+}
+
+.loading-text-small {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Status Messages */
+.success {
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+.error {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--color-danger);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+.warning {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--color-warning);
+    border: 1px solid rgba(255, 149, 0, 0.2);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-md) 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        box-shadow: none;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+    
+    .header-right {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .project-controls {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .project-selector {
+        max-width: none;
+    }
+    
+    .nav-items {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .nav-item {
+        min-width: 70px;
+        padding: var(--spacing-sm) var(--spacing-xs);
+    }
+    
+    .main-content {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid, .export-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .chapter-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .expand-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+    
+    .expand-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .expand-editor textarea, .expand-reader {
+        padding: var(--spacing-lg);
+    }
+    
+    .modal-content {
+        margin: var(--spacing-md);
+        width: calc(100% - 2 * var(--spacing-md));
+    }
+    
+    .config-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .feedback-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .feedback-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .book-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .book-title-section {
+        padding: var(--spacing-lg);
+    }
+    
+    .settings-actions {
+        flex-direction: column;
+    }
+    
+    .donation-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .step-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .app-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .nav-item {
+        min-width: 60px;
+        padding: var(--spacing-sm) var(--spacing-xs);
+    }
+    
+    .nav-icon {
+        font-size: var(--font-size-sm);
+    }
+    
+    .nav-label {
+        font-size: 10px;
+    }
+    
+    .donation-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
 
 </body>
 </html>
