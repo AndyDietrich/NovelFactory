@@ -1,4 +1,4 @@
-/* Apple-Inspired Design System with Fun Theme */
+/* Modern, minimalistic Design Theme */
 :root {
     /* Colors - Light Theme */
     --color-primary: #007AFF;
@@ -687,6 +687,12 @@ textarea {
     font-size: var(--font-size-sm);
 }
 
+.btn-large {
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+}
+
 .btn-ghost {
     background: var(--bg-tertiary);
     color: var(--text-primary);
@@ -875,19 +881,49 @@ textarea {
     margin-top: var(--spacing-lg);
 }
 
-/* Random Idea Section */
+/* Setup Actions Layout */
+.setup-actions {
+    margin-top: var(--spacing-2xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
 .random-idea-section {
     text-align: center;
-    padding: var(--spacing-xl);
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    margin: var(--spacing-lg) 0;
+    width: 100%;
 }
 
 .random-idea-hint {
     margin-top: var(--spacing-md);
     font-size: var(--font-size-sm);
     color: var(--text-tertiary);
+}
+
+.main-setup-actions {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.secondary-actions {
+    display: flex;
+    justify-content: center;
+}
+
+/* Primary Actions Section */
+.primary-actions-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.main-generation-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-lg);
 }
 
 /* Step Actions */
@@ -1362,19 +1398,95 @@ textarea {
 }
 
 /* Advanced Model Selection */
-.advanced-models-section {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
+.advanced-models-container {
+    margin-bottom: var(--spacing-2xl);
 }
 
-.advanced-models-section h4 {
-    font-size: var(--font-size-lg);
+.advanced-models-toggle {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Checkbox Component Styling */
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.checkbox-container:hover {
+    background-color: var(--bg-secondary);
+}
+
+.checkbox-container input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: relative;
+    height: 20px;
+    width: 20px;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--border-secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.checkbox-container:hover .checkmark {
+    border-color: var(--color-primary);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-content {
+    flex: 1;
+}
+
+.checkbox-label {
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+.checkbox-content .form-hint {
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: 1.4;
 }
 
 .advanced-models-grid {
@@ -1406,6 +1518,113 @@ textarea {
     display: flex;
     gap: var(--spacing-sm);
     justify-content: flex-end;
+}
+
+/* Custom Prompts Container */
+.custom-prompts-container {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--separator);
+}
+
+.custom-prompts-container h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.prompt-editors {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+.prompt-group {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.prompt-group label {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+    display: block;
+}
+
+.prompt-group textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.prompt-group button {
+    align-self: flex-start;
+}
+
+.custom-prompts-actions {
+    margin-top: var(--spacing-lg);
+    display: flex;
+    justify-content: center;
+}
+
+/* Collapsible Sections */
+.collapsible-section {
+    margin: var(--spacing-xl) 0;
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.collapsible-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-bottom: 1px solid var(--separator);
+}
+
+.collapsible-header:hover {
+    background: var(--bg-tertiary);
+}
+
+.toggle-icon {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.collapsible-section.expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.collapsible-header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.collapsible-content {
+    padding: var(--spacing-xl);
+    background: var(--bg-primary);
+    display: none;
+}
+
+.collapsible-section.expanded .collapsible-content {
+    display: block;
 }
 
 /* Analysis Section */
@@ -1953,6 +2172,20 @@ textarea {
     
     .advanced-models-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .main-setup-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .checkbox-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .checkmark {
+        margin-top: 0;
     }
 }
 

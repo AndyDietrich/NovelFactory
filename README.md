@@ -83,12 +83,12 @@ novelfactory-ai/
 
 #### OpenRouter (Recommended)
 - **Website**: [openrouter.ai](https://openrouter.ai)
-- **Models**: Claude Sonnet 4, Claude Opus 4.1, GPT-5, GPT-4o
+- **Models**: Claude Sonnet 4, Claude Opus 4.1, Claude Sonnet 3.5 (Thinking), GPT-5, GPT-5-mini, GPT-5-nano, GPT-4o, Gemini 2.5 Pro, Gemini 2.5 Flash, DeepSeek (Chat) V3
 - **Benefits**: Access to multiple AI providers, competitive pricing
 
 #### OpenAI
 - **Website**: [platform.openai.com](https://platform.openai.com)
-- **Models**: GPT-5, GPT-4o, GPT-4 Turbo, GPT-4o Mini
+- **Models**: GPT-5, GPT-5 mini, GPT-4o, GPT-4o Mini
 - **Benefits**: Direct access to latest OpenAI models
 
 ### **Recommended Settings**
