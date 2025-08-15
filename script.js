@@ -170,14 +170,20 @@ const apiModels = {
             { value: 'openai/gpt-4o', label: 'GPT-4o', cost: { input: 5.00, output: 15.00 }},
             { value: 'openai/gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10.00 }},
             { value: 'anthropic/claude-3.7-sonnet:thinking', label: 'Claude Sonnet 3.7 (Thinking)', cost: { input: 3.00, output: 15.00 }},
-            { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', cost: { input: 1.25, output: 10.00 }}
+            { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', cost: { input: 1.25, output: 10.00 }},
+            { value: 'x-ai/grok-4', label: 'Grok 4', cost: { input: 3.00, output: 15.00 }},
+            { value: 'perplexity/sonar-reasoning-pro', label: 'Sonar Reasoning Pro', cost: { input: 2.00, output: 8.00 }}
         ],
         budget: [
             { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini', cost: { input: 0.25, output: 2.00 }},
             { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.60 }},
             { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', cost: { input: 0.05, output: 0.40 }},
             { value: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.30, output: 2.50 }},
-            { value: 'deepseek/deepseek-chat-v3-0324', label: 'DeepSeek Chat V3', cost: { input: 0.18, output: 0.72 }}
+            { value: 'deepseek/deepseek-chat-v3-0324', label: 'DeepSeek Chat V3', cost: { input: 0.18, output: 0.72 }},
+            { value: 'deepseek/deepseek-chat-v3-0324:free', label: 'DeepSeek V3: FREE', cost: { input: 0.00, output: 0.00 }},
+            { value: 'openai/gpt-oss-20b:free', label: 'OpenAI GPT-OSS 20B: FREE', cost: { input: 0.00, output: 0.00 }},
+            { value: 'thedrummer/anubis-70b-v1.1t', label: 'Anubis 70B V1.1T', cost: { input: 0.40, output: 0.70 }},
+            { value: 'microsoft/wizardlm-2-8x22b', label: 'WizardLM 2-8x22B', cost: { input: 0.48, output: 0.48 }}
         ]
     },
     openai: {
@@ -4084,18 +4090,8 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 
 // Console welcome message
 console.log(`
-NovelFactory AI v${CONFIG.VERSION} - Production Ready
+NovelFactory AI v${CONFIG.VERSION}
 https://novelfactory.ink
-
-All Features Implemented:
-• Clean design without unnecessary emojis
-• Reorganized setup buttons layout
-• Combined advanced settings sections
-• Comprehensive prompt management
-• Production-ready code structure
-• Auto-save and project management
-• Advanced model selection per step
-• Complete feedback loop system
 
 Happy writing!
 `);
