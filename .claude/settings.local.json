@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(node:*)",
-      "Bash(start index.html)"
+      "Bash(start index.html)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

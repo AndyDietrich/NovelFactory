@@ -1781,28 +1781,21 @@ function setupWritingInterface() {
     // Ensure chapters array is properly sized
     bookData.chapters = Array(bookData.numChapters).fill(null).map((_, i) => bookData.chapters[i] || '');
 
-    // Add chapter controls
-    const controlsDiv = document.createElement('div');
-    controlsDiv.className = 'chapter-controls';
-    controlsDiv.innerHTML = `
-        <h4>Chapter Generation Options</h4>
-        <div class="controls-row">
-            <button class="btn btn-ghost btn-sm" onclick="selectAllChapters()">
-                <span class="label">Select All</span>
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="deselectAllChapters()">
-                <span class="label">Deselect All</span>
-            </button>
-            <button class="btn btn-primary btn-sm" onclick="generateSelectedChapters()" id="generate-selected-btn" disabled>
-                <span class="label">Generate Selected (0)</span>
-            </button>
-            <button class="btn btn-secondary btn-sm" onclick="generateAllChapters()">
+    // Add primary generation actions section (similar to story structure and chapter planning)
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'primary-actions-section';
+    actionsDiv.innerHTML = `
+        <div class="main-generation-actions">
+            <button class="btn btn-primary btn-large" onclick="generateAllChapters()">
                 <span class="label">Generate All Chapters</span>
+            </button>
+            <button class="btn btn-secondary" onclick="generateSelectedChapters()" id="generate-selected-btn" disabled>
+                <span class="label">Generate Selected (0)</span>
             </button>
         </div>
         <p class="writing-hint">Tip: Type directly in chapter fields or use AI generation. Select multiple chapters for batch processing.</p>
     `;
-    container.appendChild(controlsDiv);
+    container.appendChild(actionsDiv);
 
     // Create chapter items
     for (let i = 1; i <= bookData.numChapters; i++) {

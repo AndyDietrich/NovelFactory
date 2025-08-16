@@ -261,7 +261,7 @@
                             <button class="btn btn-primary btn-large" onclick="collectBookData(); autoSave(); showStep('outline'); window.scrollTo({top: 0, behavior: 'smooth'})">
                                 <span class="label">Start Creating Book</span>
                             </button>
-                            <button class="btn btn-secondary btn-large" onclick="startOneClickGeneration()">
+                            <button class="btn btn-primary btn-large one-click-btn" onclick="startOneClickGeneration()">
                                 <span class="label">1-Click Generation</span>
                             </button>
                         </div>
@@ -279,7 +279,7 @@
             <div id="outline" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Story Structure & Characters</h2>
-                    <p class="step-description">Create your story structure manually or generate with AI</p>
+                    <p class="step-description">Plot out a story structure and Characters for your novel</p>
                 </div>
 
                 <div class="step-content">
@@ -291,9 +291,6 @@
                             </button>
                             <button class="btn btn-secondary" onclick="regenerateOutline()">
                                 <span class="label">Regenerate</span>
-                            </button>
-                            <button class="btn btn-ghost" onclick="clearOutlineContent()">
-                                <span class="label">Clear Content</span>
                             </button>
                         </div>
                     </div>
@@ -381,7 +378,7 @@
             <div id="chapters" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Chapter Planning</h2>
-                    <p class="step-description">Create your detailed chapter plan manually or generate with AI</p>
+                    <p class="step-description">Create a detailed chapter plan for your novel</p>
                 </div>
 
                 <div class="step-content">
@@ -393,9 +390,6 @@
                             </button>
                             <button class="btn btn-secondary" onclick="regenerateChapterOutline()">
                                 <span class="label">Regenerate</span>
-                            </button>
-                            <button class="btn btn-ghost" onclick="clearChaptersContent()">
-                                <span class="label">Clear Content</span>
                             </button>
                         </div>
                     </div>
@@ -485,18 +479,11 @@
             <div id="writing" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Writing Chapters</h2>
-                    <p class="step-description">Generate the full prose for each chapter with professional quality</p>
+                    <p class="step-description">Write prose for your book</p>
                 </div>
 
                 <div class="step-content">
-                    <!-- Progress Section -->
-                    <div class="progress-section">
-                        <div class="progress-bar">
-                            <div id="writing-progress" class="progress-fill"></div>
-                        </div>
-                        <div id="writing-status">Ready to begin writing chapters...</div>
-                    </div>
-
+                    
                     <!-- Writing Container -->
                     <div id="chapters-container">
                         <div class="writing-placeholder">
@@ -574,7 +561,7 @@
             <div id="export" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Export Your Book</h2>
-                    <p class="step-description">Download your completed book in multiple professional formats</p>
+                    <p class="step-description">Download your completed book in different formats</p>
                 </div>
 
                 <div class="step-content">
@@ -834,14 +821,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             <!-- Tutorial Step -->
             <div id="tutorial" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Tutorial & Guide</h2>
-                    <p class="step-description">Complete guide to using NovelFactory effectively</p>
+                    <p class="step-description">Complete guide and information to using NovelFactory</p>
                 </div>
 
                 <div class="step-content">

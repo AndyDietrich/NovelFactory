@@ -776,6 +776,20 @@ textarea {
 }
 
 /* Tutorial Styles */
+#tutorial {
+    padding-top: 0;
+}
+
+#tutorial .step-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+#tutorial .step-content {
+    padding-top: 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 .tutorial-section {
     margin-bottom: var(--spacing-2xl);
 }
@@ -2781,4 +2795,80 @@ textarea {
 [data-theme="dark"] .model-setting {
     background: var(--bg-quaternary);
     border-color: var(--border-primary);
+}
+
+/* ==================================================
+   SPECIAL BUTTON STYLING
+   ================================================== */
+
+/* One-Click Generation Button - Special Purple */
+.one-click-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    border-color: #6366f1 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+.one-click-btn:hover {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+    border-color: #4f46e5 !important;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+.one-click-btn:active {
+    background: linear-gradient(135deg, #4338ca, #6d28d9) !important;
+    transform: translateY(0px);
+}
+
+/* Color Theme Button Customizations */
+[data-theme="fun"] .btn:not(.one-click-btn) {
+    transition: all 0.3s ease;
+}
+
+/* Generation buttons in color theme - Purple */
+[data-theme="fun"] .btn-primary:not(.one-click-btn),
+[data-theme="fun"] button[onclick*="generate"]:not(button[onclick*="regenerate"]):not(.one-click-btn) {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+[data-theme="fun"] .btn-primary:not(.one-click-btn):hover,
+[data-theme="fun"] button[onclick*="generate"]:not(button[onclick*="regenerate"]):not(.one-click-btn):hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea) !important;
+    border-color: #7c3aed !important;
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+/* Regenerate buttons in color theme - Light Red/Pink */
+[data-theme="fun"] button[onclick*="regenerate"],
+[data-theme="fun"] .btn-secondary {
+    background: linear-gradient(135deg, #f87171, #fb7185) !important;
+    border-color: #f87171 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3) !important;
+}
+
+[data-theme="fun"] button[onclick*="regenerate"]:hover,
+[data-theme="fun"] .btn-secondary:hover {
+    background: linear-gradient(135deg, #ef4444, #f43f5e) !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 6px 16px rgba(248, 113, 113, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+/* Keep success buttons green in color theme */
+[data-theme="fun"] .btn-success {
+    background: linear-gradient(135deg, #10b981, #34d399) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="fun"] .btn-success:hover {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+    border-color: #059669 !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
+    transform: translateY(-1px);
 }
