@@ -64,15 +64,18 @@
         /* Per-chapter collapse icon button inside chapter header */
         .collapse-chapter-btn {
             margin-left: auto;
-            padding: 4px 6px;
-            font-size: 12px;
+            padding: 2px 4px;
+            font-size: 10px;
+            min-width: auto;
+            width: 20px;
+            height: 20px;
         }
         /* Chapter content collapse state tweaks (ensures content space is collapsed cleanly) */
         .chapter-content-field.collapsed { display: none !important; }
         /* Small override for the collapse button group layout in header if needed */
         .chapter-header { align-items: center; position: relative; }
         /* Position the collapse button at top-right (CSS supports absolute positioning) */
-        .chapter-item .collapse-chapter-btn { position: absolute; top: 8px; right: 8px; z-index: 2; margin-left: 0; }
+        .chapter-item .collapse-chapter-btn { position: absolute; top: 4px; right: 4px; z-index: 2; margin-left: 0; padding: 0; }
         /* Small helpers for per-chapter collapse icons in header alignment */
         .chapter-actions { display: flex; align-items: center; gap: 6px; }
     </style>
@@ -167,6 +170,7 @@
                 </button>
             </div>
         </nav>
+
 
         <!-- Main Content -->
         <main class="main-content">
@@ -289,8 +293,8 @@
                             <button class="btn btn-primary btn-large" onclick="generateOutline()">
                                 <span class="label">Generate Story Structure</span>
                             </button>
-                            <button class="btn btn-secondary" onclick="regenerateOutline()">
-                                <span class="label">Regenerate</span>
+                            <button class="btn btn-secondary" onclick="showOutlineEditModal()">
+                                <span class="label">Edit</span>
                             </button>
                         </div>
                     </div>
@@ -388,8 +392,8 @@
                             <button class="btn btn-primary btn-large" onclick="generateChapterOutline()">
                                 <span class="label">Generate Chapter Plan</span>
                             </button>
-                            <button class="btn btn-secondary" onclick="regenerateChapterOutline()">
-                                <span class="label">Regenerate</span>
+                            <button class="btn btn-secondary" onclick="showChapterOutlineEditModal()">
+                                <span class="label">Edit</span>
                             </button>
                         </div>
                     </div>
@@ -1158,6 +1162,164 @@
                 <button class="btn btn-ghost" onclick="closeFeedbackModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="submitFeedback()">
                     <span class="label">Send Feedback</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Edit Modal -->
+    <div id="chapter-edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="chapter-edit-title">Edit Chapter</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeChapterEditModal()">
+                    <span class="label">Close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-mode-selection">
+                    <h4>Edit Mode</h4>
+                    <div class="edit-mode-buttons">
+                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectEditMode('automated')">
+                            <div class="mode-content">
+                                <strong>Automated</strong>
+                                <small>AI analyzes and improves the chapter automatically</small>
+                            </div>
+                        </button>
+                        <button class="edit-mode-btn" data-mode="manual" onclick="selectEditMode('manual')">
+                            <div class="mode-content">
+                                <strong>Manual</strong>
+                                <small>Provide specific feedback for AI to implement</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="manual-edit-feedback" class="manual-edit-section" style="display: none;">
+                    <label for="chapter-edit-instructions">Edit Instructions:</label>
+                    <textarea id="chapter-edit-instructions" placeholder="Describe what you'd like to change or improve about this chapter..." rows="4"></textarea>
+                </div>
+                
+                <div class="edit-loops-section">
+                    <label for="chapter-edit-loops">Number of Edit Loops:</label>
+                    <select id="chapter-edit-loops">
+                        <option value="1">1 loop</option>
+                        <option value="2">2 loops</option>
+                        <option value="3">3 loops</option>
+                        <option value="5">5 loops</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeChapterEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="executeChapterEdit()" id="execute-edit-btn">
+                    <span class="label">Start Editing</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outline Edit Modal -->
+    <div id="outline-edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Story Structure</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeOutlineEditModal()">
+                    <span class="label">Close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-mode-selection">
+                    <h4>Edit Mode</h4>
+                    <div class="edit-mode-buttons">
+                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectOutlineEditMode('automated')">
+                            <div class="mode-content">
+                                <strong>Automated</strong>
+                                <small>AI analyzes and improves the story structure automatically</small>
+                            </div>
+                        </button>
+                        <button class="edit-mode-btn" data-mode="manual" onclick="selectOutlineEditMode('manual')">
+                            <div class="mode-content">
+                                <strong>Manual</strong>
+                                <small>Provide specific feedback for AI to implement</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="manual-outline-edit-feedback" class="manual-edit-section" style="display: none;">
+                    <label for="outline-edit-instructions">Edit Instructions:</label>
+                    <textarea id="outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the story structure..." rows="4"></textarea>
+                </div>
+
+                <div class="feedback-loops-section">
+                    <label for="outline-edit-loops">Number of edit loops:</label>
+                    <select id="outline-edit-loops">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeOutlineEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="executeOutlineEdit()" id="execute-outline-edit-btn">
+                    <span class="label">Start Editing</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Outline Edit Modal -->
+    <div id="chapter-outline-edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Chapter Plan</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeChapterOutlineEditModal()">
+                    <span class="label">Close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-mode-selection">
+                    <h4>Edit Mode</h4>
+                    <div class="edit-mode-buttons">
+                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectChapterOutlineEditMode('automated')">
+                            <div class="mode-content">
+                                <strong>Automated</strong>
+                                <small>AI analyzes and edits the chapter plan</small>
+                            </div>
+                        </button>
+                        <button class="edit-mode-btn" data-mode="manual" onclick="selectChapterOutlineEditMode('manual')">
+                            <div class="mode-content">
+                                <strong>Manual</strong>
+                                <small>Provide specific feedback for AI to implement</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="manual-chapter-outline-edit-feedback" class="manual-edit-section" style="display: none;">
+                    <label for="chapter-outline-edit-instructions">Edit Instructions:</label>
+                    <textarea id="chapter-outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the chapter plan..." rows="4"></textarea>
+                </div>
+
+                <div class="feedback-loops-section">
+                    <label for="chapter-outline-edit-loops">Number of edit loops:</label>
+                    <select id="chapter-outline-edit-loops">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeChapterOutlineEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="executeChapterOutlineEdit()" id="execute-chapter-outline-edit-btn">
+                    <span class="label">Start Editing</span>
                 </button>
             </div>
         </div>

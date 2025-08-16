@@ -33,6 +33,7 @@ let bookData = {
     lastSaved: new Date().toISOString()
 };
 
+
 /**
  * AI settings and configuration
  */
@@ -1802,7 +1803,10 @@ function setupWritingInterface() {
         const chapterDiv = document.createElement('div');
         chapterDiv.className = 'chapter-item';
         chapterDiv.innerHTML = `
-            <div class="chapter-header" aria-label="Chapter ${i} header" style="align-items: center;">
+            <div class="chapter-header" aria-label="Chapter ${i} header" style="align-items: center; position: relative;">
+                <button class="collapse-chapter-btn btn btn-ghost" onclick="toggleChapterCollapse(${i})" title="Collapse/Expand Chapter" aria-label="Collapse/Expand Chapter">
+                    <span class="icon"><i class="fas fa-angle-down"></i></span>
+                </button>
                 <div class="chapter-info">
                     <div class="chapter-checkbox">
                         <input type="checkbox" id="chapter-${i}-checkbox" onchange="updateGenerateSelectedButton()">
@@ -1816,23 +1820,11 @@ function setupWritingInterface() {
                     <button class="btn btn-ghost btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
                         <span class="label">Generate</span>
                     </button>
-                    <button class="btn btn-secondary btn-sm" onclick="regenerateChapter(${i})" id="chapter-${i}-regenerate-btn">
-                        <span class="label">Regenerate</span>
-                    </button>
                     <button class="btn btn-success btn-sm" onclick="saveChapterContent(${i})" id="chapter-${i}-save-btn">
                         <span class="label">Save</span>
                     </button>
-                    <button class="collapse-chapter-btn btn btn-ghost btn-sm" onclick="toggleChapterCollapse(${i})" title="Collapse/Expand Chapter" aria-label="Collapse/Expand Chapter">
-                        <span class="icon"><i class="fas fa-angle-down"></i></span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="expandChapter(${i})" id="chapter-${i}-expand-btn">
-                        <span class="label">Expand</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="runChapterFeedback(${i})">
-                        <span class="label">Improve</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="clearChapterContent(${i})">
-                        <span class="label">Clear</span>
+                    <button class="btn btn-ghost btn-sm" onclick="showChapterEditModal(${i})">
+                        <span class="label">Edit</span>
                     </button>
                 </div>
             </div>
@@ -2300,6 +2292,380 @@ async function runChapterFeedback(chapterNum) {
     } catch (error) {
         document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Feedback error: ${error.message}`;
         await customAlert(`Error in feedback loop: ${error.message}`, 'Feedback Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+// Global variable to store current chapter being edited
+let currentEditingChapter = null;
+
+// Global variable to store chapter content for undo functionality
+
+/**
+ * Show chapter edit modal
+ * @param {number} chapterNum - Chapter number
+ */
+function showChapterEditModal(chapterNum) {
+    // Ensure writing interface is initialized so chapter elements exist
+    ensureWritingInterfaceInitialized();
+    
+    currentEditingChapter = chapterNum;
+    
+    // Update modal title
+    document.getElementById('chapter-edit-title').textContent = `Edit Chapter ${chapterNum}`;
+    
+    // Reset form
+    selectEditMode('automated');
+    document.getElementById('chapter-edit-instructions').value = '';
+    document.getElementById('chapter-edit-loops').value = '1';
+    
+    // Show modal
+    document.getElementById('chapter-edit-modal').style.display = 'flex';
+}
+
+/**
+ * Select edit mode and update UI
+ * @param {string} mode - 'automated' or 'manual'
+ */
+function selectEditMode(mode) {
+    // Update button states
+    document.querySelectorAll('.edit-mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const targetBtn = document.querySelector(`[data-mode="${mode}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+    
+    // Show/hide manual feedback section
+    const manualSection = document.getElementById('manual-edit-feedback');
+    if (mode === 'manual') {
+        manualSection.style.display = 'block';
+    } else {
+        manualSection.style.display = 'none';
+    }
+}
+
+/**
+ * Close chapter edit modal
+ */
+function closeChapterEditModal() {
+    document.getElementById('chapter-edit-modal').style.display = 'none';
+    currentEditingChapter = null;
+}
+
+/**
+ * Execute chapter edit based on selected mode
+ */
+async function executeChapterEdit() {
+    if (!currentEditingChapter) {
+        return;
+    }
+    
+    const activeBtn = document.querySelector('.edit-mode-btn.active');
+    if (!activeBtn) {
+        await customAlert('Please select an edit mode.', 'No Mode Selected');
+        return;
+    }
+    
+    const editMode = activeBtn.dataset.mode;
+    const feedbackLoops = parseInt(document.getElementById('chapter-edit-loops').value);
+    let manualFeedback = '';
+    
+    if (editMode === 'manual') {
+        manualFeedback = document.getElementById('chapter-edit-instructions').value.trim();
+        if (!manualFeedback) {
+            await customAlert('Please provide edit instructions for manual mode.', 'Missing Instructions');
+            return;
+        }
+    }
+    
+    // Store the chapter number before closing modal
+    const chapterToEdit = currentEditingChapter;
+    
+    // Close modal
+    closeChapterEditModal();
+    
+    // Execute the edit  
+    await runChapterEdit(chapterToEdit, editMode, feedbackLoops, manualFeedback);
+}
+
+/**
+ * Run chapter edit with specified parameters
+ * @param {number} chapterNum - Chapter number
+ * @param {string} editMode - 'automated' or 'manual'
+ * @param {number} feedbackLoops - Number of edit loops
+ * @param {string} manualFeedback - Manual feedback for manual mode
+ */
+async function runChapterEdit(chapterNum, editMode, feedbackLoops, manualFeedback = '') {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+
+    const chapterElement = document.getElementById(`chapter-${chapterNum}-content`);
+    if (!chapterElement) {
+        await customAlert(`Could not find chapter ${chapterNum} content element. Please try refreshing the page.`, 'Element Not Found');
+        return;
+    }
+    
+    const chapter = chapterElement.value;
+    
+    if (!chapter.trim()) {
+        await customAlert('No chapter content to edit. Please write or generate the chapter first.', 'No Content');
+        return;
+    }
+
+
+    try {
+        isGenerating = true;
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Editing Chapter ${chapterNum}...`;
+        showGenerationInfo(`Editing Chapter ${chapterNum} with ${editMode} mode...`);
+
+        let improvedChapter = chapter;
+        const feedbackModel = getSelectedModel('feedback');
+
+        for (let i = 0; i < feedbackLoops; i++) {
+            showGenerationInfo(`Running ${editMode} edit loop ${i + 1} of ${feedbackLoops}...`);
+            
+            if (editMode === 'manual') {
+                improvedChapter = await runManualFeedback('chapter', improvedChapter, manualFeedback, feedbackModel);
+            } else {
+                improvedChapter = await runAIFeedback('chapter', improvedChapter, feedbackModel);
+            }
+        }
+
+        const updateElement = document.getElementById(`chapter-${chapterNum}-content`);
+        if (updateElement) {
+            updateElement.value = improvedChapter;
+            updateChapterContent(chapterNum);
+        }
+
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Edited with ${feedbackLoops} ${editMode} edit loop(s)`;
+        
+        // Undo/redo now handled by global toolbar
+        
+    } catch (error) {
+        document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Edit error: ${error.message}`;
+        await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
+        // No need to clean up undo data - handled by global system
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+/**
+ * Undo chapter edit - restore original content
+ * @param {number} chapterNum - Chapter number
+ */
+// Outline Edit Modal Functions
+let currentOutlineEditMode = 'automated';
+
+function showOutlineEditModal() {
+    // Reset form
+    selectOutlineEditMode('automated');
+    document.getElementById('outline-edit-instructions').value = '';
+    document.getElementById('outline-edit-loops').value = '2';
+    
+    // Show modal
+    document.getElementById('outline-edit-modal').style.display = 'flex';
+}
+
+function closeOutlineEditModal() {
+    document.getElementById('outline-edit-modal').style.display = 'none';
+}
+
+function selectOutlineEditMode(mode) {
+    currentOutlineEditMode = mode;
+    
+    // Update button states
+    const buttons = document.querySelectorAll('#outline-edit-modal .edit-mode-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.mode === mode) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Show/hide manual feedback section
+    const manualSection = document.getElementById('manual-outline-edit-feedback');
+    if (mode === 'manual') {
+        manualSection.style.display = 'block';
+    } else {
+        manualSection.style.display = 'none';
+    }
+}
+
+async function executeOutlineEdit() {
+    const feedbackLoops = parseInt(document.getElementById('outline-edit-loops').value);
+    let manualFeedback = '';
+    
+    if (currentOutlineEditMode === 'manual') {
+        manualFeedback = document.getElementById('outline-edit-instructions').value.trim();
+        if (!manualFeedback) {
+            await customAlert('Please provide edit instructions for manual mode.', 'Instructions Required');
+            return;
+        }
+    }
+    
+    closeOutlineEditModal();
+    
+    // Run the edit function (similar to runChapterEdit but for outline)
+    await runOutlineEdit(currentOutlineEditMode, feedbackLoops, manualFeedback);
+}
+
+// Chapter Outline Edit Modal Functions
+let currentChapterOutlineEditMode = 'automated';
+
+function showChapterOutlineEditModal() {
+    // Reset form
+    selectChapterOutlineEditMode('automated');
+    document.getElementById('chapter-outline-edit-instructions').value = '';
+    document.getElementById('chapter-outline-edit-loops').value = '2';
+    
+    // Show modal
+    document.getElementById('chapter-outline-edit-modal').style.display = 'flex';
+}
+
+function closeChapterOutlineEditModal() {
+    document.getElementById('chapter-outline-edit-modal').style.display = 'none';
+}
+
+function selectChapterOutlineEditMode(mode) {
+    currentChapterOutlineEditMode = mode;
+    
+    // Update button states
+    const buttons = document.querySelectorAll('#chapter-outline-edit-modal .edit-mode-btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.mode === mode) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Show/hide manual feedback section
+    const manualSection = document.getElementById('manual-chapter-outline-edit-feedback');
+    if (mode === 'manual') {
+        manualSection.style.display = 'block';
+    } else {
+        manualSection.style.display = 'none';
+    }
+}
+
+async function executeChapterOutlineEdit() {
+    const feedbackLoops = parseInt(document.getElementById('chapter-outline-edit-loops').value);
+    let manualFeedback = '';
+    
+    if (currentChapterOutlineEditMode === 'manual') {
+        manualFeedback = document.getElementById('chapter-outline-edit-instructions').value.trim();
+        if (!manualFeedback) {
+            await customAlert('Please provide edit instructions for manual mode.', 'Instructions Required');
+            return;
+        }
+    }
+    
+    closeChapterOutlineEditModal();
+    
+    // Run the edit function (similar to runChapterEdit but for chapter outline)
+    await runChapterOutlineEdit(currentChapterOutlineEditMode, feedbackLoops, manualFeedback);
+}
+
+// Outline Edit Function
+async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+
+    const outlineElement = document.getElementById('outline-content');
+    if (!outlineElement) {
+        await customAlert('Could not find story structure content element.', 'Element Not Found');
+        return;
+    }
+    
+    const outline = outlineElement.value;
+    
+    if (!outline.trim()) {
+        await customAlert('No story structure content to edit. Please generate the story structure first.', 'No Content');
+        return;
+    }
+
+    try {
+        isGenerating = true;
+        showGenerationInfo(`Editing Story Structure with ${editMode} mode...`);
+
+        let improvedOutline = outline;
+
+        for (let i = 0; i < feedbackLoops; i++) {
+            if (editMode === 'manual') {
+                improvedOutline = await runManualFeedback('outline', improvedOutline, manualFeedback, getSelectedModel());
+            } else {
+                improvedOutline = await runAIFeedback('outline', improvedOutline, getSelectedModel());
+            }
+        }
+
+        // Update outline content
+        outlineElement.value = improvedOutline;
+        bookData.outline = improvedOutline;
+        saveToLocalStorage();
+
+        await customAlert(`Story structure edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        
+    } catch (error) {
+        await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+// Chapter Outline Edit Function
+async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+
+    const chapterOutlineElement = document.getElementById('chapters-content');
+    if (!chapterOutlineElement) {
+        await customAlert('Could not find chapter plan content element.', 'Element Not Found');
+        return;
+    }
+    
+    const chapterOutline = chapterOutlineElement.value;
+    
+    if (!chapterOutline.trim()) {
+        await customAlert('No chapter plan content to edit. Please generate the chapter plan first.', 'No Content');
+        return;
+    }
+
+    try {
+        isGenerating = true;
+        showGenerationInfo(`Editing Chapter Plan with ${editMode} mode...`);
+
+        let improvedChapterOutline = chapterOutline;
+
+        for (let i = 0; i < feedbackLoops; i++) {
+            if (editMode === 'manual') {
+                improvedChapterOutline = await runManualFeedback('chapters', improvedChapterOutline, manualFeedback, getSelectedModel());
+            } else {
+                improvedChapterOutline = await runAIFeedback('chapters', improvedChapterOutline, getSelectedModel());
+            }
+        }
+
+        // Update chapter outline content
+        chapterOutlineElement.value = improvedChapterOutline;
+        bookData.chapterOutline = improvedChapterOutline;
+        saveToLocalStorage();
+
+        await customAlert(`Chapter plan edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        
+    } catch (error) {
+        await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
     } finally {
         isGenerating = false;
         hideGenerationInfo();
