@@ -1180,13 +1180,42 @@ function resetAdvancedModelSettings() {
 function updateAdvancedModelsVisualState() {
     const checkbox = document.getElementById('enable-advanced-models');
     const selects = document.querySelectorAll('[id^="advanced-model-"]');
+    const statusElement = document.getElementById('advanced-models-status');
+    const expandableSection = document.getElementById('advanced-models-expandable');
     
     if (checkbox) {
         const isEnabled = checkbox.checked;
+        
+        // Update model selects
         selects.forEach(select => {
             select.disabled = !isEnabled;
             select.style.opacity = isEnabled ? '1' : '0.5';
         });
+        
+        // Update status text and styling
+        if (statusElement) {
+            statusElement.textContent = isEnabled ? 'Enabled' : 'Disabled';
+            statusElement.classList.toggle('enabled', isEnabled);
+        }
+        
+        // Show/hide expandable section with animation
+        if (expandableSection) {
+            if (isEnabled) {
+                expandableSection.style.display = 'block';
+                // Trigger animation by adding class after display
+                setTimeout(() => {
+                    expandableSection.classList.add('expanded');
+                }, 10);
+            } else {
+                expandableSection.classList.remove('expanded');
+                // Hide after animation completes
+                setTimeout(() => {
+                    if (!checkbox.checked) { // Double-check state hasn't changed
+                        expandableSection.style.display = 'none';
+                    }
+                }, 300);
+            }
+        }
     }
 }
 

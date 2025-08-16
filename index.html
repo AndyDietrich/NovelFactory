@@ -697,28 +697,29 @@
                         <div id="api-status"></div>
                     </div>
 
-                    <!-- Combined Advanced Configuration -->
-                    <div class="collapsible-section advanced-settings-section">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection(this)">
-                            <span class="toggle-icon">▼</span>
-                            <h3>Advanced Configuration & Custom Prompts</h3>
-                        </div>
-                        <div class="collapsible-content">
-                            <!-- Advanced Models Section -->
-                            <div class="advanced-models-container">
+                    <!-- Advanced Model Selection Toggle -->
+                    <div class="advanced-models-toggle-section">
+                        <div class="toggle-section-header">
+                            <div class="toggle-info">
                                 <h4>Advanced Model Selection</h4>
-                                <div class="advanced-models-toggle">
-                                    <label class="checkbox-container">
-                                        <input type="checkbox" id="enable-advanced-models" onchange="saveAdvancedModelSettings(); updateAdvancedModelsVisualState()">
-                                        <span class="checkmark"></span>
-                                        <div class="checkbox-content">
-                                            <span class="checkbox-label">Enable Advanced Models</span>
-                                            <p class="form-hint">Customize which AI model to use for each generation step. Different models excel at different tasks.</p>
-                                        </div>
-                                    </label>
-                                </div>
-                                
-                                <div class="advanced-models-grid">
+                                <p class="toggle-description">Use different AI models for different generation steps</p>
+                            </div>
+                            <div class="toggle-switch-container">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="enable-advanced-models" onchange="saveAdvancedModelSettings(); updateAdvancedModelsVisualState()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-status" id="advanced-models-status">Disabled</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Models Configuration (Expandable) -->
+                    <div class="advanced-models-expandable" id="advanced-models-expandable" style="display: none;">
+                        <div class="advanced-models-content">
+                            <h5 class="section-description">Choose specific AI models for different parts of the book generation process. Each model has different strengths.</h5>
+                            
+                            <div class="advanced-models-grid">
                                     <div class="model-setting">
                                         <label for="advanced-model-outline">Story Structure Generation</label>
                                         <select id="advanced-model-outline" onchange="saveAdvancedModelSettings()">
@@ -774,11 +775,18 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Custom Prompts Section -->
+                    <!-- Custom Prompts Section -->
+                    <div class="collapsible-section custom-prompts-section">
+                        <div class="collapsible-header" onclick="toggleCollapsibleSection(this)">
+                            <span class="toggle-icon">▼</span>
+                            <h3>Custom Prompts</h3>
+                        </div>
+                        <div class="collapsible-content">
                             <div class="custom-prompts-container">
-                                <h4>Custom Prompts</h4>
-                                <p class="form-hint">Customize the AI generation prompts for each step. Changes are saved automatically.</p>
+                                <p class="section-description">Customize the AI generation prompts for each step. Changes are saved automatically.</p>
                                 
                                 <div class="prompt-editors">
                                     <div class="prompt-group">
