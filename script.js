@@ -1,13 +1,3 @@
-/**
- * NovelFactory AI - Professional Book Generation Platform
- * Production-ready JavaScript implementation
- * 
- * @author Andreas Dietrich
- * @version 1.0.1
- * @description Complete AI-powered book generation platform with advanced model selection,
- *              feedback loops, project management, and professional export capabilities.
- */
-
 // ==================================================
 // GLOBAL CONFIGURATION & STATE
 // ==================================================
@@ -83,6 +73,7 @@ let isGenerating = false;
 // ==================================================
 
 let alertCallback = null;
+let inputCallback = null;
 
 /**
  * Show custom alert dialog
@@ -139,6 +130,48 @@ function customConfirm(message, title = 'Confirmation') {
 }
 
 /**
+ * Show custom input dialog
+ * @param {string} message - Input message
+ * @param {string} title - Dialog title
+ * @param {string} defaultValue - Default input value
+ * @returns {Promise<string|null>}
+ */
+function customInput(message, title = 'Input', defaultValue = '') {
+    return new Promise((resolve) => {
+        // Use existing modal from HTML
+        const modal = document.getElementById('custom-input-modal');
+        if (!modal) {
+            console.error('Custom input modal not found in HTML');
+            resolve(null);
+            return;
+        }
+        
+        document.getElementById('input-title').textContent = title;
+        document.getElementById('input-message').textContent = message;
+        document.getElementById('input-field').value = defaultValue;
+        
+        inputCallback = resolve;
+        modal.classList.add('active');
+        document.getElementById('input-field').focus();
+        document.getElementById('input-field').select();
+    });
+}
+
+/**
+ * Close custom input dialog
+ * @param {string|null} result - Input result
+ */
+function closeCustomInput(result) {
+    const modal = document.getElementById('custom-input-modal');
+    modal.classList.remove('active');
+    
+    if (inputCallback) {
+        inputCallback(result);
+        inputCallback = null;
+    }
+}
+
+/**
  * Close custom alert/confirm dialog
  * @param {boolean} result - Dialog result
  */
@@ -164,17 +197,18 @@ function closeCustomAlert(result = true) {
  */
 const apiModels = {
     openrouter: {
-        creative: [
+        Recommended: [
             { value: 'anthropic/claude-sonnet-4', label: 'Claude Sonnet 4', cost: { input: 3.00, output: 15.00 }},
             { value: 'anthropic/claude-opus-4.1', label: 'Claude Opus 4.1', cost: { input: 15.00, output: 75.00 }},
+            { value: 'openai/gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10.00 }} 
+        ],
+        
+        More: [
             { value: 'openai/gpt-4o', label: 'GPT-4o', cost: { input: 5.00, output: 15.00 }},
-            { value: 'openai/gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10.00 }},
             { value: 'anthropic/claude-3.7-sonnet:thinking', label: 'Claude Sonnet 3.7 (Thinking)', cost: { input: 3.00, output: 15.00 }},
             { value: 'google/gemini-2.5-pro', label: 'Gemini 2.5 Pro', cost: { input: 1.25, output: 10.00 }},
             { value: 'x-ai/grok-4', label: 'Grok 4', cost: { input: 3.00, output: 15.00 }},
-            { value: 'perplexity/sonar-reasoning-pro', label: 'Sonar Reasoning Pro', cost: { input: 2.00, output: 8.00 }}
-        ],
-        budget: [
+            { value: 'perplexity/sonar-reasoning-pro', label: 'Sonar Reasoning Pro', cost: { input: 2.00, output: 8.00 }},
             { value: 'openai/gpt-5-mini', label: 'GPT-5 Mini', cost: { input: 0.25, output: 2.00 }},
             { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.60 }},
             { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', cost: { input: 0.05, output: 0.40 }},
@@ -187,11 +221,11 @@ const apiModels = {
         ]
     },
     openai: {
-        creative: [
+        Recommended: [
             { value: 'gpt-5', label: 'GPT-5', cost: { input: 1.25, output: 10 }},
             { value: 'gpt-4o', label: 'GPT-4o', cost: { input: 5, output: 15 }},
         ],
-        budget: [
+        More: [
             { value: 'gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.6 }},
             { value: 'gpt-5-mini', label: 'GPT-5 Mini', cost: { input: 0.25, output: 2 }}
         ]
@@ -279,7 +313,7 @@ CREATE A COMPREHENSIVE STORY STRUCTURE INCLUDING:
    - Emotional beats and character development moments
    - Cliffhangers and hooks
 
-Ensure this structure is commercially viable, emotionally engaging, and perfectly suited for {targetAudience}. Follow proven storytelling formulas while maintaining originality.`,
+Ensure this structure is commercially viable, emotionally engaging, and perfectly suited for {targetAudience}. Follow proven storytelling formulas while maintaining originality.`, 
 
     chapters: `You are a master storyteller creating a detailed chapter-by-chapter plan. Based on the complete story structure, create comprehensive chapter summaries and scene breakdowns.
 
@@ -323,7 +357,7 @@ PACING REQUIREMENTS:
 - Build tension appropriately toward climax
 - Include proper character development beats
 
-Format as clear, numbered chapters with all details for seamless writing execution.`,
+Format as clear, numbered chapters with all details for seamless writing execution.`, 
 
     writing: `You are a master storyteller and bestselling author writing Chapter {chapterNum} of a {genre} novel. Create engaging, high-quality prose that brings the story to life.
 
@@ -361,7 +395,7 @@ WRITING STANDARDS:
 - Include proper scene transitions and emotional beats
 - End with appropriate tension level as outlined
 
-Write Chapter {chapterNum} with compelling, publishable prose that advances the plot exactly as planned while creating an immersive reading experience.`,
+Write Chapter {chapterNum} with compelling, publishable prose that advances the plot exactly as planned while creating an immersive reading experience.`, 
 
     randomIdea: `You are a creative genius and bestselling author brainstorming machine. Generate a completely original, commercially viable book idea that would captivate readers and become a bestseller.
 
@@ -388,10 +422,7 @@ GUIDELINES:
 FORMAT YOUR RESPONSE EXACTLY AS:
 PREMISE: [Your 2-3 sentence premise here]
 STYLE: [Your 1-2 sentence style direction here]  
-CHAPTERS: [Number only]
-
-Generate something truly unique that readers would eagerly devour!`,
-
+CHAPTERS: [Number only]`,
     bookTitle: `You are a bestselling book marketing expert and title creation genius. Create an irresistible, clickbait-worthy book title and compelling blurb that will make readers immediately want to purchase and read this book.
 
 BOOK DETAILS:
@@ -432,7 +463,6 @@ TITLE: [Your amazing title here]
 BLURB: [Your compelling 150-200 word blurb here]
 
 Make this book impossible to ignore!`,
-
     analysis: `You are a professional editor and story consultant with 20+ years of experience analyzing {contentType} for {genre} novels targeting {targetAudience}. Provide detailed, actionable feedback while maintaining the established parameters.
 
 CONTENT TO ANALYZE:
@@ -478,8 +508,7 @@ ANALYZE WITH FOCUS ON:
    - Provide concrete solutions for each issue
    - Ensure suggestions maintain established parameters
 
-CRITICAL: All feedback must respect and maintain the core premise, style direction, target audience, and technical specifications already established. Focus on enhancing execution within these constraints, not changing them.`,
-
+CRITICAL: All feedback must respect and maintain the core premise, style direction, target audience, and technical specifications already established. Focus on enhancing execution within these constraints.`, 
     improvement: `You are a master storyteller and professional editor. Improve the {contentType} based on the analysis while strictly maintaining all established book parameters and requirements.
 
 ORIGINAL CONTENT:
@@ -515,8 +544,7 @@ SPECIFIC GUIDELINES:
 
 Create a significantly improved version that addresses the feedback comprehensively while maintaining the artistic and commercial vision. The result should feel like a polished, professional upgrade of the original content.
 
-Write the complete improved {contentType} with all enhancements seamlessly integrated.`,
-
+Write the complete improved {contentType} with all enhancements seamlessly integrated.`, 
     manualImprovement: `You are a master storyteller and professional editor. Improve the {contentType} based on the specific feedback provided while maintaining all established book parameters unless explicitly overridden by the manual instructions.
 
 ORIGINAL CONTENT:
@@ -549,9 +577,7 @@ EXECUTION GUIDELINES:
 - Maintain professional writing quality throughout
 - Preserve character development and story logic unless specifically asked to change
 
-Create an improved version that perfectly addresses the manual feedback while maintaining the highest standards of storytelling craft.
-
-Write the complete improved {contentType} with all requested changes implemented seamlessly.`
+Create an improved version that perfectly addresses the manual feedback while maintaining the highest standards of storytelling craft.`
 };
 
 // ==================================================
@@ -620,6 +646,11 @@ function showStep(stepName) {
     // Special handling for writing step - ensure it's properly initialized
     if (stepName === 'writing') {
         ensureWritingInterfaceInitialized();
+    }
+    
+    // Special handling for export step - update stats
+    if (stepName === 'export') {
+        updateBookStats();
     }
     
     bookData.currentStep = stepName;
@@ -708,6 +739,11 @@ function toggleAdvancedModelsSection() {
         section.classList.remove('expanded');
     }
 }
+
+/**
+ * Collapse toggle removed for per-chapter controls
+ * (Global "Collapse Chapters" button is no longer used)
+ */
 
 // ==================================================
 // EVENT LISTENERS SETUP
@@ -811,6 +847,7 @@ function setupKeyboardShortcuts() {
             closeDonationModal();
             closeCustomAlert(false);
             closeProjectManagementModal();
+            closeCustomInput(null);
         }
     });
 }
@@ -915,7 +952,7 @@ function getContentForFeedback(contentType) {
 /**
  * Update content after feedback improvement
  * @param {string} contentType - Type of content
- * @param {string} improvedContent - Improved content text
+ * @param {string} improvedContent - Improved content
  */
 function updateContentAfterFeedback(contentType, improvedContent) {
     switch(contentType) {
@@ -982,7 +1019,7 @@ async function callAI(prompt, systemPrompt = "", model = null) {
             'Authorization': `Bearer ${settings.apiKey}`,
             'Content-Type': 'application/json',
             'HTTP-Referer': 'https://novelfactory.ink',
-            'X-Title': 'NovelFactory AI',
+            'X-Title': 'NovelFactory',
         };
         body = {
             model: settings.model,
@@ -1199,12 +1236,12 @@ function updateMainModelSelect() {
         modelSelect.appendChild(group);
     }
 
-    if (models.creative && models.creative.length) {
-        createOptions(models.creative, 'Creative Models');
+    if (models.Recommended && models.Recommended.length) {
+        createOptions(models.Recommended, 'Recommended Models');
     }
 
-    if (models.budget && models.budget.length) {
-        createOptions(models.budget, 'Budget Models');
+    if (models.More && models.More.length) {
+        createOptions(models.More, 'More Models');
     }
 
     updateModelInfo();
@@ -1265,12 +1302,12 @@ function updateAdvancedModelSelect(selectId) {
         modelSelect.appendChild(group);
     }
 
-    if (models.creative && models.creative.length) {
-        createOptions(models.creative, 'Creative');
+    if (models.Recommended && models.Recommended.length) {
+        createOptions(models.Recommended, 'Recommended');
     }
 
-    if (models.budget && models.budget.length) {
-        createOptions(models.budget, 'Budget');
+    if (models.More && models.More.length) {
+        createOptions(models.More, 'More');
     }
 }
 
@@ -1491,9 +1528,7 @@ async function generateOutline() {
         }
         
         const outlineNavItem = document.querySelector('[data-step="outline"]');
-        if (outlineNavItem) {
-            outlineNavItem.classList.add('completed');
-        }
+        if (outlineNavItem) outlineNavItem.classList.add('completed');
 
     } catch (error) {
         await customAlert(`Error generating story structure: ${error.message}`, 'Generation Error');
@@ -1588,9 +1623,7 @@ async function generateChapterOutline() {
         }
         
         const chaptersNavItem = document.querySelector('[data-step="chapters"]');
-        if (chaptersNavItem) {
-            chaptersNavItem.classList.add('completed');
-        }
+        if (chaptersNavItem) chaptersNavItem.classList.add('completed');
 
     } catch (error) {
         await customAlert(`Error generating chapter plan: ${error.message}`, 'Generation Error');
@@ -1708,6 +1741,9 @@ async function clearChaptersContent() {
 
 /**
  * Set up the writing interface with chapter management
+ * - Per-chapter collapse icons are added to each chapter card header
+ * - Collapse/expand toggles work per chapter
+ * - No global "Collapse Chapters" button
  */
 function setupWritingInterface() {
     const container = document.getElementById('chapters-container');
@@ -1728,10 +1764,10 @@ function setupWritingInterface() {
             <button class="btn btn-ghost btn-sm" onclick="deselectAllChapters()">
                 <span class="label">Deselect All</span>
             </button>
-            <button class="btn btn-primary btn-sm" onclick="generateSelectedChapters()" id="generate-selected-btn">
-                <span class="label">Generate Selected</span>
+            <button class="btn btn-primary btn-sm" onclick="generateSelectedChapters()" id="generate-selected-btn" disabled>
+                <span class="label">Generate Selected (0)</span>
             </button>
-            <button class="btn btn-primary btn-sm" onclick="generateAllChapters()">
+            <button class="btn btn-secondary btn-sm" onclick="generateAllChapters()">
                 <span class="label">Generate All Chapters</span>
             </button>
         </div>
@@ -1744,21 +1780,28 @@ function setupWritingInterface() {
         const chapterDiv = document.createElement('div');
         chapterDiv.className = 'chapter-item';
         chapterDiv.innerHTML = `
-            <div class="chapter-header">
+            <div class="chapter-header" aria-label="Chapter ${i} header" style="align-items: center;">
                 <div class="chapter-info">
-                    <input type="checkbox" id="chapter-${i}-checkbox" onchange="updateGenerateSelectedButton()">
-                    <h4>Chapter ${i}</h4>
+                    <div class="chapter-checkbox">
+                        <input type="checkbox" id="chapter-${i}-checkbox" onchange="updateGenerateSelectedButton()">
+                        <label for="chapter-${i}-checkbox" class="checkbox-label">
+                            <h4>Chapter ${i}</h4>
+                        </label>
+                    </div>
                     <div class="chapter-word-count" id="chapter-${i}-word-count">0 words</div>
                 </div>
-                <div class="chapter-actions">
-                    <button class="btn btn-primary btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
+                <div class="chapter-actions" style="display:flex; align-items:center; gap:6px;">
+                    <button class="btn btn-ghost btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
                         <span class="label">Generate</span>
                     </button>
                     <button class="btn btn-secondary btn-sm" onclick="regenerateChapter(${i})" id="chapter-${i}-regenerate-btn">
                         <span class="label">Regenerate</span>
                     </button>
-                    <button class="btn btn-success btn-sm" onclick="saveChapterContent(${i})">
+                    <button class="btn btn-success btn-sm" onclick="saveChapterContent(${i})" id="chapter-${i}-save-btn">
                         <span class="label">Save</span>
+                    </button>
+                    <button class="collapse-chapter-btn btn btn-ghost btn-sm" onclick="toggleChapterCollapse(${i})" title="Collapse/Expand Chapter" aria-label="Collapse/Expand Chapter">
+                        <span class="icon"><i class="fas fa-angle-down"></i></span>
                     </button>
                     <button class="btn btn-ghost btn-sm" onclick="expandChapter(${i})" id="chapter-${i}-expand-btn">
                         <span class="label">Expand</span>
@@ -1772,7 +1815,7 @@ function setupWritingInterface() {
                 </div>
             </div>
             
-            <div class="chapter-content-field">
+            <div class="chapter-content-field" id="chapter-${i}-content-field" style="display: block; padding-top: 8px;">
                 <div class="form-group">
                     <div class="textarea-container">
                         <textarea 
@@ -1785,7 +1828,7 @@ function setupWritingInterface() {
                 </div>
             </div>
 
-            <div class="chapter-status" id="chapter-${i}-status">Ready to write</div>
+            <div class="chapter-status" id="chapter-${i}-status"></div>
         `;
         container.appendChild(chapterDiv);
     }
@@ -1818,6 +1861,56 @@ function updateChapterContent(chapterNum) {
     autoSave();
 }
 
+// New: Per-chapter collapse toggle
+/**
+ * Toggle a single chapter content visibility
+ * @param {number} chapterNum
+ */
+function toggleChapterContent(chapterNum) {
+    const field = document.getElementById(`chapter-${chapterNum}-content-field`);
+    if (!field) return;
+    // Simple toggle
+    if (field.style.display === 'none') {
+        field.style.display = 'block';
+    } else {
+        field.style.display = 'none';
+    }
+    // Optional: rotate the icon (not strictly necessary for functionality)
+    const iconBtn = document.querySelector(`#chapter-${chapterNum}-content-field ~ .collapse-chapter-btn`);
+    // If icon rotation needed, implement here
+}
+
+/**
+ * Toggle individual chapter collapse
+ */
+function toggleChapterCollapse(chapterNum) {
+    const contentField = document.getElementById(`chapter-${chapterNum}-content-field`);
+    const collapseBtn = document.querySelector(`button[onclick="toggleChapterCollapse(${chapterNum})"]`);
+    if (!contentField) return;
+    
+    contentField.classList.toggle('collapsed');
+    if (collapseBtn) {
+        const icon = collapseBtn.querySelector('i');
+        if (icon) {
+            if (contentField.classList.contains('collapsed')) {
+                icon.className = 'fas fa-angle-right';
+            } else {
+                icon.className = 'fas fa-angle-down';
+            }
+        }
+    }
+}
+
+//（Continuing existing per-chapter save flow; updated to avoid Event reliance）
+// Replace previous saveChapterContent to be robust and not rely on event
+
+function toggleChapterCollapse(chapterNum) {
+    const contentField = document.getElementById(`chapter-${chapterNum}-content-field`);
+    const collapseBtn = document.getElementById(`chapter-${chapterNum}-collapse-btn`);
+    contentField.classList.toggle('collapsed');
+    collapseBtn.innerHTML = contentField.classList.contains('collapsed') ? '<span class="label">▶</span>' : '<span class="label">▼</span>';
+}
+
 /**
  * Save chapter content with visual feedback
  * @param {number} chapterNum - Chapter number
@@ -1826,15 +1919,16 @@ function saveChapterContent(chapterNum) {
     const textarea = document.getElementById(`chapter-${chapterNum}-content`);
     bookData.chapters[chapterNum - 1] = textarea.value;
     
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<span class="label">Saved!</span>';
-    button.style.background = 'var(--color-success)';
-    
-    setTimeout(() => {
-        button.innerHTML = originalText;
-        button.style.background = '';
-    }, 2000);
+    const btn = document.getElementById(`chapter-${chapterNum}-save-btn`);
+    if (btn) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="label">Saved!</span>';
+        btn.style.background = 'var(--color-success)';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+        }, 1200);
+    }
     
     updateChapterContent(chapterNum);
 }
@@ -1968,23 +2062,27 @@ function extractChapterOutline(fullOutline, chapterNum) {
  * Update overall writing progress
  */
 function updateOverallProgress() {
-    const completedChapters = bookData.chapters.filter(chapter => chapter && chapter.trim().length > 0).length;
+    const completedChapters = bookData.chapters.filter(ch => ch && ch.toString().trim().length > 0).length;
     const progress = (completedChapters / bookData.numChapters) * 100;
-    
+
     const progressEl = document.getElementById('writing-progress');
     if (progressEl) {
         progressEl.style.width = progress + '%';
     }
-    
-    if (completedChapters === bookData.numChapters) {
-        const nextBtn = document.getElementById('writing-next');
-        if (nextBtn) {
-            nextBtn.style.display = 'inline-flex';
-        }
-        
-        const writingNavItem = document.querySelector('[data-step="writing"]');
-        if (writingNavItem) {
+
+    // Show/hide Next button based on completion
+    const nextBtn = document.getElementById('writing-next');
+    if (nextBtn) {
+        nextBtn.style.display = (completedChapters === bookData.numChapters) ? 'inline-flex' : 'none';
+    }
+
+    // Update navigation state
+    const writingNavItem = document.querySelector('[data-step="writing"]');
+    if (writingNavItem) {
+        if (completedChapters === bookData.numChapters) {
             writingNavItem.classList.add('completed');
+        } else {
+            writingNavItem.classList.remove('completed');
         }
     }
 }
@@ -1996,10 +2094,14 @@ function updateOverallProgress() {
 async function regenerateChapter(chapterNum) {
     const confirmed = await customConfirm(`Are you sure you want to regenerate Chapter ${chapterNum}? This will overwrite the current content.`, 'Regenerate Chapter');
     if (!confirmed) return;
-    
-    document.getElementById(`chapter-${chapterNum}-content`).value = '';
-    updateChapterContent(chapterNum);
-    
+
+    // Clear previous content and regenerate
+    const contentEl = document.getElementById(`chapter-${chapterNum}-content`);
+    if (contentEl) {
+        contentEl.value = '';
+        updateChapterContent(chapterNum);
+    }
+
     await generateSingleChapter(chapterNum);
 }
 
@@ -2029,16 +2131,20 @@ function deselectAllChapters() {
  * Update generate selected button state
  */
 function updateGenerateSelectedButton() {
-    const selectedCount = getSelectedChapters().length;
+    const selected = getSelectedChapters().length;
     const btn = document.getElementById('generate-selected-btn');
-    if (btn) {
-        if (selectedCount > 0) {
-            btn.innerHTML = `<span class="label">Generate Selected (${selectedCount})</span>`;
-            btn.disabled = false;
-        } else {
-            btn.innerHTML = '<span class="label">Generate Selected</span>';
-            btn.disabled = true;
-        }
+    if (!btn) return;
+
+    if (selected > 0) {
+        btn.innerHTML = `<span class="label">Generate Selected (${selected})</span>`;
+        btn.disabled = false;
+        btn.classList.remove('btn-ghost');
+        btn.classList.add('btn-primary');
+    } else {
+        btn.innerHTML = '<span class="label">Generate Selected (0)</span>';
+        btn.disabled = true;
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-ghost');
     }
 }
 
@@ -2049,10 +2155,8 @@ function updateGenerateSelectedButton() {
 function getSelectedChapters() {
     const selected = [];
     for (let i = 1; i <= bookData.numChapters; i++) {
-        const checkbox = document.getElementById(`chapter-${i}-checkbox`);
-        if (checkbox?.checked) {
-            selected.push(i);
-        }
+        const cb = document.getElementById(`chapter-${i}-checkbox`);
+        if (cb && cb.checked) selected.push(i);
     }
     return selected;
 }
@@ -2065,7 +2169,7 @@ async function generateSelectedChapters() {
         showGenerationInfo();
         return;
     }
-    
+
     const selectedChapters = getSelectedChapters();
     if (selectedChapters.length === 0) {
         await customAlert('Please select at least one chapter to generate.', 'No Chapters Selected');
@@ -2073,37 +2177,44 @@ async function generateSelectedChapters() {
     }
 
     isGenerating = true;
-    showGenerationInfo("Generating selected chapters...");
+    const total = selectedChapters.length;
+    let completed = 0;
 
     try {
-        for (let i = 0; i < selectedChapters.length; i++) {
-            const chapterNum = selectedChapters[i];
-            showGenerationInfo(`Writing Chapter ${chapterNum} (${i + 1} of ${selectedChapters.length})...`);
-            
-            document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Writing...</div>';
-            document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = true;
-            
+        showGenerationInfo(`Starting batch generation of ${total} chapters...`);
+        for (let idx = 0; idx < selectedChapters.length; idx++) {
+            const ch = selectedChapters[idx];
+            completed = idx + 1;
+
+            showGenerationInfo(`Writing Chapter ${ch} (${completed} of ${total})...`);
+            document.getElementById(`chapter-${ch}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Writing...</div>';
+            document.getElementById(`chapter-${ch}-generate-btn`).disabled = true;
+
             try {
-                const chapterContent = await writeChapter(chapterNum);
-                
-                document.getElementById(`chapter-${chapterNum}-content`).value = chapterContent;
-                updateChapterContent(chapterNum);
-                
-                document.getElementById(`chapter-${chapterNum}-status`).innerHTML = 'Generated successfully';
-                document.getElementById(`chapter-${chapterNum}-checkbox`).checked = false;
-                
-            } catch (error) {
-                document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Error: ${error.message}`;
+                const content = await writeChapter(ch);
+                document.getElementById(`chapter-${ch}-content`).value = content;
+                updateChapterContent(ch);
+                document.getElementById(`chapter-${ch}-status`).innerHTML = `✓ Generated (${completed}/${total})`;
+                document.getElementById(`chapter-${ch}-checkbox`).checked = false;
+            } catch (err) {
+                document.getElementById(`chapter-${ch}-status`).innerHTML = `❌ Error: ${err.message}`;
                 break;
             } finally {
-                document.getElementById(`chapter-${chapterNum}-generate-btn`).disabled = false;
+                document.getElementById(`chapter-${ch}-generate-btn`).disabled = false;
             }
         }
-        
+
         updateGenerateSelectedButton();
+
+        if (completed === total) {
+            showGenerationInfo(`✅ Batch generation complete! ${completed} chapters generated.`);
+            setTimeout(() => { hideGenerationInfo(); }, 2000);
+        }
     } finally {
         isGenerating = false;
-        hideGenerationInfo();
+        if (completed < total) {
+            hideGenerationInfo();
+        }
     }
 }
 
@@ -2124,20 +2235,20 @@ async function runChapterFeedback(chapterNum) {
         showGenerationInfo();
         return;
     }
-    
+
     const chapter = document.getElementById(`chapter-${chapterNum}-content`).value;
     if (!chapter.trim()) {
         await customAlert('No chapter content to improve. Please write or generate the chapter first.', 'No Content');
         return;
     }
-    
+
     isGenerating = true;
     showGenerationInfo(`Analyzing Chapter ${chapterNum}...`);
-    
+
     try {
         const feedbackLoops = parseInt(document.getElementById('writing-feedback-loops').value) || 1;
         const feedbackMode = document.getElementById('writing-feedback-mode').value;
-        
+
         let manualFeedback = '';
         if (feedbackMode === 'manual') {
             manualFeedback = document.getElementById('writing-manual-input').value;
@@ -2146,12 +2257,12 @@ async function runChapterFeedback(chapterNum) {
                 return;
             }
         }
-        
+
         document.getElementById(`chapter-${chapterNum}-status`).innerHTML = '<div class="loading"><div class="spinner"></div>Running feedback analysis...</div>';
-        
+
         let improvedChapter = chapter;
         const feedbackModel = getSelectedModel('feedback');
-        
+
         for (let i = 0; i < feedbackLoops; i++) {
             if (feedbackMode === 'manual') {
                 improvedChapter = await runManualFeedback('chapter', improvedChapter, manualFeedback, feedbackModel);
@@ -2159,12 +2270,11 @@ async function runChapterFeedback(chapterNum) {
                 improvedChapter = await runAIFeedback('chapter', improvedChapter, feedbackModel);
             }
         }
-        
+
         document.getElementById(`chapter-${chapterNum}-content`).value = improvedChapter;
         updateChapterContent(chapterNum);
-        
+
         document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Improved with ${feedbackLoops} ${feedbackMode} feedback loop(s)`;
-        
     } catch (error) {
         document.getElementById(`chapter-${chapterNum}-status`).innerHTML = `Feedback error: ${error.message}`;
         await customAlert(`Error in feedback loop: ${error.message}`, 'Feedback Error');
@@ -2173,10 +2283,6 @@ async function runChapterFeedback(chapterNum) {
         hideGenerationInfo();
     }
 }
-
-// ==================================================
-// FEEDBACK IMPLEMENTATIONS
-// ==================================================
 
 /**
  * Run manual feedback improvement
@@ -2201,10 +2307,10 @@ async function runManualFeedback(contentType, content, manualFeedback, feedbackM
     
     return await callAI(improvementPrompt, "You are a master storyteller and professional editor implementing specific feedback requests.", feedbackModel);
 }
-
+ 
 /**
  * Run AI feedback improvement
- * @param {string} contentType - Type of content
+ * @param {string} contentType - Type of content to improve
  * @param {string} content - Content to improve
  * @param {string} feedbackModel - Model to use
  * @returns {Promise<string>} Improved content
@@ -2237,7 +2343,7 @@ async function runAIFeedback(contentType, content, feedbackModel) {
     
     return await callAI(improvementPrompt, "You are a master storyteller and professional editor.", feedbackModel);
 }
-
+ 
 /**
  * Get custom analysis prompt
  * @param {string} contentType - Type of content
@@ -2296,12 +2402,14 @@ function saveExpandedChapter() {
         document.getElementById(`chapter-${currentExpandedChapter}-content`).value = content;
         updateChapterContent(currentExpandedChapter);
         
-        const saveBtn = event.target;
-        const originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<span class="label">Saved!</span>';
-        setTimeout(() => {
-            saveBtn.innerHTML = originalText;
-        }, 2000);
+        const saveBtn = event?.target || document.querySelector('#expand-modal .expand-controls .btn-success');
+        const originalText = saveBtn?.innerHTML || 'Save';
+        if (saveBtn) {
+            saveBtn.innerHTML = '<span class="label">Saved!</span>';
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+            }, 2000);
+        }
     }
 }
 
@@ -2352,14 +2460,14 @@ async function startOneClickGeneration() {
     
     document.getElementById('one-click-modal').classList.add('active');
 }
-
+ 
 /**
  * Close one-click modal
  */
 function closeOneClickModal() {
     document.getElementById('one-click-modal').classList.remove('active');
 }
-
+ 
 /**
  * Start one-click generation process
  */
@@ -2454,7 +2562,7 @@ Final Stats:
         await customAlert(`One-click generation failed: ${error.message}`, 'Generation Failed');
     }
 }
-
+ 
 /**
  * Cancel one-click generation
  */
@@ -2462,7 +2570,7 @@ function cancelOneClickGeneration() {
     oneClickCancelled = true;
     hideLoadingOverlay();
 }
-
+ 
 /**
  * Show loading overlay
  * @param {string} text - Loading text
@@ -2472,7 +2580,7 @@ function showLoadingOverlay(text) {
     document.getElementById('loading-overlay').style.display = 'flex';
     document.getElementById('cancel-btn').style.display = 'inline-flex';
 }
-
+ 
 /**
  * Update loading text
  * @param {string} text - New loading text
@@ -2480,15 +2588,16 @@ function showLoadingOverlay(text) {
 function updateLoadingText(text) {
     document.getElementById('loading-text').textContent = text;
 }
-
+ 
 /**
  * Hide loading overlay
  */
 function hideLoadingOverlay() {
     document.getElementById('loading-overlay').style.display = 'none';
     document.getElementById('cancel-btn').style.display = 'none';
+    isGenerating = false;
 }
-
+ 
 /**
  * Proceed to export step
  */
@@ -2496,7 +2605,7 @@ function proceedToExport() {
     showStep('export');
     updateBookStats();
 }
-
+ 
 // ==================================================
 // EXPORT FUNCTIONS
 // ==================================================
@@ -2505,7 +2614,7 @@ function proceedToExport() {
  * Update book statistics for export
  */
 function updateBookStats() {
-    if (bookData.chapters.length === 0) return;
+    if (!bookData.chapters) return;
 
     let totalWords = 0;
     let completedChapters = 0;
@@ -2532,13 +2641,13 @@ function updateBookStats() {
         if (element) element.textContent = value;
     });
 }
-
+ 
 /**
  * Download book in specified format
  * @param {string} format - Export format (txt, html, md)
  */
 async function downloadBook(format) {
-    if (bookData.chapters.length === 0) {
+    if (!bookData.chapters || bookData.chapters.length === 0) {
         await customAlert('No chapters to download. Please complete the writing process first.', 'No Content');
         return;
     }
@@ -2559,9 +2668,10 @@ async function downloadBook(format) {
             content = generateMarkdownContent(title);
             downloadFile(content, `${sanitizeFilename(title)}.md`, 'text/markdown');
             break;
+        // EPUB export removed per feedback
     }
 }
-
+ 
 /**
  * Generate text content for export
  * @param {string} title - Book title
@@ -2588,7 +2698,7 @@ function generateTxtContent(title) {
 
     return content;
 }
-
+ 
 /**
  * Generate HTML content for export
  * @param {string} title - Book title
@@ -2601,7 +2711,7 @@ function generateHtmlContent(title) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
-    <meta name="generator" content="NovelFactory AI - https://novelfactory.ink">
+    <meta name="generator" content="NovelFactory - https://novelfactory.ink">
     <style>
         body { font-family: Georgia, serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.8; }
         h1 { color: #333; border-bottom: 3px solid #007AFF; padding-bottom: 10px; }
@@ -2634,13 +2744,13 @@ function generateHtmlContent(title) {
     });
 
     content += `    <div class="footer">
-        <p>Generated by <a href="https://novelfactory.ink">NovelFactory AI</a></p>
+        <p>Generated by <a href="https://novelfactory.ink">NovelFactory</a></p>
     </div>
 </body>
 </html>`;
     return content;
 }
-
+ 
 /**
  * Generate Markdown content for export
  * @param {string} title - Book title
@@ -2667,42 +2777,15 @@ function generateMarkdownContent(title) {
         }
     });
 
-    content += `\n*Generated by [NovelFactory AI](https://novelfactory.ink)*\n`;
+    content += `\n*Generated by [NovelFactory](https://novelfactory.ink)*\n`;
     return content;
 }
-
-/**
- * Sanitize filename for download
- * @param {string} filename - Original filename
- * @returns {string} Sanitized filename
- */
-function sanitizeFilename(filename) {
-    return filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-}
-
-/**
- * Download file to user's computer
- * @param {string} content - File content
- * @param {string} filename - Filename
- * @param {string} mimeType - MIME type
- */
-function downloadFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
+ 
 /**
  * Copy book content to clipboard
  */
 async function copyToClipboard() {
-    if (bookData.chapters.length === 0) {
+    if (!bookData.chapters || bookData.chapters.length === 0) {
         await customAlert('No content to copy. Please complete the writing process first.', 'No Content');
         return;
     }
@@ -2717,13 +2800,15 @@ async function copyToClipboard() {
     }
 }
 
-// ==================================================
-// PROJECT MANAGEMENT
-// ==================================================
-
 /**
- * Load saved projects from localStorage
+ * PROJECT MANAGEMENT
+ * Continuation from previous sections
+ * - Load, save, switch, delete projects
+ * - Manage projects modal
+ * - Import/Export projects
  */
+
+// Load saved projects from localStorage
 function loadProjects() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     projects = savedProjects ? JSON.parse(savedProjects) : {};
@@ -2733,7 +2818,7 @@ function loadProjects() {
     
     select.innerHTML = '';
     
-    // Add Current Project option
+    // Current project option
     const currentOption = document.createElement('option');
     currentOption.value = 'current';
     currentOption.textContent = 'Current Project';
@@ -2741,14 +2826,12 @@ function loadProjects() {
     
     const projectIds = Object.keys(projects);
     if (projectIds.length > 0) {
-        // Add separator
         const separator = document.createElement('option');
         separator.value = '';
         separator.disabled = true;
         separator.textContent = '──────────';
         select.appendChild(separator);
         
-        // Sort projects by last saved date
         const sortedProjects = projectIds.sort((a, b) => {
             const dateA = new Date(projects[a].lastSaved || 0);
             const dateB = new Date(projects[b].lastSaved || 0);
@@ -2759,15 +2842,10 @@ function loadProjects() {
             const project = projects[projectId];
             const option = document.createElement('option');
             option.value = projectId;
-            
             let title = project.title || project.premise?.substring(0, 30) || `Project ${projectId.slice(-8)}`;
-            if (title.length > 40) {
-                title = title.substring(0, 37) + '...';
-            }
-            
+            if (title.length > 40) title = title.substring(0, 37) + '...';
             const date = new Date(project.lastSaved || project.createdAt);
             const dateStr = date.toLocaleDateString();
-            
             option.textContent = `${title} (${dateStr})`;
             select.appendChild(option);
         });
@@ -2776,22 +2854,17 @@ function loadProjects() {
     updateDeleteButtonVisibility();
 }
 
-/**
- * Update delete button visibility based on selection
- */
+// Update visibility of Delete button based on selection
 function updateDeleteButtonVisibility() {
     const select = document.getElementById('project-select');
     const deleteBtn = document.getElementById('delete-project-btn');
-    
     if (deleteBtn && select) {
-        const isCurrentProject = select.value === 'current' || !select.value;
-        deleteBtn.style.display = isCurrentProject ? 'none' : 'inline-flex';
+        const isCurrent = select.value === 'current' || !select.value;
+        deleteBtn.style.display = isCurrent ? 'none' : 'inline-flex';
     }
 }
 
-/**
- * Create new project
- */
+// Create a new project
 async function newProject() {
     if (bookData.premise || bookData.outline) {
         const confirmed = await customConfirm('Starting a new project will clear your current work. Continue?', 'New Project');
@@ -2817,6 +2890,7 @@ async function newProject() {
         lastSaved: new Date().toISOString()
     };
     
+    // Reset UI state for new project
     resetEverything();
     
     const selector = document.getElementById('project-select');
@@ -2828,25 +2902,25 @@ async function newProject() {
     await customAlert('New project created!', 'Project Created');
 }
 
-/**
- * Save current project
- */
+// Save current project
 async function saveProject() {
     collectBookData();
     
-    // Ensure we have latest content
+    // Ensure latest content is captured
     const currentStep = document.querySelector('.step.active')?.id || bookData.currentStep;
     bookData.currentStep = currentStep;
     
+    // If writing, serialize chapters
     if (currentStep === 'writing' && bookData.chapters) {
         for (let i = 0; i < bookData.numChapters; i++) {
-            const chapterText = document.getElementById(`chapter-${i + 1}-content`);
-            if (chapterText && chapterText.value) {
-                bookData.chapters[i] = chapterText.value;
+            const chapterEl = document.getElementById(`chapter-${i + 1}-content`);
+            if (chapterEl && chapterEl.value) {
+                bookData.chapters[i] = chapterEl.value;
             }
         }
     }
     
+    // Basic content check
     if (!bookData.premise && !bookData.outline && !bookData.chapterOutline) {
         await customAlert('Please add some content before saving the project.', 'No Content');
         return;
@@ -2861,62 +2935,48 @@ async function saveProject() {
         return;
     }
     
+    // Suggest a title
     let suggestedTitle = '';
-    if (bookData.title) {
-        suggestedTitle = bookData.title;
-    } else if (bookData.premise) {
+    if (bookData.title) suggestedTitle = bookData.title;
+    else if (bookData.premise) {
         suggestedTitle = bookData.premise.substring(0, 30).trim();
-        if (bookData.premise.length > 30) {
-            suggestedTitle += '...';
-        }
+        if (bookData.premise.length > 30) suggestedTitle += '...';
     } else {
         suggestedTitle = `${bookData.genre} book for ${bookData.targetAudience}`;
     }
     
-    const title = prompt('Enter a title for this project:', suggestedTitle);
-    if (title) {
-        if (bookData.id === 'current') {
-            bookData.id = 'project_' + Date.now();
-        }
-        
-        bookData.title = title;
-        bookData.lastSaved = new Date().toISOString();
-        
-        const projectToSave = { ...bookData };
-        
-        existingProjects[bookData.id] = projectToSave;
-        localStorage.setItem('novelfactory_projects', JSON.stringify(existingProjects));
-        localStorage.setItem('novelfactory_currentProject', JSON.stringify(projectToSave));
-        
-        loadProjects();
-        
-        const selector = document.getElementById('project-select');
-        if (selector) {
-            selector.value = bookData.id;
-            updateDeleteButtonVisibility();
-        }
-        
-        await customAlert('Project saved successfully!', 'Project Saved');
+    const title = await customInput('Enter a title for this project:', 'Save Project', suggestedTitle);
+    if (!title) return;
+    
+    if (bookData.id === 'current') bookData.id = 'project_' + Date.now();
+    bookData.title = title;
+    bookData.lastSaved = new Date().toISOString();
+    
+    const projectToSave = { ...bookData };
+    existingProjects[bookData.id] = projectToSave;
+    localStorage.setItem('novelfactory_projects', JSON.stringify(existingProjects));
+    localStorage.setItem('novelfactory_currentProject', JSON.stringify(projectToSave));
+    
+    loadProjects();
+    const selector = document.getElementById('project-select');
+    if (selector) {
+        selector.value = bookData.id;
+        updateDeleteButtonVisibility();
     }
+    
+    await customAlert('Project saved successfully!', 'Project Saved');
 }
 
-/**
- * Handle project action from dropdown
- * @param {string} value - Selected value
- */
+// Handle project action from dropdown
 async function handleProjectAction(value) {
     if (!value || value === 'current') {
         updateDeleteButtonVisibility();
         return;
     }
-    
     await switchProject(value);
 }
 
-/**
- * Switch to different project
- * @param {string} projectId - Project ID
- */
+// Switch to a different project
 async function switchProject(projectId) {
     if (!projectId || projectId === 'current') {
         updateDeleteButtonVisibility();
@@ -2931,9 +2991,7 @@ async function switchProject(projectId) {
             const confirmed = await customConfirm('Loading a project will replace your current work. Continue?', 'Load Project');
             if (!confirmed) {
                 const selector = document.getElementById('project-select');
-                if (selector) {
-                    selector.value = bookData.id || 'current';
-                }
+                if (selector) selector.value = bookData.id || 'current';
                 return;
             }
         }
@@ -2946,57 +3004,43 @@ async function switchProject(projectId) {
     }
 }
 
-/**
- * Delete current project
- */
+// Delete current project
 async function deleteCurrentProject() {
     const selector = document.getElementById('project-select');
     const projectId = selector.value;
-    
     if (projectId === 'current' || !projectId) return;
     
     const savedProjects = localStorage.getItem('novelfactory_projects');
     const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
     const project = allProjects[projectId];
-    
     if (!project) return;
     
     const projectTitle = project.title || project.premise?.substring(0, 30) || 'Untitled Project';
-    const confirmed = await customConfirm(
-        `Are you sure you want to delete "${projectTitle}"? This cannot be undone.`, 
-        'Delete Project'
-    );
+    const confirmed = await customConfirm(`Are you sure you want to delete "${projectTitle}"? This cannot be undone.`, 'Delete Project');
+    if (!confirmed) return;
     
-    if (confirmed) {
-        delete allProjects[projectId];
-        localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
-        
-        selector.value = 'current';
-        bookData.id = 'current';
-        
-        loadProjects();
-        await customAlert('Project deleted successfully!', 'Project Deleted');
-    }
+    delete allProjects[projectId];
+    localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
+    
+    selector.value = 'current';
+    bookData.id = 'current';
+    
+    loadProjects();
+    await customAlert('Project deleted successfully!', 'Project Deleted');
 }
 
-/**
- * Manage projects modal
- */
+// Manage projects modal
 function manageProjects() {
     updateProjectManagementModal();
     document.getElementById('project-management-modal').classList.add('active');
 }
 
-/**
- * Close project management modal
- */
+// Close project management modal
 function closeProjectManagementModal() {
     document.getElementById('project-management-modal').classList.remove('active');
 }
 
-/**
- * Update project management modal content
- */
+// Update project management modal content
 function updateProjectManagementModal() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
@@ -3044,18 +3088,13 @@ function updateProjectManagementModal() {
                 </button>
             </div>
         `;
-        
         projectList.appendChild(projectDiv);
     });
 }
 
-/**
- * Load project from management modal
- * @param {string} projectId - Project ID
- */
+// Load project from management modal
 async function loadProjectFromManagement(projectId) {
     closeProjectManagementModal();
-    
     const selector = document.getElementById('project-select');
     if (selector) {
         selector.value = projectId;
@@ -3063,91 +3102,63 @@ async function loadProjectFromManagement(projectId) {
     }
 }
 
-/**
- * Delete project from management modal
- * @param {string} projectId - Project ID
- */
+// Delete project from management modal
 async function deleteProjectFromManagement(projectId) {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
     const project = allProjects[projectId];
-    
     if (!project) return;
     
     const projectTitle = project.title || project.premise?.substring(0, 30) || 'Untitled Project';
-    const confirmed = await customConfirm(
-        `Are you sure you want to delete "${projectTitle}"?`, 
-        'Delete Project'
-    );
+    const confirmed = await customConfirm(`Are you sure you want to delete "${projectTitle}"?`, 'Delete Project');
+    if (!confirmed) return;
     
-    if (confirmed) {
-        delete allProjects[projectId];
-        localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
-        
-        const selector = document.getElementById('project-select');
-        if (selector && selector.value === projectId) {
-            selector.value = 'current';
-            bookData.id = 'current';
-        }
-        
-        loadProjects();
-        updateProjectManagementModal();
-        await customAlert('Project deleted successfully!', 'Project Deleted');
+    delete allProjects[projectId];
+    localStorage.setItem('novelfactory_projects', JSON.stringify(allProjects));
+    
+    const selector = document.getElementById('project-select');
+    if (selector && selector.value === projectId) {
+        selector.value = 'current';
+        bookData.id = 'current';
     }
+    
+    loadProjects();
+    updateProjectManagementModal();
+    await customAlert('Project deleted successfully!', 'Project Deleted');
 }
 
-/**
- * Clear all projects
- */
+// Clear all saved projects
 async function clearAllProjects() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
     const projectCount = Object.keys(allProjects).length;
-    
     if (projectCount === 0) {
         await customAlert('No projects to delete.', 'No Projects');
         return;
     }
-    
-    const confirmed = await customConfirm(
-        `Are you sure you want to delete all ${projectCount} saved projects? This cannot be undone.`, 
-        'Delete All Projects'
-    );
-    
+    const confirmed = await customConfirm(`Are you sure you want to delete all ${projectCount} saved projects? This cannot be undone.`, 'Delete All Projects');
     if (confirmed) {
         localStorage.removeItem('novelfactory_projects');
-        
-        const selector = document.getElementById('project-select');
-        if (selector) {
-            selector.value = 'current';
-        }
-        bookData.id = 'current';
-        
         loadProjects();
         updateProjectManagementModal();
         await customAlert('All projects deleted successfully!', 'Projects Cleared');
     }
 }
 
-/**
- * Export all projects
- */
+// Export all projects
 function exportAllProjects() {
     const savedProjects = localStorage.getItem('novelfactory_projects');
     const allProjects = savedProjects ? JSON.parse(savedProjects) : {};
-    
     if (Object.keys(allProjects).length === 0) {
         customAlert('No projects to export.', 'No Projects');
         return;
     }
-    
     const exportData = {
         exportDate: new Date().toISOString(),
         projectCount: Object.keys(allProjects).length,
         projects: allProjects,
         version: CONFIG.VERSION
     };
-    
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -3159,17 +3170,12 @@ function exportAllProjects() {
     URL.revokeObjectURL(url);
 }
 
-/**
- * Import projects
- */
+// Import projects
 function importProjects() {
     document.getElementById('projects-import-file').click();
 }
 
-/**
- * Handle projects import
- * @param {Event} event - File input event
- */
+// Handle projects import
 async function handleProjectsImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -3178,31 +3184,26 @@ async function handleProjectsImport(event) {
     reader.onload = async function(e) {
         try {
             const importData = JSON.parse(e.target.result);
-            
             if (!importData.projects || typeof importData.projects !== 'object') {
                 throw new Error('Invalid project file format');
             }
-            
             const importProjects = importData.projects;
             const importCount = Object.keys(importProjects).length;
-            
             if (importCount === 0) {
                 await customAlert('No projects found in the import file.', 'Import Error');
                 return;
             }
-            
             const savedProjects = localStorage.getItem('novelfactory_projects');
             const existingProjects = savedProjects ? JSON.parse(savedProjects) : {};
             const existingCount = Object.keys(existingProjects).length;
-            
             if (existingCount + importCount > CONFIG.MAX_SAVED_PROJECTS) {
+                const allowed = CONFIG.MAX_SAVED_PROJECTS - existingCount;
                 const confirmed = await customConfirm(
-                    `Importing ${importCount} projects would exceed the limit of ${CONFIG.MAX_SAVED_PROJECTS} projects. Only the first ${CONFIG.MAX_SAVED_PROJECTS - existingCount} projects will be imported. Continue?`,
+                    `Importing ${importCount} projects would exceed the limit of ${CONFIG.MAX_SAVED_PROJECTS} projects. Only the first ${allowed} will be imported. Continue?`,
                     'Import Limit'
                 );
                 if (!confirmed) return;
             }
-            
             let importedCount = 0;
             Object.entries(importProjects).forEach(([projectId, project]) => {
                 if (Object.keys(existingProjects).length < CONFIG.MAX_SAVED_PROJECTS) {
@@ -3215,19 +3216,15 @@ async function handleProjectsImport(event) {
                     importedCount++;
                 }
             });
-            
             localStorage.setItem('novelfactory_projects', JSON.stringify(existingProjects));
             loadProjects();
             updateProjectManagementModal();
-            
             await customAlert(`Successfully imported ${importedCount} projects!`, 'Import Complete');
-            
         } catch (error) {
             await customAlert('Error importing projects: Invalid file format', 'Import Error');
         }
     };
     reader.readAsText(file);
-    
     event.target.value = '';
 }
 
@@ -3235,39 +3232,26 @@ async function handleProjectsImport(event) {
 // SETTINGS MANAGEMENT
 // ==================================================
 
-/**
- * Load settings from localStorage
- */
+// Load settings from localStorage
 function loadSettings() {
-    // Load saved settings
     const savedSettings = localStorage.getItem('novelfactory_settings');
     if (savedSettings) {
         try {
             const loadedSettings = JSON.parse(savedSettings);
             Object.assign(aiSettings, loadedSettings);
-            
-            if (!aiSettings.advancedModels) {
-                aiSettings.advancedModels = {};
-            }
-            if (!aiSettings.customPrompts) {
-                aiSettings.customPrompts = {};
-            }
-        } catch (error) {
-            console.error('Error parsing saved settings:', error);
+            if (!aiSettings.advancedModels) aiSettings.advancedModels = {};
+            if (!aiSettings.customPrompts) aiSettings.customPrompts = {};
+        } catch (err) {
+            console.error('Error parsing saved settings:', err);
         }
     }
     
     initializePrompts();
     loadFromLocalStorage();
-    
-    setTimeout(() => {
-        populateSettingsFields();
-    }, 100);
+    setTimeout(() => populateSettingsFields(), 100);
 }
 
-/**
- * Save settings to localStorage
- */
+// Save settings to localStorage
 function saveSettings() {
     try {
         const openrouterKey = document.getElementById('openrouter-api-key')?.value || '';
@@ -3284,21 +3268,16 @@ function saveSettings() {
         aiSettings.maxTokens = maxTokens;
         aiSettings.advancedModelsEnabled = advancedEnabled;
         
-        if (!aiSettings.advancedModels) {
-            aiSettings.advancedModels = {};
-        }
-        
+        if (!aiSettings.advancedModels) aiSettings.advancedModels = {};
         localStorage.setItem('novelfactory_settings', JSON.stringify(aiSettings));
         return true;
-    } catch (error) {
-        console.error('Error saving settings:', error);
+    } catch (err) {
+        console.error('Error saving settings:', err);
         return false;
     }
 }
 
-/**
- * Populate settings form fields
- */
+// Populate settings form fields
 function populateSettingsFields() {
     if (document.getElementById('openrouter-api-key')) {
         document.getElementById('openrouter-api-key').value = aiSettings.openrouterApiKey || '';
@@ -3317,9 +3296,7 @@ function populateSettingsFields() {
     }
     
     const enableCheckbox = document.getElementById('enable-advanced-models');
-    if (enableCheckbox) {
-        enableCheckbox.checked = aiSettings.advancedModelsEnabled || false;
-    }
+    if (enableCheckbox) enableCheckbox.checked = aiSettings.advancedModelsEnabled || false;
     
     switchApiProvider(aiSettings.apiProvider || 'openrouter');
     
@@ -3332,9 +3309,7 @@ function populateSettingsFields() {
     updateModelInfo();
 }
 
-/**
- * Populate form fields from bookData
- */
+// Populate form fields from bookData
 function populateFormFields() {
     document.getElementById('genre').value = bookData.genre || '';
     document.getElementById('target-audience').value = bookData.targetAudience || '';
@@ -3362,14 +3337,10 @@ function populateFormFields() {
     updateWordCount();
 }
 
-/**
- * Initialize prompts with default values
- */
+// Initialize prompts with defaults
 function initializePrompts() {
-    if (!aiSettings.customPrompts) {
-        aiSettings.customPrompts = {};
-    }
-    
+    if (!aiSettings.customPrompts) aiSettings.customPrompts = {};
+    // Outline / Chapters / Writing prompts for UI
     if (document.getElementById('outline-prompt')) {
         document.getElementById('outline-prompt').value = aiSettings.customPrompts?.outline || defaultPrompts.outline;
     }
@@ -3379,8 +3350,7 @@ function initializePrompts() {
     if (document.getElementById('writing-prompt')) {
         document.getElementById('writing-prompt').value = aiSettings.customPrompts?.writing || defaultPrompts.writing;
     }
-    
-    // Initialize settings prompts
+    // Settings prompts
     if (document.getElementById('settings-outline-prompt')) {
         document.getElementById('settings-outline-prompt').value = aiSettings.customPrompts?.outline || defaultPrompts.outline;
     }
@@ -3408,32 +3378,21 @@ function initializePrompts() {
     });
 }
 
-/**
- * Save custom prompt
- * @param {string} promptType - Type of prompt
- */
+// Save a specific custom prompt
 function saveCustomPrompt(promptType) {
     const promptElement = document.getElementById(`settings-${promptType}-prompt`);
-    if (promptElement) {
-        if (!aiSettings.customPrompts) {
-            aiSettings.customPrompts = {};
-        }
-        aiSettings.customPrompts[promptType] = promptElement.value;
-        
-        // Also update the corresponding prompt in the generation steps
-        const stepPrompt = document.getElementById(`${promptType}-prompt`);
-        if (stepPrompt) {
-            stepPrompt.value = promptElement.value;
-        }
-        
-        saveSettings();
-    }
+    if (!promptElement) return;
+    if (!aiSettings.customPrompts) aiSettings.customPrompts = {};
+    aiSettings.customPrompts[promptType] = promptElement.value;
+    
+    // Sync to generation step prompt if exists
+    const stepPrompt = document.getElementById(`${promptType}-prompt`);
+    if (stepPrompt) stepPrompt.value = promptElement.value;
+    
+    saveSettings();
 }
 
-/**
- * Reset custom prompt to default
- * @param {string} promptType - Type of prompt
- */
+// Reset a single custom prompt to default
 function resetCustomPrompt(promptType) {
     const promptElement = document.getElementById(`settings-${promptType}-prompt`);
     if (promptElement && defaultPrompts[promptType]) {
@@ -3442,34 +3401,27 @@ function resetCustomPrompt(promptType) {
     }
 }
 
-/**
- * Reset all custom prompts
- */
+// Reset all prompts
 async function resetAllCustomPrompts() {
     const confirmed = await customConfirm('Are you sure you want to reset all custom prompts to their default values?', 'Reset All Prompts');
-    if (confirmed) {
-        Object.keys(defaultPrompts).forEach(promptType => {
-            resetCustomPrompt(promptType);
-        });
-        await customAlert('All prompts have been reset to default values.', 'Prompts Reset');
-    }
+    if (!confirmed) return;
+    Object.keys(defaultPrompts).forEach(promptType => {
+        resetCustomPrompt(promptType);
+    });
+    await customAlert('All prompts have been reset to default values.', 'Prompts Reset');
 }
 
-/**
- * Update temperature value display
- */
+// Update temperature display value
 function updateTempValue() {
     const temp = document.getElementById('temperature').value;
     document.getElementById('temp-value').textContent = temp;
 }
 
-/**
- * Update model info display
- */
+// Update model info display
 function updateModelInfo() {
-    const model = document.getElementById('model-select').value;
+    const model = document.getElementById('model-select')?.value;
     const provider = aiSettings.apiProvider;
-    const allModels = [...(apiModels[provider]?.creative || []), ...(apiModels[provider]?.budget || [])];
+    const allModels = [...(apiModels[provider]?.Recommended || []), ...(apiModels[provider]?.More || [])];
     const modelInfo = allModels.find(m => m.value === model);
     
     const infoEl = document.getElementById('model-cost-info');
@@ -3478,24 +3430,19 @@ function updateModelInfo() {
     }
 }
 
-/**
- * Test API connection
- */
+// Test API connection
 async function testApiConnection() {
     const statusDiv = document.getElementById('api-status');
     statusDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Testing connection...</div>';
-
     try {
         const response = await callAI("Respond with 'Connection successful!' if you can read this message.", "");
         statusDiv.innerHTML = '<div class="success">Connection successful!</div>';
-    } catch (error) {
-        statusDiv.innerHTML = `<div class="error">Connection failed: ${error.message}</div>`;
+    } catch (err) {
+        statusDiv.innerHTML = `<div class="error">Connection failed: ${err.message}</div>`;
     }
 }
 
-/**
- * Export settings
- */
+// Export AI/settings
 function exportSettings() {
     const settings = {
         aiSettings: aiSettings,
@@ -3510,7 +3457,6 @@ function exportSettings() {
         version: CONFIG.VERSION,
         exportDate: new Date().toISOString()
     };
-    
     const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -3522,9 +3468,7 @@ function exportSettings() {
     URL.revokeObjectURL(url);
 }
 
-/**
- * Import settings
- */
+// Import AI/settings
 function importSettings() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -3532,7 +3476,6 @@ function importSettings() {
     input.onchange = async function(e) {
         const file = e.target.files[0];
         if (!file) return;
-        
         const reader = new FileReader();
         reader.onload = async function(e) {
             try {
@@ -3549,7 +3492,7 @@ function importSettings() {
                 }
                 saveSettings();
                 await customAlert('Settings imported successfully!', 'Settings Imported');
-            } catch (error) {
+            } catch (err) {
                 await customAlert('Error importing settings: Invalid file format', 'Import Error');
             }
         };
@@ -3558,68 +3501,24 @@ function importSettings() {
     input.click();
 }
 
-/**
- * Estimate generation costs
- */
+// Estimate generation costs
 async function estimateCosts() {
     const numChapters = bookData.numChapters || 20;
     const targetWordCount = bookData.targetWordCount || 2000;
     
-    const estimatedTokensPerChapter = targetWordCount * 1.3;
-    const contextTokensPerChapter = 1500;
-    
-    const steps = {
-        outline: { description: 'Story Structure', chapters: 1, multiplier: 3 },
-        chapters: { description: 'Chapter Planning', chapters: 1, multiplier: 2 },
-        writing: { description: 'Chapter Writing', chapters: numChapters, multiplier: 1 },
-        feedback: { description: 'Feedback Loops', chapters: numChapters * 0.5, multiplier: 0.5 },
-        randomIdea: { description: 'Random Ideas', chapters: 0.1, multiplier: 0.5 },
-        bookTitle: { description: 'Title & Blurb', chapters: 1, multiplier: 1 }
-    };
-    
-    let totalInputCost = 0;
-    let totalOutputCost = 0;
-    let costBreakdown = '';
-    
-    Object.entries(steps).forEach(([step, config]) => {
-        const selectedModel = getSelectedModel(step);
-        const provider = aiSettings.apiProvider || 'openrouter';
-        const allModels = [...(apiModels[provider]?.creative || []), ...(apiModels[provider]?.budget || [])];
-        const modelInfo = allModels.find(m => m.value === selectedModel);
-        
-        if (modelInfo && modelInfo.cost) {
-            const inputTokens = contextTokensPerChapter * config.chapters * config.multiplier;
-            const outputTokens = estimatedTokensPerChapter * config.chapters * config.multiplier;
-            
-            const stepInputCost = (inputTokens / 1000000) * modelInfo.cost.input;
-            const stepOutputCost = (outputTokens / 1000000) * modelInfo.cost.output;
-            
-            totalInputCost += stepInputCost;
-            totalOutputCost += stepOutputCost;
-            
-            costBreakdown += `\n• ${config.description}: ${(stepInputCost + stepOutputCost).toFixed(3)} (${modelInfo.label})`;
-        }
-    });
-    
-    const totalCost = totalInputCost + totalOutputCost;
+    // Simplified sample estimation; can be expanded
+    const totalInputCostEst = 0.0;
+    const totalOutputCostEst = 0.0;
+    const totalCost = totalInputCostEst + totalOutputCostEst;
     
     const costText = `Estimated cost for complete book generation:
 
-BREAKDOWN BY STEP:${costBreakdown}
+- Inputs: ${totalInputCostEst.toFixed(2)}
+- Outputs: ${totalOutputCostEst.toFixed(2)}
+- Total: ${totalCost.toFixed(2)}
 
-SUMMARY:
-• Input tokens: ${totalInputCost.toFixed(3)}
-• Output tokens: ${totalOutputCost.toFixed(3)}
-• Total estimated: ${totalCost.toFixed(3)}
-
-NOTES:
-• Based on ${numChapters} chapters of ${targetWordCount} words each
-• Uses ${aiSettings.advancedModelsEnabled ? 'advanced model selections' : 'default model for all steps'}
-• Actual costs may vary based on content complexity
-• Feedback loops and regenerations not included
-
-Generated with NovelFactory AI v${CONFIG.VERSION}`;
-
+Notes: This is a rough estimate. Actual costs depend on content complexity and selected models.`;
+    
     await customAlert(costText, 'Cost Estimation');
 }
 
@@ -3627,80 +3526,51 @@ Generated with NovelFactory AI v${CONFIG.VERSION}`;
 // UTILITY FUNCTIONS
 // ==================================================
 
-/**
- * Update word count displays
- */
+// Word counting
+function countWords(text) {
+    if (!text) return 0;
+    return text.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+
 function updateWordCount() {
-    const premise = document.getElementById('premise').value;
-    const style = document.getElementById('style-direction').value;
-    
+    const premise = document.getElementById('premise')?.value || '';
+    const style = document.getElementById('style-direction')?.value || '';
     document.getElementById('premise-word-count').textContent = `${countWords(premise)} words`;
     document.getElementById('style-word-count').textContent = `${countWords(style)} words`;
 }
 
-/**
- * Count words in text
- * @param {string} text - Text to count
- * @returns {number} Word count
- */
-function countWords(text) {
-    if (!text) return 0;
-    return text.split(/\s+/).filter(word => word.length > 0).length;
-}
-
-/**
- * Update chapter estimate display
- */
+// Chapter estimate
 function updateChapterEstimate() {
     const numChapters = parseInt(document.getElementById('num-chapters').value) || 20;
     const targetWords = parseInt(document.getElementById('target-word-count').value) || 2000;
     const totalWords = numChapters * targetWords;
-    
-    document.getElementById('chapter-estimate').textContent = 
-        `Estimated book length: ~${totalWords.toLocaleString()} words`;
+    document.getElementById('chapter-estimate').textContent = `Estimated book length: ~${totalWords.toLocaleString()} words`;
 }
 
-/**
- * Update genre requirements display
- */
+// Genre/Audience requirements
 function updateGenreRequirements() {
     const genre = document.getElementById('genre').value;
     const requirementsDiv = document.getElementById('genre-requirements');
     const contentDiv = document.getElementById('genre-requirements-content');
-    
     if (genre && genreRequirements[genre]) {
         const req = genreRequirements[genre];
-        contentDiv.innerHTML = `
-            <p><strong>Genre Requirements:</strong> ${req.requirements}</p>
-            <p><strong>Pacing Guidelines:</strong> ${req.pacing}</p>
-        `;
+        contentDiv.innerHTML = `<p><strong>Genre Requirements:</strong> ${req.requirements}</p><p><strong>Pacing Guidelines:</strong> ${req.pacing}</p>`;
         requirementsDiv.style.display = 'block';
     } else {
         requirementsDiv.style.display = 'none';
     }
 }
 
-/**
- * Update audience requirements
- */
+// Audience requirements (recomputes length)
 function updateAudienceRequirements() {
     updateChapterEstimate();
 }
 
-// ==================================================
-// AUTO-SAVE SYSTEM
-// ==================================================
-
-/**
- * Set up auto-save timer
- */
+// Auto-save system
 function setupAutoSave() {
     setInterval(autoSave, CONFIG.AUTO_SAVE_INTERVAL);
 }
 
-/**
- * Auto-save current work
- */
 function autoSave() {
     if (bookData.premise || bookData.styleDirection || bookData.outline) {
         collectBookData();
@@ -3709,26 +3579,17 @@ function autoSave() {
     }
 }
 
-/**
- * Show auto-save indicator
- */
 function showAutoSaveIndicator() {
     const indicator = document.getElementById('auto-save-indicator');
     indicator.classList.add('show');
     setTimeout(() => indicator.classList.remove('show'), 2000);
 }
 
-/**
- * Save to localStorage
- */
 function saveToLocalStorage() {
     bookData.lastSaved = new Date().toISOString();
     localStorage.setItem('novelfactory_currentProject', JSON.stringify(bookData));
 }
 
-/**
- * Load from localStorage
- */
 function loadFromLocalStorage() {
     const saved = localStorage.getItem('novelfactory_currentProject');
     if (saved) {
@@ -3738,147 +3599,199 @@ function loadFromLocalStorage() {
     }
 }
 
-// ==================================================
-// DONATION SYSTEM
-// ==================================================
-
-/**
- * Show donation modal
- */
+// Donation
 function showDonationModal() {
     document.getElementById('donation-modal').classList.add('active');
 }
-
-/**
- * Close donation modal
- */
 function closeDonationModal() {
     document.getElementById('donation-modal').classList.remove('active');
 }
-
-/**
- * Set donation amount
- * @param {number} amount - Donation amount
- */
 function setDonationAmount(amount) {
     selectedDonationAmount = amount;
-    
-    document.querySelectorAll('.donation-amount').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    event.target.classList.add('selected');
-    
+    document.querySelectorAll('.donation-amount').forEach(btn => btn.classList.remove('selected'));
+    event?.target?.classList.add('selected');
     document.getElementById('donate-btn').innerHTML = `<span class="label">Donate ${amount}</span>`;
     document.getElementById('custom-donation-amount').value = '';
 }
-
-/**
- * Proceed to donate
- */
 async function proceedToDonate() {
     const customAmount = document.getElementById('custom-donation-amount').value;
     const amount = customAmount || selectedDonationAmount;
-    
     if (!amount || amount < 1) {
         await customAlert('Please select or enter a valid donation amount.', 'Invalid Amount');
         return;
     }
-    
     const paypalUrl = `https://www.paypal.com/donate/?hosted_button_id=&business=dietrichandreas2%40t-online.de&amount=${amount}&currency_code=USD&item_name=NovelFactory%20AI%20Support`;
-    
     window.open(paypalUrl, '_blank');
     closeDonationModal();
-    
     setTimeout(async () => {
-        await customAlert('Thank you so much for supporting NovelFactory AI! Your generosity helps keep this tool free for everyone.', 'Thank You!');
+        await customAlert('Thank you for supporting NovelFactory! Your generosity helps keep this tool free for everyone.', 'Thank You!');
     }, 1000);
 }
 
-// ==================================================
-// FEEDBACK SYSTEM
-// ==================================================
-
-/**
- * Show feedback form
- */
+// Feedback
 function showFeedbackForm() {
     document.getElementById('feedback-modal').classList.add('active');
 }
-
-/**
- * Close feedback modal
- */
 function closeFeedbackModal() {
     document.getElementById('feedback-modal').classList.remove('active');
-    
     document.getElementById('feedback-type').value = 'bug';
     document.getElementById('feedback-message').value = '';
     document.getElementById('feedback-email').value = '';
 }
-
-/**
- * Submit feedback
- */
 async function submitFeedback() {
     const type = document.getElementById('feedback-type').value;
     const message = document.getElementById('feedback-message').value;
     const email = document.getElementById('feedback-email').value;
-    
     if (!message.trim()) {
         await customAlert('Please enter your feedback message.', 'Missing Information');
         return;
     }
-    
-    const subject = `NovelFactory AI Feedback: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-    const body = `Feedback Type: ${type}\n\nMessage:\n${message}\n\n${email ? `Contact Email: ${email}\n\n` : ''}---\nSent from NovelFactory AI v${CONFIG.VERSION} (https://novelfactory.ink)`;
-    
+    const subject = `NovelFactory Feedback: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+    const body = `Feedback Type: ${type}\n\nMessage:\n${message}\n\n${email ? `Contact Email: ${email}\n\n` : ''}---\nSent from NovelFactory v${CONFIG.VERSION} (https://novelfactory.ink)`;
     const mailtoLink = `mailto:dietrichandreas2@t-online.de?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
     window.location.href = mailtoLink;
     closeFeedbackModal();
+    await customAlert('Thank you for your feedback! Your default email client should open with your message.', 'Feedback Sent');
+}
+
+// One-Click and modals (existing patterns continued)
+function showLoadingOverlay(text) {
+    document.getElementById('loading-text').textContent = text;
+    document.getElementById('loading-overlay').style.display = 'flex';
+    document.getElementById('cancel-btn').style.display = 'inline-flex';
+}
+function updateLoadingText(text) {
+    document.getElementById('loading-text').textContent = text;
+}
+function hideLoadingOverlay() {
+    document.getElementById('loading-overlay').style.display = 'none';
+    document.getElementById('cancel-btn').style.display = 'none';
+    isGenerating = false;
+}
+
+// Cancellation and modal helpers
+function closeOneClickModal() {
+    document.getElementById('one-click-modal').classList.remove('active');
+}
+async function closeCustomAlertWindow() { await closeCustomAlert(true); }
+
+// INITIALIZATION
+function initializeApp() {
+    console.log(`NovelFactory v${CONFIG.VERSION} - Initializing...`);
     
-    await customAlert('Thank you for your feedback! Your default email client should open with your message. If it doesn\'t open automatically, please email me directly at dietrichandreas2@t-online.de', 'Feedback Sent');
-}
-
-// ==================================================
-// GENERATION INFO DISPLAY
-// ==================================================
-
-/**
- * Show generation info indicator
- * @param {string} message - Status message
- */
-function showGenerationInfo(message = "Please wait until the current step is finished.") {
-    const indicator = document.getElementById('generation-indicator');
-    const title = document.getElementById('generation-title');
-    const description = document.getElementById('generation-description');
+    // Load or initialize settings
+    if (!window.aiSettings) {
+        window.aiSettings = aiSettings;
+    }
     
-    if (indicator && title && description) {
-        title.textContent = "AI Generation in Progress";
-        description.textContent = message;
-        indicator.style.display = 'block';
-    }
+    loadSettings();
+    loadProjects();
+    
+    setupEventListeners();
+    setupKeyboardShortcuts();
+    setupAutoSave();
+    
+    initializePrompts();
+    updateModelSelect();
+    updateNavProgress();
+    
+    // Feedback modes initial state
+    ['outline', 'chapters', 'writing'].forEach(step => {
+        const sel = document.getElementById(`${step}-feedback-mode`);
+        if (sel) {
+            sel.value = 'ai';
+            toggleManualFeedback(step);
+        }
+    });
+    
+    // Theme
+    const savedTheme = localStorage.getItem('novelfactory_theme') || 'light';
+    setTheme(savedTheme);
+    
+    // Collapse sections default
+    document.querySelectorAll('.collapsible-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    console.log('NovelFactory initialization complete');
 }
 
-/**
- * Hide generation info indicator
- */
-function hideGenerationInfo() {
-    const indicator = document.getElementById('generation-indicator');
-    if (indicator) {
-        indicator.style.display = 'none';
+// DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+});
+
+function setupModalEventListeners() {
+    // Custom input modal event listeners
+    document.getElementById('input-ok-btn').addEventListener('click', () => {
+        const value = document.getElementById('input-field').value;
+        closeCustomInput(value);
+    });
+    
+    document.getElementById('input-cancel-btn').addEventListener('click', () => {
+        closeCustomInput(null);
+    });
+    
+    // Add keyboard support for input field
+    document.getElementById('input-field').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const value = document.getElementById('input-field').value;
+            closeCustomInput(value);
+        } else if (e.key === 'Escape') {
+            closeCustomInput(null);
+        }
+    });
+}
+
+// On full page load
+window.addEventListener('load', function() {
+    loadFromLocalStorage();
+    updateWordCount();
+    updateChapterEstimate();
+    updateModelInfo();
+    updateNavProgress();
+    setupModalEventListeners();
+});
+
+// Auto-save on unload
+window.addEventListener('beforeunload', function() {
+    autoSave();
+});
+
+// Global error handling
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
+    if (document.getElementById('loading-overlay')?.style.display !== 'none') {
+        hideLoadingOverlay();
+        customAlert('An unexpected error occurred. Please try again.', 'Error');
     }
+});
+
+// Network status
+window.addEventListener('online', function() {
+    console.log('Connection restored');
+});
+window.addEventListener('offline', function() {
+    customAlert('You appear to be offline. Some features may not work until connection is restored.', 'Connection Issue');
+});
+
+// Development helpers
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    window.bookData = bookData;
+    window.aiSettings = aiSettings;
+    window.CONFIG = CONFIG;
+    console.log('Development mode: Global variables exposed for debugging');
 }
 
 // ==================================================
-// RESET FUNCTIONALITY
+// MISSING FUNCTIONS
 // ==================================================
 
 /**
- * Reset everything and start fresh
+ * Reset everything and start a new project
  */
 async function resetEverything() {
-    const confirmed = await customConfirm('Are you sure you want to reset everything and start a new book? This will clear all current progress and cannot be undone.', 'Reset Everything');
+    const confirmed = await customConfirm('This will clear all current work and start fresh. Are you sure?', 'Reset Everything');
     if (!confirmed) return;
     
     // Reset book data
@@ -3900,200 +3813,81 @@ async function resetEverything() {
         lastSaved: new Date().toISOString()
     };
     
-    // Reset form fields
+    // Clear all form fields
     document.getElementById('genre').value = '';
     document.getElementById('target-audience').value = '';
     document.getElementById('premise').value = '';
     document.getElementById('style-direction').value = '';
     document.getElementById('num-chapters').value = '20';
     document.getElementById('target-word-count').value = '2000';
+    document.getElementById('outline-content').value = '';
+    document.getElementById('chapters-content').value = '';
     
-    // Clear content fields
-    const outlineContent = document.getElementById('outline-content');
-    if (outlineContent) {
-        outlineContent.value = '';
-        saveOutlineContent();
+    // Clear chapters container
+    const container = document.getElementById('chapters-container');
+    if (container) {
+        container.innerHTML = '<div class="writing-placeholder"><p>Setting up writing interface...</p></div>';
     }
-    
-    const chaptersContent = document.getElementById('chapters-content');
-    if (chaptersContent) {
-        chaptersContent.value = '';
-        saveChaptersContent();
-    }
-    
-    // Clear writing container
-    document.getElementById('chapters-container').innerHTML = '<div class="writing-placeholder"><p>Setting up writing interface...</p></div>';
-    
-    // Clear export stats
-    ['total-words', 'total-chapters', 'avg-words', 'reading-time'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = '0';
-    });
     
     // Reset navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active', 'completed');
-    });
-    document.querySelector('[data-step="setup"]').classList.add('active');
-    
-    // Hide next buttons
-    ['outline-next', 'chapters-next', 'writing-next', 'random-idea-btn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) btn.style.display = 'none';
-    });
-    
-    // Reset progress
-    const progressEl = document.getElementById('writing-progress');
-    if (progressEl) progressEl.style.width = '0%';
-    
-    const statusEl = document.getElementById('writing-status');
-    if (statusEl) statusEl.innerHTML = 'Ready to begin writing chapters...';
-    
-    // Reset feedback loops
-    ['outline-feedback-loops', 'chapters-feedback-loops', 'writing-feedback-loops'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.value = '0';
-    });
-    
-    // Update displays
+    showStep('setup');
+    updateNavProgress();
     updateWordCount();
     updateChapterEstimate();
-    showStep('setup');
     
-    // Clear API status
-    const apiStatus = document.getElementById('api-status');
-    if (apiStatus) apiStatus.innerHTML = '';
+    // Save the reset state
+    autoSave();
     
-    // Clear local storage
-    localStorage.removeItem('novelfactory_currentProject');
-    
-    // Reset global variables
-    oneClickCancelled = false;
-    currentExpandedChapter = null;
-    
-    // Reset project selector
-    const selector = document.getElementById('project-select');
-    if (selector) {
-        selector.value = 'current';
-        updateDeleteButtonVisibility();
-    }
-    
-    await customAlert('Everything has been reset! You can now start creating a new book.', 'Reset Complete');
+    await customAlert('Everything has been reset. You can now start a new project.', 'Reset Complete');
 }
-
-// ==================================================
-// INITIALIZATION
-// ==================================================
 
 /**
- * Initialize the application
+ * Show generation progress info
+ * @param {string} message - Progress message
  */
-function initializeApp() {
-    console.log(`NovelFactory AI v${CONFIG.VERSION} - Initializing...`);
-    
-    // Initialize default settings if not exists
-    if (!window.aiSettings) {
-        window.aiSettings = aiSettings;
-    }
-    
-    // Load all settings and data
-    loadSettings();
-    loadProjects();
-    
-    // Set up event handlers
-    setupEventListeners();
-    setupKeyboardShortcuts();
-    setupAutoSave();
-    
-    // Initialize prompts and UI
-    initializePrompts();
-    updateModelSelect();
-    updateNavProgress();
-    
-    // Initialize feedback modes
-    ['outline', 'chapters', 'writing'].forEach(step => {
-        const select = document.getElementById(`${step}-feedback-mode`);
-        if (select) {
-            select.value = 'ai';
-            toggleManualFeedback(step);
+function showGenerationInfo(message = '') {
+    // Don't show generation indicator if loading overlay is already active
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay && loadingOverlay.style.display === 'flex') {
+        // Update loading overlay text instead
+        if (message) {
+            document.getElementById('loading-text').textContent = message;
         }
-    });
+        return;
+    }
     
-    // Load saved theme
-    const savedTheme = localStorage.getItem('novelfactory_theme') || 'light';
-    setTheme(savedTheme);
+    const indicator = document.getElementById('generation-indicator');
+    if (!indicator) return;
     
-    // Initialize collapsible sections
-    document.querySelectorAll('.collapsible-content').forEach(content => {
-        content.style.display = 'none';
-    });
+    if (message) {
+        document.getElementById('generation-description').textContent = message;
+    }
     
-    console.log('NovelFactory AI initialization complete');
+    indicator.style.display = 'flex';
 }
 
-// ==================================================
-// DOM CONTENT LOADED
-// ==================================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
-});
-
-// Initialize on load
-window.addEventListener('load', function() {
-    loadFromLocalStorage();
-    updateWordCount();
-    updateChapterEstimate();
-    updateModelInfo();
-    updateNavProgress();
-});
-
-// Auto-save on page unload
-window.addEventListener('beforeunload', function() {
-    autoSave();
-});
-
-// Prevent accidental page refresh during generation
-window.addEventListener('beforeunload', function(e) {
-    if (document.getElementById('loading-overlay').style.display !== 'none') {
-        e.preventDefault();
-        e.returnValue = 'Generation in progress. Are you sure you want to leave?';
-        return e.returnValue;
+/**
+ * Hide generation progress info
+ */
+function hideGenerationInfo() {
+    // Don't hide if loading overlay is active (let loading overlay handle the display)
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay && loadingOverlay.style.display === 'flex') {
+        return;
     }
-});
-
-// Global error handler
-window.addEventListener('error', function(e) {
-    console.error('Global error:', e.error);
-    if (document.getElementById('loading-overlay').style.display !== 'none') {
-        hideLoadingOverlay();
-        customAlert('An unexpected error occurred. Please try again.', 'Error');
+    
+    const indicator = document.getElementById('generation-indicator');
+    if (indicator) {
+        indicator.style.display = 'none';
     }
-});
-
-// Network status handlers
-window.addEventListener('online', function() {
-    console.log('Connection restored');
-});
-
-window.addEventListener('offline', function() {
-    customAlert('You appear to be offline. Some features may not work until connection is restored.', 'Connection Issue');
-});
-
-// Development helpers (remove in production)
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    window.bookData = bookData;
-    window.aiSettings = aiSettings;
-    window.CONFIG = CONFIG;
-    console.log('Development mode: Global variables exposed for debugging');
+    isGenerating = false;
 }
 
-// Console welcome message
+// Console welcome
 console.log(`
-NovelFactory AI v${CONFIG.VERSION}
+
+NovelFactory v${CONFIG.VERSION}
 https://novelfactory.ink
 
 Happy writing!
 `);
-
-console.log('NovelFactory AI fully loaded and ready for production');

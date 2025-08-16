@@ -732,6 +732,33 @@ textarea {
     font-size: var(--font-size-base);
 }
 
+.btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-disabled:hover {
+    background: var(--color-ghost) !important;
+    transform: none !important;
+}
+
+/* Enhanced Button States for Ghost Buttons */
+.btn.btn-ghost[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    border-color: var(--border-secondary);
+}
+
+.btn.btn-ghost[disabled]:hover {
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    border-color: var(--border-secondary);
+    transform: none;
+    box-shadow: none;
+}
+
 /* Cards */
 .info-card, .output-section {
     background: var(--bg-tertiary);
@@ -1147,6 +1174,12 @@ textarea {
     box-shadow: var(--shadow-small);
 }
 
+.chapter-item.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+    box-shadow: var(--shadow-medium);
+}
+
 .chapter-header {
     display: flex;
     justify-content: space-between;
@@ -1189,6 +1222,13 @@ textarea {
     font-size: var(--font-size-sm);
     color: var(--text-secondary);
     margin-bottom: var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+}
+
+.chapter-status .loading {
+    color: var(--color-primary);
 }
 
 .chapter-content {
@@ -1212,6 +1252,69 @@ textarea {
     display: flex;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
+}
+
+/* Enhanced Chapter Checkbox Styling */
+.chapter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.chapter-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+}
+
+.chapter-checkbox .checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0;
+    gap: var(--spacing-sm);
+}
+
+.chapter-checkbox .checkbox-label h4 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chapter-checkbox input[type="checkbox"]:checked + .checkbox-label h4 {
+    color: var(--color-primary);
+}
+
+/* Chapters Collapsed State */
+.chapters-collapsed .chapter-item:not(:first-of-type) .chapter-content-field {
+    display: none;
+}
+
+.chapters-collapsed .chapter-item:not(:first-of-type) .chapter-status {
+    display: none;
+}
+
+/* Chapter Collapse/Expand Styling */
+.chapter-content-field {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.chapter-content-field.collapsed {
+    display: none !important;
+}
+
+#toggle-chapters-btn {
+    background: var(--color-secondary);
+    color: white;
+}
+
+#toggle-chapters-btn:hover {
+    background: #7A7A85;
 }
 
 /* Stats Grid */
@@ -1349,6 +1452,20 @@ textarea {
     margin-bottom: var(--spacing-lg);
 }
 
+.export-card.new-feature {
+    border: 2px solid var(--color-warning);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--color-warning-light) 100%);
+}
+
+.export-card.new-feature .export-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
 /* Settings */
 .settings-section {
     margin-bottom: var(--spacing-2xl);
@@ -1404,6 +1521,25 @@ textarea {
 
 .advanced-models-toggle {
     margin-bottom: var(--spacing-lg);
+}
+
+/* Selection Controls Styling */
+.selection-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.generation-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.view-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
 }
 
 /* Checkbox Component Styling */
@@ -1475,11 +1611,15 @@ textarea {
 }
 
 .checkbox-label {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-    display: block;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 !important;
+}
+
+.checkbox-label h4 {
+    margin: 0;
+    margin-left: var(--spacing-xs);
 }
 
 .checkbox-content .form-hint {
@@ -1784,6 +1924,30 @@ textarea {
     border-top: 1px solid var(--separator);
 }
 
+/* Custom Input Modal */
+.custom-input-modal .modal-content {
+    min-width: 400px;
+    max-width: 500px;
+}
+
+.custom-input-modal .input-field {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    margin-top: var(--spacing-md);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.custom-input-modal .input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
 /* One-Click Configuration */
 .one-click-config {
     margin-top: var(--spacing-lg);
@@ -2029,11 +2193,106 @@ textarea {
     gap: var(--spacing-md);
 }
 
+/* Enhanced Custom Alert Modal */
+.custom-alert-modal .modal-content {
+    min-width: 400px;
+    max-width: 500px;
+}
+
+.alert-content {
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-large);
+}
+
+.alert-header {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.alert-header h3 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.alert-body {
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.alert-footer {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
 /* Alert Types */
 .custom-alert.success .custom-alert-icon { color: var(--color-success); }
 .custom-alert.error .custom-alert-icon { color: var(--color-danger); }
 .custom-alert.warning .custom-alert-icon { color: var(--color-warning); }
 .custom-alert.info .custom-alert-icon { color: var(--color-primary); }
+
+/* Project Management */
+.project-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.project-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    background: var(--bg-tertiary);
+    transition: all var(--transition-fast);
+}
+
+.project-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-small);
+}
+
+.project-info h4 {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+}
+
+.project-info p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.project-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.project-stats {
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.project-management-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+}
+
+.no-projects {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: var(--spacing-2xl);
+}
 
 /* Animations */
 @keyframes fadeIn {
@@ -2187,6 +2446,21 @@ textarea {
     .checkmark {
         margin-top: 0;
     }
+
+    .project-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+
+    .project-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .project-management-actions {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2227,5 +2501,20 @@ textarea {
     .custom-alert-footer {
         padding: var(--spacing-md);
         flex-direction: column;
+    }
+
+    .export-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chapter-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .chapter-info {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
     }
 }

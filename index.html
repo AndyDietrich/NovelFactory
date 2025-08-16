@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovelFactory AI - Create Complete Books with AI | Professional Book Generator</title>
-    <meta name="description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction with our advanced AI book generator. Try NovelFactory AI free today!">
+    <title>NovelFactory - Create Complete Books with AI | Professional Book Generator</title>
+    <meta name="description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction with our advanced AI book generator. Try NovelFactory free today!">
     <meta name="keywords" content="AI book generator, novel writing AI, story generator, book creator, AI author, fiction generator, novel factory, AI writing tool, automated book creation">
-    <meta name="author" content="NovelFactory AI">
+    <meta name="author" content="NovelFactory">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph for social sharing -->
-    <meta property="og:title" content="NovelFactory AI - Create Complete Books with AI">
+    <meta property="og:title" content="NovelFactory - Create Complete Books with AI">
     <meta property="og:description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction with our advanced AI book generator.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://novelfactory.ink">
     <meta property="og:image" content="https://novelfactory.ink/og-image.jpg">
-    <meta property="og:site_name" content="NovelFactory AI">
+    <meta property="og:site_name" content="NovelFactory">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="NovelFactory AI - Create Complete Books with AI">
+    <meta name="twitter:title" content="NovelFactory - Create Complete Books with AI">
     <meta name="twitter:description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction.">
     <meta name="twitter:image" content="https://novelfactory.ink/twitter-image.jpg">
     <meta name="twitter:site" content="@novelfactory">
@@ -32,7 +32,7 @@
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "NovelFactory AI",
+        "name": "NovelFactory",
         "description": "Fully automated AI-powered book generator for crafting complete novels and creating stories",
         "url": "https://novelfactory.ink",
         "applicationCategory": "Writing Tool",
@@ -46,8 +46,36 @@
     </script>
 
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        /* General button size adjustments - makes all buttons a bit smaller */
+        .btn {
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+            border-radius: 8px !important;
+        }
+        .btn-sm {
+            padding: 4px 8px !important;
+            font-size: 12px !important;
+        }
+        .btn-large {
+            padding: 8px 14px !important;
+            font-size: 15px !important;
+        }
+        /* Per-chapter collapse icon button inside chapter header */
+        .collapse-chapter-btn {
+            margin-left: auto;
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+        /* Chapter content collapse state tweaks (ensures content space is collapsed cleanly) */
+        .chapter-content-field.collapsed { display: none !important; }
+        /* Small override for the collapse button group layout in header if needed */
+        .chapter-header { align-items: center; position: relative; }
+        /* Position the collapse button at top-right (CSS supports absolute positioning) */
+        .chapter-item .collapse-chapter-btn { position: absolute; top: 8px; right: 8px; z-index: 2; margin-left: 0; }
+        /* Small helpers for per-chapter collapse icons in header alignment */
+        .chapter-actions { display: flex; align-items: center; gap: 6px; }
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="favicon.ico" sizes="any">
@@ -58,7 +86,7 @@
         <header class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1 class="app-title">NovelFactory AI</h1>
+                    <h1 class="app-title">NovelFactory</h1>
                     <p class="app-subtitle">Craft bestselling novels</p>
                 </div>
                 <div class="header-right">
@@ -442,6 +470,8 @@
                         </div>
                     </div>
 
+                    <!-- Per-chapter collapse icons are added in the JS when building the chapter items. No global collapse button now. -->
+
                     <!-- Navigation -->
                     <div class="step-actions">
                         <button class="btn btn-success btn-large" onclick="proceedToWriting(); window.scrollTo({top: 0, behavior: 'smooth'})" id="chapters-next" style="display: none;">
@@ -569,29 +599,27 @@
 
                     <div class="export-grid">
                         <div class="export-card">
-                            <div class="export-icon">TXT</div>
                             <h4>Text Format</h4>
                             <p>Simple text file for basic reading</p>
                             <button class="btn btn-primary" onclick="downloadBook('txt')">Download TXT</button>
                         </div>
                         <div class="export-card">
-                            <div class="export-icon">HTML</div>
                             <h4>HTML Format</h4>
                             <p>Web-ready format with styling</p>
                             <button class="btn btn-primary" onclick="downloadBook('html')">Download HTML</button>
                         </div>
                         <div class="export-card">
-                            <div class="export-icon">MD</div>
                             <h4>Markdown Format</h4>
                             <p>Universal format for publishing platforms</p>
                             <button class="btn btn-primary" onclick="downloadBook('md')">Download Markdown</button>
                         </div>
+                        <!-- EPUB export removed per feedback -->
                         <div class="export-card">
-                            <div class="export-icon">COPY</div>
                             <h4>Copy to Clipboard</h4>
                             <p>Quick copy for pasting elsewhere</p>
                             <button class="btn btn-primary" onclick="copyToClipboard()">Copy Text</button>
                         </div>
+                        <!-- Google Drive export removed per feedback -->
                     </div>
                 </div>
             </div>
@@ -636,7 +664,7 @@
                                 <select id="model-select" onchange="updateModelInfo(); saveSettings()">
                                     <!-- Models will be populated by JavaScript -->
                                 </select>
-                                <div id="model-cost-info" class="form-hint">Best quality models marked with stars | Budget models marked with dollar signs</div>
+                                <div id="model-cost-info" class="form-hint">Cost information will appear here</div>
                             </div>
                         </div>
 
@@ -805,7 +833,7 @@
             <div id="tutorial" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Tutorial & Guide</h2>
-                    <p class="step-description">Complete guide to using NovelFactory AI effectively</p>
+                    <p class="step-description">Complete guide to using NovelFactory effectively</p>
                 </div>
 
                 <div class="step-content">
@@ -878,7 +906,7 @@
                             <p>Optimize performance and cost:</p>
                             <ul>
                                 <li><strong>Step-Specific Models:</strong> Different models for different tasks</li>
-                                <li><strong>Creative vs Budget:</strong> Balance quality and cost</li>
+                                <li><strong>Variety of Models:</strong> Balance quality and cost</li>
                                 <li><strong>Model Specialization:</strong> Some excel at specific tasks</li>
                                 <li><strong>Cost Optimization:</strong> Strategic model usage</li>
                             </ul>
@@ -963,7 +991,25 @@
         </div>
     </div>
 
-    <!-- Enhanced Expand Modal -->
+    <!-- Custom Input Modal -->
+    <div id="custom-input-modal" class="modal custom-input-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="input-title">Input Required</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeCustomInput(null)">Close</button>
+            </div>
+            <div class="modal-body">
+                <p id="input-message">Please enter a value:</p>
+                <input type="text" id="input-field" class="input-field" placeholder="Enter value...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" id="input-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="input-ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expanded Chapter Modal -->
     <div id="expand-modal" class="expand-modal">
         <div class="expand-header">
             <div class="expand-title">
@@ -1127,14 +1173,14 @@
     <div id="donation-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Support NovelFactory AI</h3>
+                <h3>Support NovelFactory</h3>
                 <button class="btn btn-ghost btn-sm" onclick="closeDonationModal()">
                     <span class="label">Close</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="donation-content">
-                    <p><strong>NovelFactory AI is completely free to use!</strong></p>
+                    <p><strong>NovelFactory is completely free to use!</strong></p>
                     <p>If you find this tool helpful and would like to support its development, consider buying me a coffee. Your support helps me:</p>
                     <ul>
                         <li>Keep the service free for everyone</li>

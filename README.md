@@ -1,4 +1,4 @@
-# NovelFactory AI
+# NovelFactory
 
 **Professional AI-Powered Book Generator**
 
@@ -187,7 +187,7 @@ novelfactory-ai/
 
 ## Contributing
 
-I welcome contributions to NovelFactory AI! Here's how you can help:
+I welcome contributions to NovelFactory! Here's how you can help:
 
 ### **Bug Reports**
 Use the built-in feedback system in the app header or email me directly at `dietrichandreas2@t-online.de`
@@ -206,10 +206,10 @@ Submit ideas through the feedback form with detailed descriptions of desired fun
 - **Documentation**: Comprehensive help in the Tutorial tab
 
 ### **Supporting Development**
-NovelFactory AI is free to use! If you find it helpful, consider supporting continued development:
+NovelFactory is free to use! If you find it helpful, consider supporting continued development:
 - **Donate**: Use the donation button in the app header
 - **PayPal**: Direct donations to `dietrichandreas2@t-online.de`
-- **Share**: Tell other writers about NovelFactory AI
+- **Share**: Tell other writers about NovelFactory
 - **Feedback**: Help me improve with your suggestions
 
 ---
@@ -253,7 +253,7 @@ NovelFactory AI is free to use! If you find it helpful, consider supporting cont
 
 ## Version
 
-**Current Version**: 1.0.1
+**Current Version**: 1.0.4
 **Last Updated**: August 2025
 **License**: MIT License
 
@@ -269,4 +269,4 @@ NovelFactory AI is free to use! If you find it helpful, consider supporting cont
 
 **Happy Writing!**
 
-*Generate your next bestseller with NovelFactory AI*
+*Generate your next bestseller with NovelFactory*
