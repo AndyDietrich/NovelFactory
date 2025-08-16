@@ -82,6 +82,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="favicon.ico" sizes="any">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RMFVPF4HSS"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RMFVPF4HSS');
+    </script>
+
 </head>
 <body data-theme="light">
     <div class="app-container">
@@ -255,15 +266,15 @@
                     <!-- Action Buttons at Bottom -->
                     <div class="setup-actions">
                         <div class="random-idea-section">
-                            <button class="btn btn-secondary" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
+                            <button class="btn btn-blue-grey" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
                                 <span class="label">Generate Random Idea</span>
                             </button>
                             <p class="random-idea-hint">Select genre and target audience first, then generate a unique book idea!</p>
                         </div>
 
                         <div class="main-setup-actions">
-                            <button class="btn btn-primary btn-large" onclick="collectBookData(); autoSave(); showStep('outline'); window.scrollTo({top: 0, behavior: 'smooth'})">
-                                <span class="label">Start Creating Book</span>
+                            <button class="btn btn-success btn-large" onclick="collectBookData(); autoSave(); showStep('outline'); window.scrollTo({top: 0, behavior: 'smooth'})">
+                                <span class="label">Next: Story Structure</span>
                             </button>
                             <button class="btn btn-primary btn-large one-click-btn" onclick="startOneClickGeneration()">
                                 <span class="label">1-Click Generation</span>
@@ -293,7 +304,7 @@
                             <button class="btn btn-primary btn-large" onclick="generateOutline()">
                                 <span class="label">Generate Story Structure</span>
                             </button>
-                            <button class="btn btn-secondary" onclick="showOutlineEditModal()">
+                            <button class="btn btn-primary" onclick="showOutlineEditModal()">
                                 <span class="label">Edit</span>
                             </button>
                         </div>
@@ -392,7 +403,7 @@
                             <button class="btn btn-primary btn-large" onclick="generateChapterOutline()">
                                 <span class="label">Generate Chapter Plan</span>
                             </button>
-                            <button class="btn btn-secondary" onclick="showChapterOutlineEditModal()">
+                            <button class="btn btn-primary" onclick="showChapterOutlineEditModal()">
                                 <span class="label">Edit</span>
                             </button>
                         </div>
@@ -874,7 +885,7 @@
                         </div>
 
                         <div class="tutorial-card">
-                            <h4>Quality Enhancement</h4>
+                            <h4>Iterations and Editing</h4>
                             <p>Improve your content with feedback loops:</p>
                             <ul>
                                 <li><strong>AI Analysis:</strong> Automated quality assessment</li>
@@ -923,6 +934,44 @@
                     </div>
 
                     <div class="tutorial-section">
+                        <h3>Content Editing</h3>
+
+                        <div class="tutorial-card">
+                            <h4>Edit Mode Selection</h4>
+                            <p>Choose your editing approach:</p>
+                            <ul>
+                                <li><strong>Automated Mode:</strong> AI analyzes and improves content automatically</li>
+                                <li><strong>Manual Mode:</strong> Provide specific feedback for targeted improvements</li>
+                                <li><strong>Smart Detection:</strong> AI identifies areas needing improvement</li>
+                                <li><strong>Quality Enhancement:</strong> Improve prose, pacing, and consistency</li>
+                            </ul>
+                        </div>
+
+                        <div class="tutorial-card">
+                            <h4>Editing Different Content Types</h4>
+                            <p>Edit any part of your book:</p>
+                            <ul>
+                                <li><strong>Story Outline:</strong> Refine plot structure and narrative flow</li>
+                                <li><strong>Chapter Outlines:</strong> Improve scene planning and pacing</li>
+                                <li><strong>Chapter Content:</strong> Enhance prose, dialogue, and descriptions</li>
+                                <li><strong>Iterative Process:</strong> Make multiple rounds of improvements</li>
+                            </ul>
+                        </div>
+
+                        <div class="tutorial-card">
+                            <h4>Best Editing Practices</h4>
+                            <p>Maximize editing effectiveness:</p>
+                            <ul>
+                                <li><strong>Specific Feedback:</strong> Be clear about what needs improvement</li>
+                                <li><strong>Review Changes:</strong> Always check AI edits before accepting</li>
+                                <li><strong>Incremental Updates:</strong> Make small, focused improvements</li>
+                                <li><strong>Maintain Voice:</strong> Ensure edits preserve your writing style</li>
+                                <li><strong>Test Different Modes:</strong> Try both automated and manual approaches</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-section">
                         <h3>Tips & Best Practices</h3>
 
                         <div class="tutorial-card">
@@ -966,8 +1015,10 @@
     <!-- Generation Progress Indicator -->
     <div class="generation-indicator" id="generation-indicator">
         <div class="generation-animation"></div>
-        <h3 id="generation-title">AI Generation in Progress</h3>
-        <p id="generation-description">Please wait while the AI processes your request...</p>
+        <div class="generation-text">
+            <h3 id="generation-title">AI Generation in Progress</h3>
+            <p id="generation-description">Please wait while the AI processes your request...</p>
+        </div>
     </div>
 
     <!-- Auto-save Indicator -->

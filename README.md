@@ -235,7 +235,7 @@ NovelFactory is free to use! If you find it helpful, consider supporting continu
 
 ---
 
-## 📄 Privacy & Data
+## Privacy & Data
 
 ### **Data Storage**
 - All projects stored locally in your browser cache
@@ -243,19 +243,14 @@ NovelFactory is free to use! If you find it helpful, consider supporting continu
 - API keys stored securely in local storage
 - Export your data anytime
 
+### **Analytics
+- Google Analytics for basic website traffic monitoring
+
 ### **API Usage**
 - Your API keys are used only for AI generation
 - Direct communication with chosen AI provider
 - No intermediary data collection
 - You control all AI interactions
-
----
-
-## Version
-
-**Current Version**: 1.0.4
-**Last Updated**: August 2025
-**License**: MIT License
 
 ---
 

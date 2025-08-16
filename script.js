@@ -9,7 +9,7 @@ const CONFIG = {
     MAX_SAVED_PROJECTS: 10,
     AUTO_SAVE_INTERVAL: 30000, // 30 seconds
     READING_SPEED_WPM: 250,
-    VERSION: '1.0.1'
+    VERSION: '1.0.5'
 };
 
 /**
@@ -1790,7 +1790,7 @@ function setupWritingInterface() {
             <button class="btn btn-primary btn-large" onclick="generateAllChapters()">
                 <span class="label">Generate All Chapters</span>
             </button>
-            <button class="btn btn-secondary" onclick="generateSelectedChapters()" id="generate-selected-btn" disabled>
+            <button class="btn btn-primary" onclick="generateSelectedChapters()" id="generate-selected-btn" disabled>
                 <span class="label">Generate Selected (0)</span>
             </button>
         </div>
@@ -1803,9 +1803,9 @@ function setupWritingInterface() {
         const chapterDiv = document.createElement('div');
         chapterDiv.className = 'chapter-item';
         chapterDiv.innerHTML = `
-            <div class="chapter-header" aria-label="Chapter ${i} header" style="align-items: center; position: relative;">
-                <button class="collapse-chapter-btn btn btn-ghost" onclick="toggleChapterCollapse(${i})" title="Collapse/Expand Chapter" aria-label="Collapse/Expand Chapter">
-                    <span class="icon"><i class="fas fa-angle-down"></i></span>
+            <div class="chapter-header" aria-label="Chapter ${i} header">
+                <button class="collapse-chapter-btn" onclick="toggleChapterCollapse(${i})" title="Collapse/Expand Chapter" aria-label="Collapse/Expand Chapter">
+                    <i class="fas fa-angle-down"></i>
                 </button>
                 <div class="chapter-info">
                     <div class="chapter-checkbox">
@@ -1817,13 +1817,10 @@ function setupWritingInterface() {
                     <div class="chapter-word-count" id="chapter-${i}-word-count">0 words</div>
                 </div>
                 <div class="chapter-actions" style="display:flex; align-items:center; gap:6px;">
-                    <button class="btn btn-ghost btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
+                    <button class="btn btn-primary btn-sm" onclick="generateSingleChapter(${i})" id="chapter-${i}-generate-btn">
                         <span class="label">Generate</span>
                     </button>
-                    <button class="btn btn-success btn-sm" onclick="saveChapterContent(${i})" id="chapter-${i}-save-btn">
-                        <span class="label">Save</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="showChapterEditModal(${i})">
+                    <button class="btn btn-primary btn-sm" onclick="showChapterEditModal(${i})">
                         <span class="label">Edit</span>
                     </button>
                 </div>
@@ -2221,7 +2218,7 @@ async function generateSelectedChapters() {
         updateGenerateSelectedButton();
 
         if (completed === total) {
-            showGenerationInfo(`✅ Batch generation complete! ${completed} chapters generated.`);
+            showGenerationInfo(`Batch generation complete! ${completed} chapters generated.`);
             setTimeout(() => { hideGenerationInfo(); }, 2000);
         }
     } finally {

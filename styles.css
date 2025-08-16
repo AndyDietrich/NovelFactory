@@ -211,22 +211,43 @@
     background: var(--bg-primary);
     border: 2px solid var(--color-primary);
     border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-2xl);
     box-shadow: var(--shadow-large);
     z-index: 9999;
-    text-align: center;
-    min-width: 300px;
+    min-width: 420px;
+    max-width: 500px;
+    align-items: center;
+    gap: var(--spacing-lg);
 }
 
 .ai-generating .generation-indicator {
-    display: block;
+    display: flex;
 }
 
 .generation-animation {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto var(--spacing-lg);
+    width: 40px;
+    height: 40px;
     position: relative;
+    flex-shrink: 0;
+}
+
+.generation-text {
+    flex: 1;
+    text-align: left;
+}
+
+.generation-indicator h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.generation-indicator p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
 }
 
 .generation-animation::before {
@@ -240,28 +261,36 @@
     animation: spin 1s linear infinite;
 }
 
-.generation-animation::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
-    background: var(--color-primary);
-    border-radius: 50%;
-    animation: heartbeat 1.5s ease-in-out infinite;
+/* Removed pulsing dot animation */
+
+/* Loading indicator for inline status messages */
+.loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
-@keyframes heartbeat {
-    0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0.7;
-    }
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-secondary);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* Temperature Range Slider - Blue Color */
+#temperature::-webkit-slider-thumb {
+    background: #007AFF !important;
+}
+
+#temperature::-moz-range-thumb {
+    background: #007AFF !important;
 }
 
 /* Theme Selector Dropdown */
@@ -710,6 +739,28 @@ textarea {
 
 .btn-secondary:hover {
     background: #7A7A85;
+}
+
+.btn-blue-grey {
+    background: #64748b;
+    color: white;
+    border: 1px solid #64748b;
+}
+
+.btn-blue-grey:hover {
+    background: #475569;
+    border-color: #475569;
+}
+
+.btn-light-blue {
+    background: #60a5fa;
+    color: white;
+    border: 1px solid #60a5fa;
+}
+
+.btn-light-blue:hover {
+    background: #3b82f6;
+    border-color: #3b82f6;
 }
 
 .btn-warning {
@@ -1286,6 +1337,40 @@ textarea {
     margin-bottom: var(--spacing-md);
     flex-wrap: wrap;
     gap: var(--spacing-md);
+    position: relative;
+}
+
+.collapse-chapter-btn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.collapse-chapter-btn:hover {
+    background: var(--bg-quaternary);
+    color: var(--text-primary);
+}
+
+.collapse-chapter-btn i {
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.collapse-chapter-btn.collapsed i {
+    transform: rotate(-90deg);
 }
 
 .chapter-info {
@@ -1315,6 +1400,7 @@ textarea {
     display: flex;
     gap: var(--spacing-sm);
     flex-wrap: wrap;
+    padding-right: 50px;
 }
 
 .chapter-status {
@@ -2099,8 +2185,8 @@ textarea {
 }
 
 .loading-spinner {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border: 4px solid var(--border-secondary);
     border-top: 4px solid var(--color-primary);
     border-radius: 50%;
@@ -2886,25 +2972,7 @@ textarea {
    SPECIAL BUTTON STYLING
    ================================================== */
 
-/* One-Click Generation Button - Special Purple */
-.one-click-btn {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
-    border-color: #6366f1 !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
-}
-
-.one-click-btn:hover {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
-    border-color: #4f46e5 !important;
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4) !important;
-    transform: translateY(-1px);
-}
-
-.one-click-btn:active {
-    background: linear-gradient(135deg, #4338ca, #6d28d9) !important;
-    transform: translateY(0px);
-}
+/* One-Click Generation Button - Using same blue as other generation buttons */
 
 /* Color Theme Button Customizations */
 [data-theme="fun"] .btn:not(.one-click-btn) {
