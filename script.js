@@ -93,11 +93,48 @@ function customAlert(message, title = 'Notification') {
         titleElement.textContent = title;
         messageElement.innerHTML = message.replace(/\n/g, '<br>');
         
+        // For cost estimation, apply special styling and ensure proper positioning
+        if (title === 'Cost Estimation') {
+            messageElement.style.fontFamily = '"Consolas", "Monaco", "Menlo", "Ubuntu Mono", monospace';
+            messageElement.style.fontSize = '14px';
+            messageElement.style.lineHeight = '1.5';
+            messageElement.style.textAlign = 'left';
+            messageElement.style.whiteSpace = 'pre-wrap';
+            messageElement.style.overflowWrap = 'break-word';
+            messageElement.style.fontWeight = '400';
+            modal.querySelector('.modal-content').style.maxWidth = '600px';
+            modal.querySelector('.modal-content').style.width = '95%';
+        } else {
+            // Reset to default styling for other alerts
+            messageElement.style.fontSize = '';
+            messageElement.style.lineHeight = '';
+            messageElement.style.textAlign = 'center';
+            messageElement.style.whiteSpace = '';
+            messageElement.style.overflowWrap = '';
+            messageElement.style.fontWeight = '';
+            modal.querySelector('.modal-content').style.maxWidth = '500px';
+            modal.querySelector('.modal-content').style.width = '90%';
+        }
+        
         okBtn.style.display = 'inline-flex';
         cancelBtn.style.display = 'none';
         
         alertCallback = resolve;
         modal.classList.add('active');
+        
+        // Ensure modal opens at the top - use setTimeout to ensure DOM is fully rendered
+        setTimeout(() => {
+            modal.scrollTop = 0;
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.scrollTop = 0;
+            }
+            // For Cost Estimation, also scroll the message element to top
+            if (title === 'Cost Estimation') {
+                messageElement.scrollTop = 0;
+            }
+        }, 10);
+        
         okBtn.focus();
     });
 }
@@ -756,19 +793,30 @@ function toggleAdvancedModelsSection() {
 function setupEventListeners() {
     const genreSelect = document.getElementById('genre');
     const audienceSelect = document.getElementById('target-audience');
-    
-    // Random idea button visibility
+
+    // Random idea button visibility - always visible with styling based on selection
     function checkRandomButtonVisibility() {
         const randomBtn = document.getElementById('random-idea-btn');
-        if (genreSelect.value && audienceSelect.value) {
+        if (randomBtn) {
             randomBtn.style.display = 'inline-flex';
-        } else {
-            randomBtn.style.display = 'none';
+            
+            if (genreSelect.value && audienceSelect.value) {
+                // Both selected - normal styling
+                randomBtn.style.opacity = '1';
+                randomBtn.style.cursor = 'pointer';
+            } else {
+                // Not both selected - lighter gray styling
+                randomBtn.style.opacity = '0.6';
+                randomBtn.style.cursor = 'pointer';
+            }
         }
     }
     
     if (genreSelect) genreSelect.addEventListener('change', checkRandomButtonVisibility);
     if (audienceSelect) audienceSelect.addEventListener('change', checkRandomButtonVisibility);
+    
+    // Make sure button is visible on page load
+    checkRandomButtonVisibility();
 
     // Word count updates
     const premise = document.getElementById('premise');
@@ -776,13 +824,7 @@ function setupEventListeners() {
     if (premise) premise.addEventListener('input', updateWordCount);
     if (styleDirection) styleDirection.addEventListener('input', updateWordCount);
     
-    // Feedback mode change listeners
-    ['outline', 'chapters', 'writing'].forEach(step => {
-        const select = document.getElementById(`${step}-feedback-mode`);
-        if (select) {
-            select.addEventListener('change', () => toggleManualFeedback(step));
-        }
-    });
+    // Feedback mode change listeners (removed as Advanced Settings sections were removed)
 
     // Project selector change listener
     const projectSelect = document.getElementById('project-select');
@@ -862,10 +904,11 @@ function setupKeyboardShortcuts() {
  * @param {string} step - Step identifier
  */
 function toggleManualFeedback(step) {
-    const mode = document.getElementById(`${step}-feedback-mode`).value;
+    const modeEl = document.getElementById(`${step}-feedback-mode`);
     const manualSection = document.getElementById(`${step}-manual-feedback`);
     
-    if (manualSection) {
+    if (modeEl && manualSection) {
+        const mode = modeEl.value;
         manualSection.style.display = mode === 'manual' ? 'block' : 'none';
     }
 }
@@ -884,10 +927,19 @@ async function runFeedbackLoop(contentType) {
     showGenerationInfo(`Running ${contentType} feedback analysis...`);
     
     try {
-        const feedbackLoops = parseInt(document.getElementById(`${contentType}-feedback-loops`).value);
+        // Check if feedback elements exist (they may have been removed)
+        const feedbackLoopsEl = document.getElementById(`${contentType}-feedback-loops`);
+        const feedbackModeEl = document.getElementById(`${contentType}-feedback-mode`);
+        
+        if (!feedbackLoopsEl || !feedbackModeEl) {
+            console.log(`Feedback elements for ${contentType} not found. Skipping feedback loop.`);
+            return;
+        }
+        
+        const feedbackLoops = parseInt(feedbackLoopsEl.value);
         if (feedbackLoops === 0) return;
 
-        const feedbackMode = document.getElementById(`${contentType}-feedback-mode`).value;
+        const feedbackMode = feedbackModeEl.value;
         let content = getContentForFeedback(contentType);
 
         if (!content) {
@@ -898,10 +950,13 @@ async function runFeedbackLoop(contentType) {
         // Get manual feedback if in manual mode
         let manualFeedback = '';
         if (feedbackMode === 'manual') {
-            manualFeedback = document.getElementById(`${contentType}-manual-input`).value;
-            if (!manualFeedback.trim()) {
-                await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
-                return;
+            const manualInputEl = document.getElementById(`${contentType}-manual-input`);
+            if (manualInputEl) {
+                manualFeedback = manualInputEl.value;
+                if (!manualFeedback.trim()) {
+                    await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+                    return;
+                }
             }
         }
 
@@ -1536,7 +1591,8 @@ async function generateOutline() {
 
         const selectedModel = getSelectedModel('outline');
 
-        const prompt = formatPrompt(document.getElementById('outline-prompt').value, {
+        const promptEl = document.getElementById('outline-prompt');
+        const prompt = formatPrompt(promptEl ? promptEl.value : (aiSettings.customPrompts?.outline || defaultPrompts.outline), {
             genre: bookData.genre,
             targetAudience: bookData.targetAudience,
             premise: bookData.premise,
@@ -1597,7 +1653,8 @@ async function generateChapterOutline() {
     try {
         const selectedModel = getSelectedModel('chapters');
         
-        const prompt = formatPrompt(document.getElementById('chapters-prompt').value, {
+        const promptEl = document.getElementById('chapters-prompt');
+        const prompt = formatPrompt(promptEl ? promptEl.value : (aiSettings.customPrompts?.chapters || defaultPrompts.chapters), {
             outline: bookData.outline,
             genre: bookData.genre,
             targetAudience: bookData.targetAudience,
@@ -2023,7 +2080,8 @@ ${bookData.chapterOutline}
         const chapterOutline = extractChapterOutline(bookData.chapterOutline, chapterNum);
         const selectedModel = getSelectedModel('writing');
 
-        const prompt = formatPrompt(document.getElementById('writing-prompt').value, {
+        const promptEl = document.getElementById('writing-prompt');
+        const prompt = formatPrompt(promptEl ? promptEl.value : (aiSettings.customPrompts?.writing || defaultPrompts.writing), {
             chapterNum: chapterNum,
             genre: bookData.genre,
             targetAudience: bookData.targetAudience,
@@ -2257,15 +2315,23 @@ async function runChapterFeedback(chapterNum) {
     showGenerationInfo(`Analyzing Chapter ${chapterNum}...`);
 
     try {
-        const feedbackLoops = parseInt(document.getElementById('writing-feedback-loops').value) || 1;
-        const feedbackMode = document.getElementById('writing-feedback-mode').value;
+        // Check if feedback elements exist (they may have been removed)
+        const feedbackLoopsEl = document.getElementById('writing-feedback-loops');
+        const feedbackModeEl = document.getElementById('writing-feedback-mode');
+        
+        // Use default values if elements don't exist
+        const feedbackLoops = feedbackLoopsEl ? parseInt(feedbackLoopsEl.value) || 1 : 1;
+        const feedbackMode = feedbackModeEl ? feedbackModeEl.value : 'ai';
 
         let manualFeedback = '';
         if (feedbackMode === 'manual') {
-            manualFeedback = document.getElementById('writing-manual-input').value;
-            if (!manualFeedback.trim()) {
-                await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
-                return;
+            const manualInputEl = document.getElementById('writing-manual-input');
+            if (manualInputEl) {
+                manualFeedback = manualInputEl.value;
+                if (!manualFeedback.trim()) {
+                    await customAlert('Please provide manual feedback instructions before running the feedback loop.', 'Missing Feedback');
+                    return;
+                }
             }
         }
 
@@ -2876,8 +2942,10 @@ async function startOneClickProcess() {
         
         if (outlineLoops > 0) {
             updateLoadingText(`Improving story structure (${outlineLoops} feedback loops)...`);
-            document.getElementById('outline-feedback-loops').value = outlineLoops;
-            document.getElementById('outline-feedback-mode').value = 'ai';
+            const outlineLoopsEl = document.getElementById('outline-feedback-loops');
+            const outlineModeEl = document.getElementById('outline-feedback-mode');
+            if (outlineLoopsEl) outlineLoopsEl.value = outlineLoops;
+            if (outlineModeEl) outlineModeEl.value = 'ai';
             await runFeedbackLoop('outline');
         }
         
@@ -2892,8 +2960,10 @@ async function startOneClickProcess() {
         
         if (chaptersLoops > 0) {
             updateLoadingText(`Improving chapter plan (${chaptersLoops} feedback loops)...`);
-            document.getElementById('chapters-feedback-loops').value = chaptersLoops;
-            document.getElementById('chapters-feedback-mode').value = 'ai';
+            const chaptersLoopsEl = document.getElementById('chapters-feedback-loops');
+            const chaptersModeEl = document.getElementById('chapters-feedback-mode');
+            if (chaptersLoopsEl) chaptersLoopsEl.value = chaptersLoops;
+            if (chaptersModeEl) chaptersModeEl.value = 'ai';
             await runFeedbackLoop('chapters');
         }
         
@@ -2904,10 +2974,11 @@ async function startOneClickProcess() {
         showStep('writing');
         
         updateLoadingText('Writing all chapters...');
-        document.getElementById('writing-feedback-loops').value = writingLoops;
-        document.getElementById('writing-feedback-mode').value = 'ai';
-        
-        for (let i = 1; i <= bookData.numChapters; i++) {
+        const writingLoopsEl = document.getElementById('writing-feedback-loops');
+        const writingModeEl = document.getElementById('writing-feedback-mode');
+        if (writingLoopsEl) writingLoopsEl.value = writingLoops;
+        if (writingModeEl) writingModeEl.value = 'ai';
+     for (let i = 1; i <= bookData.numChapters; i++) {
             if (oneClickCancelled) return;
             
             updateLoadingText(`Writing Chapter ${i} of ${bookData.numChapters}...`);
@@ -3891,18 +3962,125 @@ async function estimateCosts() {
     const numChapters = bookData.numChapters || 20;
     const targetWordCount = bookData.targetWordCount || 2000;
     
-    // Simplified sample estimation; can be expanded
-    const totalInputCostEst = 0.0;
-    const totalOutputCostEst = 0.0;
+    // Get current model pricing
+    const currentModel = aiSettings.model;
+    const provider = aiSettings.apiProvider || 'openrouter';
+    const allModels = [...(apiModels[provider]?.Recommended || []), ...(apiModels[provider]?.More || [])];
+    const modelInfo = allModels.find(m => m.value === currentModel);
+    
+    if (!modelInfo || !modelInfo.cost) {
+        await customAlert('Cost information not available for the selected model.', 'Cost Estimation');
+        return;
+    }
+    
+    const { input: inputCostPer1M, output: outputCostPer1M } = modelInfo.cost;
+    
+    // Estimate token usage (rough approximation: 1 word ≈ 1.3 tokens)
+    const wordsToTokens = (words) => Math.ceil(words * 1.3);
+    
+    // Input tokens estimation
+    const premiseTokens = wordsToTokens((bookData.premise || '').split(' ').length);
+    const styleTokens = wordsToTokens((bookData.styleDirection || '').split(' ').length);
+    const basePromptTokens = 7500; // Estimated tokens for prompts and instructions
+    
+    // Story structure generation
+    const outlineInputTokens = basePromptTokens + premiseTokens + styleTokens;
+    const outlineOutputTokens = wordsToTokens(3000);
+    
+    // Chapter planning generation
+    const chaptersInputTokens = basePromptTokens + outlineOutputTokens;
+    const chaptersOutputTokens = wordsToTokens(6000);
+    
+    // Chapter writing
+    const singleChapterInputTokens = basePromptTokens + Math.floor((outlineOutputTokens + chaptersOutputTokens) / 4);
+    const singleChapterOutputTokens = wordsToTokens(targetWordCount);
+    const totalChapterInputTokens = singleChapterInputTokens * numChapters;
+    const totalChapterOutputTokens = singleChapterOutputTokens * numChapters;
+    
+    // Total tokens
+    const totalInputTokens = outlineInputTokens + chaptersInputTokens + totalChapterInputTokens;
+    const totalOutputTokens = outlineOutputTokens + chaptersOutputTokens + totalChapterOutputTokens;
+    
+    // Calculate costs (costs are per 1M tokens)
+    const totalInputCostEst = (totalInputTokens / 1000000) * inputCostPer1M;
+    const totalOutputCostEst = (totalOutputTokens / 1000000) * outputCostPer1M;
     const totalCost = totalInputCostEst + totalOutputCostEst;
     
-    const costText = `Estimated cost for complete book generation:
+    // Time estimation based on typical model speeds (tokens per second)
+    const modelSpeeds = {
+        'anthropic/claude-sonnet-4': { inputTPS: 5000, outputTPS: 50 },
+        'anthropic/claude-opus-4.1': { inputTPS: 4000, outputTPS: 35 },
+        'openai/gpt-5': { inputTPS: 6000, outputTPS: 60 },
+        'openai/gpt-4o': { inputTPS: 7000, outputTPS: 80 },
+        'anthropic/claude-3.7-sonnet:thinking': { inputTPS: 4500, outputTPS: 45 },
+        'google/gemini-2.5-pro': { inputTPS: 8000, outputTPS: 100 },
+        'anthropic/claude-3.5-sonnet': { inputTPS: 5500, outputTPS: 55 }
+    };
+    
+    // Default speeds for unknown models
+    const defaultSpeed = { inputTPS: 5000, outputTPS: 50 };
+    const modelSpeed = modelSpeeds[currentModel] || defaultSpeed;
+    
+    // Calculate time estimates (in seconds)
+    const inputProcessingTime = totalInputTokens / modelSpeed.inputTPS;
+    const outputGenerationTime = totalOutputTokens / modelSpeed.outputTPS;
+    const totalGenerationTime = inputProcessingTime + outputGenerationTime;
+    
+    // Add buffer time for API latency and processing (20% overhead)
+    const totalTimeWithOverhead = totalGenerationTime * 1.2;
+    
+    // Convert to human-readable format
+    const formatTime = (seconds) => {
+        if (seconds < 60) return `${Math.round(seconds)} seconds`;
+        if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`;
+        
+        // For over an hour, show hours and minutes
+        const hours = Math.floor(seconds / 3600);
+        const remainingMinutes = Math.round((seconds % 3600) / 60);
+        
+        if (remainingMinutes === 0) {
+            return `${hours} hour${hours !== 1 ? 's' : ''}`;
+        } else {
+            return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
+        }
+    };
+    
+    const costText = `COST & TIME ESTIMATION FOR COMPLETE BOOK GENERATION
 
-- Inputs: ${totalInputCostEst.toFixed(2)}
-- Outputs: ${totalOutputCostEst.toFixed(2)}
-- Total: ${totalCost.toFixed(2)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Notes: This is a rough estimate. Actual costs depend on content complexity and selected models.`;
+Selected Model: ${modelInfo.label}
+
+Book Specifications:
+  Chapters: ${numChapters}
+  Words per Chapter: ${targetWordCount.toLocaleString()}
+  Total Book Length: ${(numChapters * targetWordCount).toLocaleString()} words
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Token Usage Breakdown:
+  Input Tokens:  ${totalInputTokens.toLocaleString()}
+  Output Tokens: ${totalOutputTokens.toLocaleString()}
+
+Cost Breakdown:
+  Input Cost:    $${totalInputCostEst.toFixed(2)}
+  Output Cost:   $${totalOutputCostEst.toFixed(2)}
+  
+  TOTAL COST:    $${totalCost.toFixed(2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Time Estimation:
+  Processing:    ${formatTime(inputProcessingTime)}
+  Generation:    ${formatTime(outputGenerationTime)}
+  
+  TOTAL TIME:    ${formatTime(totalTimeWithOverhead)} (includes 20% buffer)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Note: Estimates are based on typical model performance and token 
+usage patterns without feedback loops. Actual costs and times may vary depending on 
+content complexity, API load, and generation quality requirements.`;
     
     await customAlert(costText, 'Cost Estimation');
 }
@@ -4005,7 +4183,7 @@ async function proceedToDonate() {
         await customAlert('Please select or enter a valid donation amount.', 'Invalid Amount');
         return;
     }
-    const paypalUrl = `https://www.paypal.com/donate/?hosted_button_id=&business=dietrichandreas2%40t-online.de&amount=${amount}&currency_code=USD&item_name=NovelFactory%20AI%20Support`;
+    const paypalUrl = `https://www.paypal.com/donate/?hosted_button_id=&business=dietrichandreas2%40t-online.de&amount=${amount}&currency_code=USD&item_name=NovelFactory%20Donation`;
     window.open(paypalUrl, '_blank');
     closeDonationModal();
     setTimeout(async () => {
@@ -4021,19 +4199,20 @@ function closeFeedbackModal() {
     document.getElementById('feedback-modal').classList.remove('active');
     document.getElementById('feedback-type').value = 'bug';
     document.getElementById('feedback-message').value = '';
-    document.getElementById('feedback-email').value = '';
 }
 async function submitFeedback() {
     const type = document.getElementById('feedback-type').value;
     const message = document.getElementById('feedback-message').value;
-    const email = document.getElementById('feedback-email').value;
+    
     if (!message.trim()) {
         await customAlert('Please enter your feedback message.', 'Missing Information');
         return;
     }
+    
     const subject = `NovelFactory Feedback: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-    const body = `Feedback Type: ${type}\n\nMessage:\n${message}\n\n${email ? `Contact Email: ${email}\n\n` : ''}---\nSent from NovelFactory v${CONFIG.VERSION} (https://novelfactory.ink)`;
+    const body = `Feedback Type: ${type}\n\nMessage:\n${message}\n\n---\nSent from NovelFactory v${CONFIG.VERSION} (https://novelfactory.ink)`;
     const mailtoLink = `mailto:dietrichandreas2@t-online.de?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
     window.location.href = mailtoLink;
     closeFeedbackModal();
     await customAlert('Thank you for your feedback! Your default email client should open with your message.', 'Feedback Sent');

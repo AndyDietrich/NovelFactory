@@ -269,7 +269,7 @@
                             <button class="btn btn-blue-grey" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
                                 <span class="label">Generate Random Idea</span>
                             </button>
-                            <p class="random-idea-hint">Select genre and target audience first, then generate a unique book idea!</p>
+                            <p class="random-idea-hint">Select genre and target audience first, then generate a book idea!</p>
                         </div>
 
                         <div class="main-setup-actions">
@@ -320,65 +320,9 @@
                                     oninput="saveOutlineContent()"></textarea>
                             <div class="word-count" id="outline-word-count">0 words</div>
                         </div>
-                        <div class="form-hint">Enter your complete story structure including plot outline, character development, three-act structure, etc.</div>
+                        <div class="form-hint">Enter your complete story structure including plot outline, character development, etc.</div>
                     </div>
 
-                    <!-- Combined Advanced Settings -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection(this)">
-                            <span class="toggle-icon">▼</span>
-                            <h3>Advanced Settings & Quality Enhancement</h3>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="feedback-controls">
-                                <h4>Quality Enhancement & Feedback</h4>
-                                <div class="feedback-options">
-                                    <label>
-                                        <span>Feedback Mode:</span>
-                                        <select id="outline-feedback-mode">
-                                            <option value="ai">AI Analysis</option>
-                                            <option value="manual">Manual Feedback</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        <span>Feedback Loops:</span>
-                                        <select id="outline-feedback-loops">
-                                            <option value="0">No feedback</option>
-                                            <option value="1">1 loop</option>
-                                            <option value="2">2 loops</option>
-                                            <option value="3">3 loops</option>
-                                            <option value="5">5 loops</option>
-                                        </select>
-                                    </label>
-                                    <div class="feedback-buttons">
-                                        <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('outline')">
-                                            <span class="label">Run Feedback Loop</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="outline-manual-feedback" class="manual-feedback-section" style="display: none;">
-                                    <label for="outline-manual-input">Manual Feedback Instructions:</label>
-                                    <textarea id="outline-manual-input" placeholder="Describe what you'd like to improve or change about the story structure..." rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="prompt-editor">
-                                <h4>Prompt Customization</h4>
-                                <label for="outline-prompt">Story Structure Generation Prompt</label>
-                                <textarea id="outline-prompt" class="prompt-textarea"></textarea>
-                            </div>
-
-                            <div id="outline-feedback-prompt-editor" class="feedback-prompt-editor" style="display: none;">
-                                <label for="outline-feedback-prompt">Editing Prompt:</label>
-                                <textarea id="outline-feedback-prompt" rows="6"></textarea>
-                                <div class="prompt-actions">
-                                    <button class="btn btn-ghost btn-sm" onclick="resetFeedbackPrompt('outline')">Reset to Default</button>
-                                    <button class="btn btn-success btn-sm" onclick="saveFeedbackPrompt('outline')">Save Changes</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Navigation -->
                     <div class="step-actions">
@@ -422,64 +366,6 @@
                         <div class="form-hint">Enter your complete chapter plan including chapter titles, scene breakdowns, plot points, etc.</div>
                     </div>
 
-                    <!-- Combined Advanced Settings -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection(this)">
-                            <span class="toggle-icon">▼</span>
-                            <h3>Advanced Settings & Quality Enhancement</h3>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="feedback-controls">
-                                <h4>Quality Enhancement & Feedback</h4>
-                                <div class="feedback-options">
-                                    <label>
-                                        <span>Feedback Mode:</span>
-                                        <select id="chapters-feedback-mode">
-                                            <option value="ai">AI Analysis</option>
-                                            <option value="manual">Manual Feedback</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        <span>Feedback Loops:</span>
-                                        <select id="chapters-feedback-loops">
-                                            <option value="0">No feedback</option>
-                                            <option value="1">1 loop</option>
-                                            <option value="2">2 loops</option>
-                                            <option value="3">3 loops</option>
-                                            <option value="5">5 loops</option>
-                                        </select>
-                                    </label>
-                                    <div class="feedback-buttons">
-                                        <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('chapters')">
-                                            <span class="label">Run Feedback Loop</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="chapters-manual-feedback" class="manual-feedback-section" style="display: none;">
-                                    <label for="chapters-manual-input">Manual Feedback Instructions:</label>
-                                    <textarea id="chapters-manual-input" placeholder="Describe what you'd like to improve or change about the chapter planning..." rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="prompt-editor">
-                                <h4>Prompt Customization</h4>
-                                <label for="chapters-prompt">Chapter Planning Prompt</label>
-                                <textarea id="chapters-prompt" class="prompt-textarea"></textarea>
-                            </div>
-
-                            <div id="chapters-feedback-prompt-editor" class="feedback-prompt-editor" style="display: none;">
-                                <label for="chapters-feedback-prompt">Feedback Analysis Prompt:</label>
-                                <textarea id="chapters-feedback-prompt" rows="6"></textarea>
-                                <div class="prompt-actions">
-                                    <button class="btn btn-ghost btn-sm" onclick="resetFeedbackPrompt('chapters')">Reset to Default</button>
-                                    <button class="btn btn-success btn-sm" onclick="saveFeedbackPrompt('chapters')">Save Changes</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Per-chapter collapse icons are added in the JS when building the chapter items. No global collapse button now. -->
 
                     <!-- Navigation -->
                     <div class="step-actions">
@@ -506,62 +392,6 @@
                         </div>
                     </div>
 
-                    <!-- Combined Advanced Settings -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsibleSection(this)">
-                            <span class="toggle-icon">▼</span>
-                            <h3>Advanced Settings & Quality Enhancement</h3>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="feedback-controls">
-                                <h4>Quality Enhancement & Feedback</h4>
-                                <div class="feedback-options">
-                                    <label>
-                                        <span>Feedback Mode:</span>
-                                        <select id="writing-feedback-mode">
-                                            <option value="ai">AI Analysis</option>
-                                            <option value="manual">Manual Feedback</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        <span>Feedback Loops:</span>
-                                        <select id="writing-feedback-loops">
-                                            <option value="0">No feedback</option>
-                                            <option value="1">1 loop</option>
-                                            <option value="2">2 loops</option>
-                                            <option value="3">3 loops</option>
-                                            <option value="5">5 loops</option>
-                                        </select>
-                                    </label>
-                                    <div class="feedback-buttons">
-                                        <button class="btn btn-ghost btn-sm" onclick="runFeedbackLoop('writing')">
-                                            <span class="label">Run Feedback Loop</span>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="writing-manual-feedback" class="manual-feedback-section" style="display: none;">
-                                    <label for="writing-manual-input">Manual Feedback Instructions:</label>
-                                    <textarea id="writing-manual-input" placeholder="Describe what you'd like to improve or change about the writing..." rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="prompt-editor">
-                                <h4>Prompt Customization</h4>
-                                <label for="writing-prompt">Chapter Writing Prompt</label>
-                                <textarea id="writing-prompt" class="prompt-textarea"></textarea>
-                            </div>
-
-                            <div id="writing-feedback-prompt-editor" class="feedback-prompt-editor" style="display: none;">
-                                <label for="writing-feedback-prompt">Feedback Analysis Prompt:</label>
-                                <textarea id="writing-feedback-prompt" rows="6"></textarea>
-                                <div class="prompt-actions">
-                                    <button class="btn btn-ghost btn-sm" onclick="resetFeedbackPrompt('writing')">Reset to Default</button>
-                                    <button class="btn btn-success btn-sm" onclick="saveFeedbackPrompt('writing')">Save Changes</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Navigation -->
                     <div class="writing-footer">
@@ -1203,11 +1033,6 @@
                     <label for="feedback-message">Your Feedback</label>
                     <textarea id="feedback-message" rows="6" placeholder="Please describe your feedback in detail..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label for="feedback-email">Email (optional)</label>
-                    <input type="email" id="feedback-email" placeholder="your@email.com">
-                    <div class="form-hint">Leave your email if you'd like a response</div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-ghost" onclick="closeFeedbackModal()">Cancel</button>
@@ -1416,7 +1241,7 @@
                         </div>
                     </div>
                     
-                    <p class="donation-note"><em>Every contribution, no matter how small, means the world to me!</em></p>
+                    <p class="donation-note"><em>I appreciate every contribution, no matter how small!</em></p>
                 </div>
             </div>
             <div class="modal-footer">
