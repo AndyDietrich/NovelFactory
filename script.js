@@ -2389,18 +2389,20 @@ function showChapterEditModal(chapterNum) {
 }
 
 /**
- * Select edit mode and update UI
- * @param {string} mode - 'automated' or 'manual'
+ * Toggle edit mode using toggle switch
+ * @param {HTMLInputElement} toggleElement - The checkbox input element
  */
-function selectEditMode(mode) {
-    // Update button states
-    document.querySelectorAll('.edit-mode-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
+function toggleEditMode(toggleElement) {
+    const mode = toggleElement.checked ? 'manual' : 'automated';
     
-    const targetBtn = document.querySelector(`[data-mode="${mode}"]`);
-    if (targetBtn) {
-        targetBtn.classList.add('active');
+    // Update helper text
+    const hintElement = document.getElementById('edit-mode-hint');
+    if (hintElement) {
+        if (mode === 'automated') {
+            hintElement.textContent = 'AI analyzes and improves the chapter automatically';
+        } else {
+            hintElement.textContent = 'Provide specific feedback for AI to implement';
+        }
     }
     
     // Show/hide manual feedback section
@@ -2409,6 +2411,18 @@ function selectEditMode(mode) {
         manualSection.style.display = 'block';
     } else {
         manualSection.style.display = 'none';
+    }
+}
+
+/**
+ * Select edit mode and update UI (legacy function for compatibility)
+ * @param {string} mode - 'automated' or 'manual'
+ */
+function selectEditMode(mode) {
+    const toggle = document.getElementById('edit-mode-toggle');
+    if (toggle) {
+        toggle.checked = mode === 'manual';
+        toggleEditMode(toggle);
     }
 }
 
@@ -2542,17 +2556,23 @@ function closeOutlineEditModal() {
     document.getElementById('outline-edit-modal').style.display = 'none';
 }
 
-function selectOutlineEditMode(mode) {
+/**
+ * Toggle outline edit mode using toggle switch
+ * @param {HTMLInputElement} toggleElement - The checkbox input element
+ */
+function toggleOutlineEditMode(toggleElement) {
+    const mode = toggleElement.checked ? 'manual' : 'automated';
     currentOutlineEditMode = mode;
     
-    // Update button states
-    const buttons = document.querySelectorAll('#outline-edit-modal .edit-mode-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.mode === mode) {
-            btn.classList.add('active');
+    // Update helper text
+    const hintElement = document.getElementById('outline-edit-mode-hint');
+    if (hintElement) {
+        if (mode === 'automated') {
+            hintElement.textContent = 'AI analyzes and improves the story structure automatically';
+        } else {
+            hintElement.textContent = 'Provide specific feedback for AI to implement';
         }
-    });
+    }
     
     // Show/hide manual feedback section
     const manualSection = document.getElementById('manual-outline-edit-feedback');
@@ -2560,6 +2580,14 @@ function selectOutlineEditMode(mode) {
         manualSection.style.display = 'block';
     } else {
         manualSection.style.display = 'none';
+    }
+}
+
+function selectOutlineEditMode(mode) {
+    const toggle = document.getElementById('outline-edit-mode-toggle');
+    if (toggle) {
+        toggle.checked = mode === 'manual';
+        toggleOutlineEditMode(toggle);
     }
 }
 
@@ -2598,17 +2626,23 @@ function closeChapterOutlineEditModal() {
     document.getElementById('chapter-outline-edit-modal').style.display = 'none';
 }
 
-function selectChapterOutlineEditMode(mode) {
+/**
+ * Toggle chapter outline edit mode using toggle switch
+ * @param {HTMLInputElement} toggleElement - The checkbox input element
+ */
+function toggleChapterOutlineEditMode(toggleElement) {
+    const mode = toggleElement.checked ? 'manual' : 'automated';
     currentChapterOutlineEditMode = mode;
     
-    // Update button states
-    const buttons = document.querySelectorAll('#chapter-outline-edit-modal .edit-mode-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.mode === mode) {
-            btn.classList.add('active');
+    // Update helper text
+    const hintElement = document.getElementById('chapter-outline-edit-mode-hint');
+    if (hintElement) {
+        if (mode === 'automated') {
+            hintElement.textContent = 'AI analyzes and edits the chapter plan';
+        } else {
+            hintElement.textContent = 'Provide specific feedback for AI to implement';
         }
-    });
+    }
     
     // Show/hide manual feedback section
     const manualSection = document.getElementById('manual-chapter-outline-edit-feedback');
@@ -2616,6 +2650,14 @@ function selectChapterOutlineEditMode(mode) {
         manualSection.style.display = 'block';
     } else {
         manualSection.style.display = 'none';
+    }
+}
+
+function selectChapterOutlineEditMode(mode) {
+    const toggle = document.getElementById('chapter-outline-edit-mode-toggle');
+    if (toggle) {
+        toggle.checked = mode === 'manual';
+        toggleChapterOutlineEditMode(toggle);
     }
 }
 

@@ -1055,20 +1055,17 @@
             <div class="modal-body">
                 <div class="edit-mode-selection">
                     <h4>Edit Mode</h4>
-                    <div class="edit-mode-buttons">
-                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectEditMode('automated')">
-                            <div class="mode-content">
-                                <strong>Automated</strong>
-                                <small>AI analyzes and improves the chapter automatically</small>
-                            </div>
-                        </button>
-                        <button class="edit-mode-btn" data-mode="manual" onclick="selectEditMode('manual')">
-                            <div class="mode-content">
-                                <strong>Manual</strong>
-                                <small>Provide specific feedback for AI to implement</small>
-                            </div>
-                        </button>
+                    <div class="toggle-switch-container">
+                        <div class="toggle-switch-wrapper">
+                            <span class="toggle-label">Automated</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="edit-mode-toggle" onchange="toggleEditMode(this)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Manual</span>
+                        </div>
                     </div>
+                    <div class="form-hint" id="edit-mode-hint">AI analyzes and improves the chapter automatically</div>
                 </div>
                 
                 <div id="manual-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1079,10 +1076,9 @@
                 <div class="edit-loops-section">
                     <label for="chapter-edit-loops">Number of Edit Loops:</label>
                     <select id="chapter-edit-loops">
-                        <option value="1">1 loop</option>
+                        <option value="1" selected>1 loop</option>
                         <option value="2">2 loops</option>
                         <option value="3">3 loops</option>
-                        <option value="5">5 loops</option>
                     </select>
                 </div>
             </div>
@@ -1107,20 +1103,17 @@
             <div class="modal-body">
                 <div class="edit-mode-selection">
                     <h4>Edit Mode</h4>
-                    <div class="edit-mode-buttons">
-                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectOutlineEditMode('automated')">
-                            <div class="mode-content">
-                                <strong>Automated</strong>
-                                <small>AI analyzes and improves the story structure automatically</small>
-                            </div>
-                        </button>
-                        <button class="edit-mode-btn" data-mode="manual" onclick="selectOutlineEditMode('manual')">
-                            <div class="mode-content">
-                                <strong>Manual</strong>
-                                <small>Provide specific feedback for AI to implement</small>
-                            </div>
-                        </button>
+                    <div class="toggle-switch-container">
+                        <div class="toggle-switch-wrapper">
+                            <span class="toggle-label">Automated</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="outline-edit-mode-toggle" onchange="toggleOutlineEditMode(this)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Manual</span>
+                        </div>
                     </div>
+                    <div class="form-hint" id="outline-edit-mode-hint">AI analyzes and improves the story structure automatically</div>
                 </div>
                 
                 <div id="manual-outline-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1131,11 +1124,9 @@
                 <div class="feedback-loops-section">
                     <label for="outline-edit-loops">Number of edit loops:</label>
                     <select id="outline-edit-loops">
-                        <option value="1">1</option>
-                        <option value="2" selected>2</option>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
                         <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
                     </select>
                 </div>
             </div>
@@ -1160,20 +1151,17 @@
             <div class="modal-body">
                 <div class="edit-mode-selection">
                     <h4>Edit Mode</h4>
-                    <div class="edit-mode-buttons">
-                        <button class="edit-mode-btn active" data-mode="automated" onclick="selectChapterOutlineEditMode('automated')">
-                            <div class="mode-content">
-                                <strong>Automated</strong>
-                                <small>AI analyzes and edits the chapter plan</small>
-                            </div>
-                        </button>
-                        <button class="edit-mode-btn" data-mode="manual" onclick="selectChapterOutlineEditMode('manual')">
-                            <div class="mode-content">
-                                <strong>Manual</strong>
-                                <small>Provide specific feedback for AI to implement</small>
-                            </div>
-                        </button>
+                    <div class="toggle-switch-container">
+                        <div class="toggle-switch-wrapper">
+                            <span class="toggle-label">Automated</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="chapter-outline-edit-mode-toggle" onchange="toggleChapterOutlineEditMode(this)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Manual</span>
+                        </div>
                     </div>
+                    <div class="form-hint" id="chapter-outline-edit-mode-hint">AI analyzes and edits the chapter plan</div>
                 </div>
                 
                 <div id="manual-chapter-outline-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1184,11 +1172,9 @@
                 <div class="feedback-loops-section">
                     <label for="chapter-outline-edit-loops">Number of edit loops:</label>
                     <select id="chapter-outline-edit-loops">
-                        <option value="1">1</option>
-                        <option value="2" selected>2</option>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
                         <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
                     </select>
                 </div>
             </div>

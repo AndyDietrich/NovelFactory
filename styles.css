@@ -843,64 +843,128 @@ textarea {
     margin-bottom: var(--spacing-lg);
 }
 
-.edit-mode-buttons {
-    display: flex;
-    gap: var(--spacing-md);
+/* Toggle Switch for Edit Mode Selection */
+.toggle-switch-container {
     margin-top: var(--spacing-sm);
 }
 
-.edit-mode-btn {
-    flex: 1;
+.toggle-switch-wrapper {
     display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-lg);
-    border: 2px solid var(--border-secondary);
-    border-radius: var(--radius-lg);
-    background: var(--bg-primary);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    text-align: left;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
 }
 
-.edit-mode-btn:hover {
-    border-color: var(--color-primary);
-    background: var(--bg-tertiary);
-    box-shadow: var(--shadow-small);
-}
-
-.edit-mode-btn.active {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    color: white;
-    box-shadow: var(--shadow-small);
-}
-
-.edit-mode-btn.active .mode-content strong,
-.edit-mode-btn.active .mode-content small {
-    color: white;
-}
-
-.mode-icon {
-    font-size: 24px;
-    margin-top: 2px;
-}
-
-.mode-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.mode-content strong {
+.toggle-label {
+    font-size: var(--font-size-base);
+    font-weight: 500;
     color: var(--text-primary);
-    font-weight: 600;
+    user-select: none;
+    transition: color var(--transition-fast);
 }
 
-.mode-content small {
-    color: var(--text-tertiary);
-    font-size: var(--font-size-sm);
-    line-height: 1.4;
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 56px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-secondary);
+    border-radius: 28px;
+    transition: all var(--transition-fast);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(28px);
+}
+
+.toggle-switch:hover .toggle-slider {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.toggle-switch input:checked:hover + .toggle-slider {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(142, 142, 147, 0.1);
+}
+
+/* EDIT MODE TOGGLE SPECIFIC STYLES */
+/* Override default toggle behavior ONLY for edit mode toggles */
+
+/* UNCHECKED = AUTOMATED MODE: Blue background, knob left */
+#edit-mode-toggle:not(:checked) + .toggle-slider,
+#outline-edit-mode-toggle:not(:checked) + .toggle-slider,
+#chapter-outline-edit-mode-toggle:not(:checked) + .toggle-slider {
+    background: var(--color-primary) !important; /* BLUE for Automated */
+}
+
+/* CHECKED = MANUAL MODE: Grey background, knob right */
+#edit-mode-toggle:checked + .toggle-slider,
+#outline-edit-mode-toggle:checked + .toggle-slider,
+#chapter-outline-edit-mode-toggle:checked + .toggle-slider {
+    background: var(--color-secondary) !important; /* GREY for Manual */
+}
+
+/* EDIT MODE LABEL COLORS - Target specific toggle IDs only */
+
+/* Default state: Automated is active (blue), Manual is inactive (grey) */
+#edit-mode-toggle:not(:checked) ~ .toggle-label:first-child,
+#outline-edit-mode-toggle:not(:checked) ~ .toggle-label:first-child,
+#chapter-outline-edit-mode-toggle:not(:checked) ~ .toggle-label:first-child {
+    color: var(--color-primary) !important; /* Automated - BLUE when active */
+    font-weight: 600 !important;
+}
+
+#edit-mode-toggle:not(:checked) ~ .toggle-label:last-child,
+#outline-edit-mode-toggle:not(:checked) ~ .toggle-label:last-child,
+#chapter-outline-edit-mode-toggle:not(:checked) ~ .toggle-label:last-child {
+    color: var(--text-secondary) !important; /* Manual - GREY when inactive */
+    font-weight: 500 !important;
+}
+
+/* When Manual is selected: Automated becomes inactive (grey), Manual becomes active (grey but bold) */
+#edit-mode-toggle:checked ~ .toggle-label:first-child,
+#outline-edit-mode-toggle:checked ~ .toggle-label:first-child,
+#chapter-outline-edit-mode-toggle:checked ~ .toggle-label:first-child {
+    color: var(--text-secondary) !important; /* Automated - GREY when inactive */
+    font-weight: 500 !important;
+}
+
+#edit-mode-toggle:checked ~ .toggle-label:last-child,
+#outline-edit-mode-toggle:checked ~ .toggle-label:last-child,
+#chapter-outline-edit-mode-toggle:checked ~ .toggle-label:last-child {
+    color: var(--color-secondary) !important; /* Manual - GREY when active */
+    font-weight: 600 !important;
 }
 
 .manual-edit-section {
