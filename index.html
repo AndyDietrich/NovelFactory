@@ -104,6 +104,14 @@
                     <p class="app-subtitle">Craft bestselling novels</p>
                 </div>
                 <div class="header-right">
+                    <div class="undo-redo-controls">
+                        <button class="btn btn-ghost btn-sm" id="undo-btn" onclick="undoAction()" disabled title="Undo">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="btn btn-ghost btn-sm" id="redo-btn" onclick="redoAction()" disabled title="Redo">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
                     <div class="theme-selector-container">
                         <select class="theme-selector" id="theme-select" onchange="changeTheme()">
                             <option value="light">Light</option>
@@ -247,6 +255,15 @@
                             <textarea id="style-direction" placeholder="Describe the writing style you want (e.g., humorous, dark, poetic, fast-paced, descriptive...)" oninput="autoSave(); updateWordCount();"></textarea>
                             <div class="word-count" id="style-word-count">0 words</div>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="style-excerpt">Style Example (Optional)</label>
+                        <div class="textarea-container">
+                            <textarea id="style-excerpt" placeholder="Paste a sample paragraph or excerpt that demonstrates the writing style you want to emulate. This will heavily influence the AI's prose generation." oninput="autoSave(); updateWordCount();"></textarea>
+                            <div class="word-count" id="style-excerpt-word-count">0 words</div>
+                        </div>
+                        <div class="form-hint">Provide a well-written example that captures the voice, tone, and style you want for your book.</div>
                     </div>
 
                     <div class="form-grid">
@@ -710,6 +727,7 @@
                                 <li><strong>Story Structure:</strong> Create complete narrative framework</li>
                                 <li><strong>Chapter Planning:</strong> Detailed scene-by-scene breakdown</li>
                                 <li><strong>Writing:</strong> Generate professional prose</li>
+                                <li><strong>Editing:</strong> Edit your story by promting to continue, show don't tell, expand or rephrase</li>
                                 <li><strong>Export:</strong> Download in multiple formats</li>
                             </ul>
                         </div>

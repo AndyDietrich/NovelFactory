@@ -9,7 +9,7 @@ const CONFIG = {
     MAX_SAVED_PROJECTS: 10,
     AUTO_SAVE_INTERVAL: 30000, // 30 seconds
     READING_SPEED_WPM: 250,
-    VERSION: '1.0.5'
+    VERSION: '1.0.7'
 };
 
 /**
@@ -23,6 +23,7 @@ let bookData = {
     targetAudience: '',
     premise: '',
     styleDirection: '',
+    styleExcerpt: '',
     numChapters: 20,
     targetWordCount: 2000,
     outline: '',
@@ -68,6 +69,13 @@ let currentExpandedChapter = null;
 let currentTheme = 'light';
 let selectedDonationAmount = 5;
 let isGenerating = false;
+
+/**
+ * Undo/Redo system
+ */
+let undoStack = [];
+let redoStack = [];
+const MAX_UNDO_STATES = 50;
 
 // ==================================================
 // CUSTOM ALERT SYSTEM
@@ -407,6 +415,8 @@ CHAPTER {chapterNum} DETAILED PLAN:
 
 PREVIOUS CHAPTER ENDING (for seamless continuity):
 {previousChapterEnding}
+
+{styleExcerptSection}
 
 SCENE STRUCTURE REQUIREMENTS:
 - **Opening**: Strong scene opener that hooks readers and flows from previous chapter
@@ -1555,6 +1565,7 @@ function collectBookData() {
     bookData.targetAudience = document.getElementById('target-audience').value;
     bookData.premise = document.getElementById('premise').value;
     bookData.styleDirection = document.getElementById('style-direction').value;
+    bookData.styleExcerpt = document.getElementById('style-excerpt').value;
     bookData.numChapters = parseInt(document.getElementById('num-chapters').value) || 20;
     bookData.targetWordCount = parseInt(document.getElementById('target-word-count').value) || 2000;
     
@@ -1574,6 +1585,9 @@ async function generateOutline() {
         showGenerationInfo();
         return;
     }
+    
+    // Save state for undo before generating
+    saveStateForUndo('Generate Story Structure');
     
     isGenerating = true;
     showGenerationInfo("Generating complete story structure with integrated characters...");
@@ -1646,6 +1660,9 @@ async function generateChapterOutline() {
         showGenerationInfo();
         return;
     }
+    
+    // Save state for undo before generating
+    saveStateForUndo('Generate Chapter Plan');
     
     isGenerating = true;
     showGenerationInfo("Creating detailed chapter plan with scene breakdowns...");
@@ -1834,9 +1851,19 @@ async function clearChaptersContent() {
  */
 function setupWritingInterface() {
     const container = document.getElementById('chapters-container');
+    if (!container) return;
+    
     container.innerHTML = '';
     
+    // Ensure numChapters is valid
+    if (!bookData.numChapters || bookData.numChapters < 1) {
+        bookData.numChapters = 20; // Default value
+    }
+    
     // Ensure chapters array is properly sized
+    if (!bookData.chapters) {
+        bookData.chapters = [];
+    }
     bookData.chapters = Array(bookData.numChapters).fill(null).map((_, i) => bookData.chapters[i] || '');
 
     // Add primary generation actions section (similar to story structure and chapter planning)
@@ -1885,6 +1912,23 @@ function setupWritingInterface() {
             
             <div class="chapter-content-field" id="chapter-${i}-content-field" style="display: block; padding-top: 8px;">
                 <div class="form-group">
+                    <div class="line-editing-controls" style="margin-bottom: 8px;">
+                        <div class="line-edit-buttons">
+                            <button class="btn btn-ghost btn-sm" onclick="continueWriting(${i})" title="Continue writing from cursor position (~200-300 words)">
+                                <i class="fas fa-arrow-right"></i> Continue
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="rewriteSelection(${i})" title="Rewrite selected paragraph with context awareness">
+                                <i class="fas fa-edit"></i> Rewrite
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="expandSelection(${i})" title="Expand selected paragraph with more details">
+                                <i class="fas fa-expand-arrows-alt"></i> Expand
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="showDontTell(${i})" title="Convert selected paragraph to 'show don't tell' style">
+                                <i class="fas fa-eye"></i> Show Don't Tell
+                            </button>
+                        </div>
+                        <div class="line-edit-hint">Select text for rewrite/expand/show options, or place cursor for continue</div>
+                    </div>
                     <div class="textarea-container">
                         <textarea 
                             id="chapter-${i}-content" 
@@ -2023,6 +2067,9 @@ async function generateSingleChapter(chapterNum) {
         return;
     }
     
+    // Save state for undo before generating
+    saveStateForUndo(`Generate Chapter ${chapterNum}`);
+    
     isGenerating = true;
     showGenerationInfo(`Writing Chapter ${chapterNum}...`);
     
@@ -2057,7 +2104,7 @@ async function writeChapter(chapterNum) {
         if (chapterNum > 1 && bookData.chapters[chapterNum - 2]) {
             const prevChapter = bookData.chapters[chapterNum - 2];
             const words = prevChapter.split(' ');
-            previousChapterEnding = words.slice(-200).join(' ');
+            previousChapterEnding = words.slice(-500).join(' ');
         }
 
         const genreReq = genreRequirements[bookData.genre] || { requirements: '', pacing: '' };
@@ -2080,6 +2127,24 @@ ${bookData.chapterOutline}
         const chapterOutline = extractChapterOutline(bookData.chapterOutline, chapterNum);
         const selectedModel = getSelectedModel('writing');
 
+        // Add style excerpt section if provided
+        const styleExcerptSection = bookData.styleExcerpt ? 
+`CRITICAL: WRITING STYLE EXAMPLE (EMULATE THIS STYLE HEAVILY):
+
+The following excerpt demonstrates the EXACT writing style, voice, tone, and prose structure you must emulate. Pay close attention to:
+- Sentence structure and rhythm
+- Word choice and vocabulary level  
+- Dialogue style and character voice
+- Descriptive language and imagery
+- Pacing and flow
+
+STYLE EXAMPLE TO EMULATE:
+"${bookData.styleExcerpt}"
+
+**Write your chapter in this EXACT style. This is your highest priority - match this voice and prose style precisely.**
+
+` : '';
+
         const promptEl = document.getElementById('writing-prompt');
         const prompt = formatPrompt(promptEl ? promptEl.value : (aiSettings.customPrompts?.writing || defaultPrompts.writing), {
             chapterNum: chapterNum,
@@ -2090,7 +2155,8 @@ ${bookData.chapterOutline}
             contextInfo: contextInfo,
             chapterOutline: chapterOutline,
             previousChapterEnding: previousChapterEnding,
-            genreSpecificElements: genreSpecificElements
+            genreSpecificElements: genreSpecificElements,
+            styleExcerptSection: styleExcerptSection
         });
 
         const chapterContent = await callAI(prompt, `You are a master storyteller writing professional ${bookData.genre} fiction for ${bookData.targetAudience} readers.`, selectedModel);
@@ -2125,6 +2191,408 @@ function extractChapterOutline(fullOutline, chapterNum) {
     }
     
     return chapterLines.join('\n') || `Chapter ${chapterNum} outline not found in full outline.`;
+}
+
+// ==================================================
+// LINE EDITING FUNCTIONS
+// ==================================================
+
+/**
+ * Continue writing from cursor position
+ * @param {number} chapterNum - Chapter number
+ */
+async function continueWriting(chapterNum) {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    
+    // Save state for undo
+    saveStateForUndo(`Continue Chapter ${chapterNum}`);
+    
+    const textarea = document.getElementById(`chapter-${chapterNum}-content`);
+    if (!textarea) {
+        await customAlert('Chapter textarea not found. Please try again.', 'Error');
+        return;
+    }
+    
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = textarea.value.substring(0, cursorPosition);
+    const textAfterCursor = textarea.value.substring(cursorPosition);
+    
+    isGenerating = true;
+    showGenerationInfo(`Continuing Chapter ${chapterNum} from cursor position...`);
+    
+    try {
+        const contextBefore = textBeforeCursor.split(' ').slice(-500).join(' '); // Last 500 words
+        const contextAfter = textAfterCursor.split(' ').slice(0, 500).join(' '); // Next 500 words
+        
+        const styleExcerptSection = bookData.styleExcerpt ? 
+`CRITICAL: WRITING STYLE TO MATCH:
+"${bookData.styleExcerpt}"
+**Match this style exactly - voice, tone, sentence structure, vocabulary level.**
+
+` : '';
+
+        const prompt = `You are a master ${bookData.genre} storyteller continuing a chapter mid-sentence or mid-paragraph.
+
+BOOK CONTEXT:
+- Genre: ${bookData.genre}
+- Target Audience: ${bookData.targetAudience}
+- Style Direction: ${bookData.styleDirection}
+
+CHAPTER ${chapterNum} CONTEXT:
+- Complete Story Structure: ${bookData.outline}
+- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+
+${styleExcerptSection}
+
+CONTINUATION TASK:
+Continue writing seamlessly from where the cursor is positioned. Write approximately 200-300 words that:
+
+PRECEDING TEXT (for context):
+"${contextBefore}"
+
+FOLLOWING TEXT (to connect to):
+"${textAfterCursor ? `"${contextAfter}"` : 'END OF CHAPTER'}"
+
+REQUIREMENTS:
+- Continue seamlessly from the preceding text
+- Write in the established voice and style
+- Advance the plot naturally according to the chapter plan
+- Maintain character consistency
+- Write 200-300 words of engaging, publishable prose
+- If there's following text, ensure your continuation flows smoothly into it
+- Match the genre conventions for ${bookData.genre}
+
+Write the continuation only (no explanations or meta-text):`;
+
+        const continuation = await callAI(prompt, `You are continuing a ${bookData.genre} chapter with seamless narrative flow.`, getSelectedModel('writing'));
+        
+        // Insert the continuation at cursor position
+        const newContent = textBeforeCursor + continuation + textAfterCursor;
+        textarea.value = newContent;
+        
+        // Position cursor at end of inserted text
+        const newCursorPosition = textBeforeCursor.length + continuation.length;
+        textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+        
+        updateChapterContent(chapterNum);
+        
+    } catch (error) {
+        await customAlert(`Failed to continue writing: ${error.message}`, 'Continue Writing Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+/**
+ * Rewrite selected text with context awareness
+ * @param {number} chapterNum - Chapter number
+ */
+async function rewriteSelection(chapterNum) {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    
+    const textarea = document.getElementById(`chapter-${chapterNum}-content`);
+    if (!textarea) {
+        await customAlert('Chapter textarea not found. Please try again.', 'Error');
+        return;
+    }
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start === end) {
+        await customAlert('Please select text to rewrite first.', 'No Selection');
+        return;
+    }
+    
+    // Save state for undo
+    saveStateForUndo(`Rewrite Selection Chapter ${chapterNum}`);
+    
+    const selectedText = textarea.value.substring(start, end);
+    const textBefore = textarea.value.substring(0, start);
+    const textAfter = textarea.value.substring(end);
+    
+    isGenerating = true;
+    showGenerationInfo(`Rewriting selected text in Chapter ${chapterNum}...`);
+    
+    try {
+        const contextBefore = textBefore.split(' ').slice(-500).join(' ');
+        const contextAfter = textAfter.split(' ').slice(0, 500).join(' ');
+        
+        const styleExcerptSection = bookData.styleExcerpt ? 
+`CRITICAL: WRITING STYLE TO MATCH:
+"${bookData.styleExcerpt}"
+**Match this style exactly - voice, tone, sentence structure, vocabulary level.**
+
+` : '';
+
+        const prompt = `You are a master ${bookData.genre} editor improving a paragraph while maintaining story continuity.
+
+BOOK CONTEXT:
+- Genre: ${bookData.genre}
+- Target Audience: ${bookData.targetAudience}
+- Style Direction: ${bookData.styleDirection}
+
+CHAPTER ${chapterNum} CONTEXT:
+- Complete Story Structure: ${bookData.outline}
+- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+
+${styleExcerptSection}
+
+REWRITING TASK:
+Improve the following paragraph while maintaining perfect continuity with surrounding text:
+
+PRECEDING TEXT:
+"${contextBefore}"
+
+TEXT TO REWRITE:
+"${selectedText}"
+
+FOLLOWING TEXT:
+"${contextAfter}"
+
+REQUIREMENTS:
+- Improve the prose quality, clarity, and engagement
+- Maintain the same story events and character actions
+- Ensure smooth transition from preceding text
+- Ensure smooth connection to following text
+- Match the established voice and style
+- Keep the same general paragraph length
+- Enhance dialogue, descriptions, or action as appropriate
+
+Provide only the improved paragraph (no explanations):`;
+
+        const rewrittenText = await callAI(prompt, `You are improving ${bookData.genre} prose while maintaining story continuity.`, getSelectedModel('writing'));
+        
+        // Replace selected text with rewritten version
+        const newContent = textBefore + rewrittenText + textAfter;
+        textarea.value = newContent;
+        
+        // Select the new text
+        textarea.setSelectionRange(start, start + rewrittenText.length);
+        
+        updateChapterContent(chapterNum);
+        
+    } catch (error) {
+        await customAlert(`Failed to rewrite selection: ${error.message}`, 'Rewrite Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+/**
+ * Expand selected text with more details
+ * @param {number} chapterNum - Chapter number
+ */
+async function expandSelection(chapterNum) {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    
+    const textarea = document.getElementById(`chapter-${chapterNum}-content`);
+    if (!textarea) {
+        await customAlert('Chapter textarea not found. Please try again.', 'Error');
+        return;
+    }
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start === end) {
+        await customAlert('Please select text to expand first.', 'No Selection');
+        return;
+    }
+    
+    // Save state for undo
+    saveStateForUndo(`Expand Selection Chapter ${chapterNum}`);
+    
+    const selectedText = textarea.value.substring(start, end);
+    const textBefore = textarea.value.substring(0, start);
+    const textAfter = textarea.value.substring(end);
+    
+    isGenerating = true;
+    showGenerationInfo(`Expanding selected text in Chapter ${chapterNum}...`);
+    
+    try {
+        const contextBefore = textBefore.split(' ').slice(-500).join(' ');
+        const contextAfter = textAfter.split(' ').slice(0, 500).join(' ');
+        
+        const styleExcerptSection = bookData.styleExcerpt ? 
+`CRITICAL: WRITING STYLE TO MATCH:
+"${bookData.styleExcerpt}"
+**Match this style exactly - voice, tone, sentence structure, vocabulary level.**
+
+` : '';
+
+        const prompt = `You are a master ${bookData.genre} writer expanding a paragraph with rich detail and depth.
+
+BOOK CONTEXT:
+- Genre: ${bookData.genre}
+- Target Audience: ${bookData.targetAudience}
+- Style Direction: ${bookData.styleDirection}
+
+CHAPTER ${chapterNum} CONTEXT:
+- Complete Story Structure: ${bookData.outline}
+- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+
+${styleExcerptSection}
+
+EXPANSION TASK:
+Take the following paragraph and expand it with rich details, deeper character insight, more vivid descriptions, and enhanced atmosphere while maintaining story continuity:
+
+PRECEDING TEXT:
+"${contextBefore}"
+
+TEXT TO EXPAND:
+"${selectedText}"
+
+FOLLOWING TEXT:
+"${contextAfter}"
+
+REQUIREMENTS:
+- Expand with sensory details, internal thoughts, dialogue, or environmental descriptions
+- Maintain the same story events and character actions
+- Add depth and richness without changing the plot
+- Ensure smooth transition from preceding text
+- Ensure smooth connection to following text
+- Match the established voice and style
+- Make it approximately 1.5-2x longer than original
+- Enhance the emotional resonance and immersion
+
+Provide only the expanded paragraph (no explanations):`;
+
+        const expandedText = await callAI(prompt, `You are expanding ${bookData.genre} prose with rich details and depth.`, getSelectedModel('writing'));
+        
+        // Replace selected text with expanded version
+        const newContent = textBefore + expandedText + textAfter;
+        textarea.value = newContent;
+        
+        // Select the new text
+        textarea.setSelectionRange(start, start + expandedText.length);
+        
+        updateChapterContent(chapterNum);
+        
+    } catch (error) {
+        await customAlert(`Failed to expand selection: ${error.message}`, 'Expand Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
+}
+
+/**
+ * Convert selected text to "show don't tell" style
+ * @param {number} chapterNum - Chapter number  
+ */
+async function showDontTell(chapterNum) {
+    if (isGenerating) {
+        showGenerationInfo();
+        return;
+    }
+    
+    const textarea = document.getElementById(`chapter-${chapterNum}-content`);
+    if (!textarea) {
+        await customAlert('Chapter textarea not found. Please try again.', 'Error');
+        return;
+    }
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start === end) {
+        await customAlert('Please select text to convert to "show don\'t tell" first.', 'No Selection');
+        return;
+    }
+    
+    // Save state for undo
+    saveStateForUndo(`Show Don't Tell Chapter ${chapterNum}`);
+    
+    const selectedText = textarea.value.substring(start, end);
+    const textBefore = textarea.value.substring(0, start);
+    const textAfter = textarea.value.substring(end);
+    
+    isGenerating = true;
+    showGenerationInfo(`Converting to "show don't tell" in Chapter ${chapterNum}...`);
+    
+    try {
+        const contextBefore = textBefore.split(' ').slice(-500).join(' ');
+        const contextAfter = textAfter.split(' ').slice(0, 500).join(' ');
+        
+        const styleExcerptSection = bookData.styleExcerpt ? 
+`CRITICAL: WRITING STYLE TO MATCH:
+"${bookData.styleExcerpt}"
+**Match this style exactly - voice, tone, sentence structure, vocabulary level.**
+
+` : '';
+
+        const prompt = `You are a master ${bookData.genre} writer expert in "show don't tell" technique. Transform telling statements into vivid, immersive showing.
+
+BOOK CONTEXT:
+- Genre: ${bookData.genre}
+- Target Audience: ${bookData.targetAudience}
+- Style Direction: ${bookData.styleDirection}
+
+CHAPTER ${chapterNum} CONTEXT:
+- Complete Story Structure: ${bookData.outline}
+- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+
+${styleExcerptSection}
+
+SHOW DON'T TELL TASK:
+Transform the following text from "telling" to "showing" using:
+- Actions and behaviors instead of statements
+- Sensory details and imagery
+- Dialogue that reveals character
+- Body language and physical reactions
+- Environmental details that reflect mood
+- Character thoughts and internal reactions
+
+PRECEDING TEXT:
+"${contextBefore}"
+
+TEXT TO TRANSFORM (from telling to showing):
+"${selectedText}"
+
+FOLLOWING TEXT:
+"${contextAfter}"
+
+REQUIREMENTS:
+- Replace exposition with action and imagery
+- Show character emotions through behavior, not statements
+- Use concrete, specific details instead of abstract concepts
+- Maintain the same story information and events
+- Ensure smooth transition from preceding text
+- Ensure smooth connection to following text  
+- Match the established voice and style
+- Make the reader experience rather than be told
+
+Provide only the transformed "showing" paragraph (no explanations):`;
+
+        const showingText = await callAI(prompt, `You are transforming ${bookData.genre} prose to masterful "show don't tell" technique.`, getSelectedModel('writing'));
+        
+        // Replace selected text with showing version
+        const newContent = textBefore + showingText + textAfter;
+        textarea.value = newContent;
+        
+        // Select the new text
+        textarea.setSelectionRange(start, start + showingText.length);
+        
+        updateChapterContent(chapterNum);
+        
+    } catch (error) {
+        await customAlert(`Failed to convert to "show don't tell": ${error.message}`, 'Show Don\'t Tell Error');
+    } finally {
+        isGenerating = false;
+        hideGenerationInfo();
+    }
 }
 
 /**
@@ -3378,6 +3846,7 @@ async function newProject() {
         targetAudience: '',
         premise: '',
         styleDirection: '',
+        styleExcerpt: '',
         numChapters: 20,
         targetWordCount: 2000,
         outline: '',
@@ -3813,6 +4282,7 @@ function populateFormFields() {
     document.getElementById('target-audience').value = bookData.targetAudience || '';
     document.getElementById('premise').value = bookData.premise || '';
     document.getElementById('style-direction').value = bookData.styleDirection || '';
+    document.getElementById('style-excerpt').value = bookData.styleExcerpt || '';
     document.getElementById('num-chapters').value = bookData.numChapters || 20;
     document.getElementById('target-word-count').value = bookData.targetWordCount || 2000;
     
@@ -4140,8 +4610,12 @@ function countWords(text) {
 function updateWordCount() {
     const premise = document.getElementById('premise')?.value || '';
     const style = document.getElementById('style-direction')?.value || '';
+    const styleExcerpt = document.getElementById('style-excerpt')?.value || '';
     document.getElementById('premise-word-count').textContent = `${countWords(premise)} words`;
     document.getElementById('style-word-count').textContent = `${countWords(style)} words`;
+    if (document.getElementById('style-excerpt-word-count')) {
+        document.getElementById('style-excerpt-word-count').textContent = `${countWords(styleExcerpt)} words`;
+    }
 }
 
 // Chapter estimate
@@ -4300,6 +4774,7 @@ function initializeApp() {
     initializePrompts();
     updateModelSelect();
     updateNavProgress();
+    updateUndoRedoButtons();
     
     // Feedback modes initial state
     ['outline', 'chapters', 'writing'].forEach(step => {
@@ -4320,6 +4795,108 @@ function initializeApp() {
     });
     
     console.log('NovelFactory initialization complete');
+}
+
+// ==================================================
+// UNDO/REDO SYSTEM
+// ==================================================
+
+/**
+ * Save current state for undo functionality
+ * @param {string} actionDescription - Description of the action
+ */
+function saveStateForUndo(actionDescription = 'Action') {
+    const currentState = {
+        bookData: JSON.parse(JSON.stringify(bookData)),
+        description: actionDescription,
+        timestamp: Date.now()
+    };
+    
+    undoStack.push(currentState);
+    
+    // Limit undo stack size
+    if (undoStack.length > MAX_UNDO_STATES) {
+        undoStack.shift();
+    }
+    
+    // Clear redo stack when new action is performed
+    redoStack = [];
+    
+    updateUndoRedoButtons();
+}
+
+/**
+ * Undo the last action
+ */
+function undoAction() {
+    if (undoStack.length === 0) return;
+    
+    // Save current state to redo stack
+    const currentState = {
+        bookData: JSON.parse(JSON.stringify(bookData)),
+        description: 'Current State',
+        timestamp: Date.now()
+    };
+    redoStack.push(currentState);
+    
+    // Get and apply previous state
+    const previousState = undoStack.pop();
+    bookData = JSON.parse(JSON.stringify(previousState.bookData));
+    
+    // Update UI
+    populateFormFields();
+    setupWritingInterface();
+    saveToLocalStorage();
+    
+    updateUndoRedoButtons();
+}
+
+/**
+ * Redo the last undone action
+ */
+function redoAction() {
+    if (redoStack.length === 0) return;
+    
+    // Save current state to undo stack
+    const currentState = {
+        bookData: JSON.parse(JSON.stringify(bookData)),
+        description: 'Current State',  
+        timestamp: Date.now()
+    };
+    undoStack.push(currentState);
+    
+    // Get and apply next state
+    const nextState = redoStack.pop();
+    bookData = JSON.parse(JSON.stringify(nextState.bookData));
+    
+    // Update UI
+    populateFormFields();
+    setupWritingInterface();
+    saveToLocalStorage();
+    
+    updateUndoRedoButtons();
+}
+
+/**
+ * Update undo/redo button states
+ */
+function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+    
+    if (undoBtn) {
+        undoBtn.disabled = undoStack.length === 0;
+        undoBtn.title = undoStack.length > 0 ? 
+            `Undo: ${undoStack[undoStack.length - 1].description}` : 
+            'No actions to undo';
+    }
+    
+    if (redoBtn) {
+        redoBtn.disabled = redoStack.length === 0;
+        redoBtn.title = redoStack.length > 0 ? 
+            `Redo: ${redoStack[redoStack.length - 1].description}` : 
+            'No actions to redo';
+    }
 }
 
 // DOM ready
@@ -4409,6 +4986,7 @@ async function resetEverything() {
         targetAudience: '',
         premise: '',
         styleDirection: '',
+        styleExcerpt: '',
         numChapters: 20,
         targetWordCount: 2000,
         outline: '',
@@ -4424,6 +5002,7 @@ async function resetEverything() {
     document.getElementById('target-audience').value = '';
     document.getElementById('premise').value = '';
     document.getElementById('style-direction').value = '';
+    document.getElementById('style-excerpt').value = '';
     document.getElementById('num-chapters').value = '20';
     document.getElementById('target-word-count').value = '2000';
     document.getElementById('outline-content').value = '';

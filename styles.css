@@ -822,6 +822,68 @@ textarea {
     box-shadow: none;
 }
 
+/* Undo/Redo Controls */
+.undo-redo-controls {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-right: var(--spacing-md);
+}
+
+.undo-redo-controls .btn {
+    padding: var(--spacing-sm);
+    min-width: 40px;
+    justify-content: center;
+}
+
+.undo-redo-controls .btn i {
+    font-size: var(--font-size-sm);
+}
+
+/* Line Editing Controls */
+.line-editing-controls {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-secondary);
+}
+
+.line-edit-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.line-edit-buttons .btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+}
+
+.line-edit-buttons .btn i {
+    font-size: var(--font-size-xs);
+    margin-right: var(--spacing-xs);
+}
+
+.line-edit-hint {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-align: center;
+    margin: 0;
+}
+
+/* Responsive line editing controls */
+@media (max-width: 768px) {
+    .line-edit-buttons {
+        flex-direction: column;
+    }
+    
+    .line-edit-buttons .btn {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
 /* Cards */
 .info-card, .output-section {
     background: var(--bg-tertiary);

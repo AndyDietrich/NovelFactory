@@ -147,7 +147,6 @@ novelfactory-ai/
 ### **Color Theme**
 - Vibrant colors and gradients
 - Playful and inspiring design
-- Works great on mobile
 
 ---
 
@@ -243,7 +242,7 @@ NovelFactory is free to use! If you find it helpful, consider supporting continu
 - API keys stored securely in local storage
 - Export your data anytime
 
-### **Analytics
+### **Analytics**
 - Google Analytics for basic website traffic monitoring
 
 ### **API Usage**
