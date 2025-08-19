@@ -320,130 +320,142 @@ const genreRequirements = {
  * Default AI generation prompts
  */
 const defaultPrompts = {
-    outline: `You are a master storyteller and bestselling author creating a complete story structure. Generate a compelling narrative framework that integrates plot, characters, and pacing for commercial success.
+    outline: `You are a master storyteller creating a comprehensive STORY BIBLE for a {genre} novel targeting {targetAudience}. Create a complete reference document that will guide all future writing.
 
-BOOK DETAILS:
-- Genre: {genre}
-- Target Audience: {targetAudience}
+BOOK CONCEPT:
 - Premise: {premise}
 - Style Direction: {styleDirection}
-- Number of Chapters: {numChapters}
+- Chapters: {numChapters}
+- Genre Requirements: {genreRequirements}
 
-GENRE-SPECIFIC REQUIREMENTS:
-{genreRequirements}
+CREATE A COMPLETE STORY BIBLE:
 
-CREATE A COMPREHENSIVE STORY STRUCTURE INCLUDING:
+## 1. CORE STORY FOUNDATIONS
+**Premise & Logline:** One-sentence hook + core concept
+**Central Themes:** 2-3 key ideas explored (love, betrayal, survival, freedom, etc.)
+**Genre & Tone:** Mood, style, and audience expectations
 
-1. **THREE-ACT BREAKDOWN**:
-   - ACT I (Setup) - Chapters 1-{act1End}: Hook, world/character introduction, inciting incident
-   - ACT II (Confrontation) - Chapters {act2Start}-{act2End}: Rising action, obstacles, midpoint twist
-   - ACT III (Resolution) - Chapters {act3Start}-{numChapters}: Climax, falling action, resolution
+## 2. THREE-ACT STORY STRUCTURE MAP
+**ACT ONE: SETUP (Chapters 1-{act1End})**
+- Business as Usual: Protagonist's ordinary world, strengths, flaws, desires
+- Stumble: Early disruptions highlighting potential and wounds
+- Inciting Incident: Event that shatters stability and forces story goal
+- Coping & Denial: Protagonist scrambles, clings to flawed beliefs
+- Point of No Return: Forced out of comfort zone into new world
 
-2. **MAIN CHARACTERS WITH ARCS**:
-   - Protagonist(s): Goals, motivations, flaws, character arc
-   - Antagonist(s): Compelling motivations, obstacles they create
-   - Supporting characters: Their roles and mini-arcs
-   - Character relationships and development throughout story
+**ACT TWO: CONFRONTATION (Chapters {act2Start}-{act2End})**
+- Entering New World: Rules shift, dangers intensify
+- First Encounters: Antagonist looms, protagonist underestimates threat
+- Early Wins & Setbacks: Beginner's luck, then harsh lessons
+- False Beliefs Tested: Coping mechanisms fail, forcing adaptation
+- Twist/Midpoint Revelation: Deeper truth revealed - wrong battle or higher stakes
+- Escalation: Confidence grows but flaws drag down, antagonist tightens grip
+- Crisis: Devastating loss mirrors wound, pushes to brink
 
-3. **PLOT STRUCTURE**:
-   - Opening hook and world establishment
-   - Key plot points and turning points
-   - Major conflicts and obstacles
-   - Midpoint game-changer
-   - Climactic confrontation
-   - Satisfying resolution
+**ACT THREE: RESOLUTION (Chapters {act3Start}-{numChapters})**
+- Dark Night of Soul: Hopelessness forces confronting misbelief as lie
+- Renewed Purpose: Choosing growth, embracing new truth
+- Final Confrontation: Ultimate showdown at full power
+- Decisive Blow: Victory only possible by abandoning misbelief
+- Aftermath: World resets, protagonist demonstrates lasting change
 
-4. **PACING & TENSION**:
-   - Chapter-level tension management
-   - Action/reflection balance
-   - Emotional beats and character development moments
-   - Cliffhangers and hooks
+## 3. MAIN CHARACTERS
+**PROTAGONIST:**
+- Name, role, physical description, mannerisms
+- Personality traits, voice, backstory, formative wounds
+- Core misbelief/flaw, external goals, internal needs
+- Complete growth arc through story
 
-Ensure this structure is commercially viable, emotionally engaging, and perfectly suited for {targetAudience}. Follow proven storytelling formulas while maintaining originality.`, 
+**ANTAGONIST:**
+- Name, role, motives, philosophy, power, flaws
+- How they oppose protagonist and represent thematic conflict
 
-    chapters: `You are a master storyteller creating a detailed chapter-by-chapter plan. Based on the complete story structure, create comprehensive chapter summaries and scene breakdowns.
+**SUPPORTING CAST:**
+- Key allies, mentors, rivals with distinct roles
+- Character web showing relationships and dynamics
 
-COMPLETE STORY STRUCTURE:
+## 4. WORLDBUILDING
+**Setting & Locations:** Key places where story unfolds
+**Culture & Society:** Social structure, traditions, beliefs relevant to story
+**Rules of the World:** Magic/science/technology systems and limitations
+**History & Lore:** Background events that impact current story
+
+## 5. STORY-SPECIFIC ELEMENTS
+**Conflict Map:** Antagonist's plan vs protagonist's goals
+**Mysteries & Reveals:** What's hidden and when it's revealed
+**Foreshadowing Seeds:** Setups for later payoffs
+**Key Subplots:** Romance, rivalries, secondary character arcs
+**Important Objects:** Weapons, artifacts, symbols that drive plot
+
+Create a complete reference that ensures consistency and depth throughout all {numChapters} chapters.`, 
+
+    chapters: `You are a master storyteller creating a complete chapter outline for ALL {numChapters} chapters in a single response. Use the story bible to create detailed chapter breakdowns.
+
+STORY BIBLE:
 {outline}
 
-BOOK DETAILS:
-- Genre: {genre}
-- Target Audience: {targetAudience}
-- Number of Chapters: {numChapters}
-- Target Words per Chapter: {targetWordCount}
+TARGET: {targetWordCount} words per chapter
 
-CREATE DETAILED CHAPTER BREAKDOWN:
+CREATE COMPLETE CHAPTER OUTLINE FOR ALL CHAPTERS (1-{numChapters}):
 
-For each chapter (1-{numChapters}), provide:
+For EACH chapter, provide:
 
-1. **CHAPTER TITLE** (compelling and genre-appropriate)
+**CHAPTER [NUMBER]: [COMPELLING TITLE]**
 
-2. **SCENE STRUCTURE**:
-   - Opening: Strong hook or continuation from previous chapter
-   - 2-3 KEY PLOT BEATS that advance the main story
-   - Character development moments and emotional beats
-   - Chapter climax: Tension peak or revelation
-   - Ending: Transition hook for next chapter
+*Scene Structure:*
+- Opening Hook: How chapter begins (continuation or new scene)
+- Plot Beats: 2-3 key events that advance main story
+- Character Moments: Development, relationships, emotional beats
+- Chapter Climax: Tension peak, revelation, or turning point
+- Ending Hook: Transition that pulls reader to next chapter
 
-3. **SPECIFIC DETAILS**:
-   - POV Character (if applicable)
-   - Setting/Location
-   - Main conflicts/obstacles in this chapter
-   - Character interactions and relationship development
-   - Clues, revelations, or plot advancement
+*Chapter Details:*
+- POV Character: Who tells this chapter
+- Setting: Where scenes take place
+- Conflicts: Main obstacles/problems in this chapter
+- Revelations: Information revealed or discovered
+- Word Target: ~{targetWordCount} words
 
-4. **WORD COUNT TARGET**: {targetWordCount} words (adjust based on chapter importance)
+*Continuity Notes:* Key details for consistency
 
-5. **CONTINUITY NOTES**: Key details for maintaining consistency
+---
 
-PACING REQUIREMENTS:
-- Maintain {genre} genre pacing throughout
-- Balance action, dialogue, and description
-- Ensure each chapter ends with reader engagement
-- Build tension appropriately toward climax
-- Include proper character development beats
+Continue this format for ALL {numChapters} chapters. Ensure each chapter flows logically from the previous while building toward the climax. Maintain consistent pacing and character development throughout.
 
-Format as clear, numbered chapters with all details for seamless writing execution.`, 
+IMPORTANT: Generate the complete outline for ALL chapters in this single response - do not split or abbreviate.`, 
 
-    writing: `You are a master storyteller and bestselling author writing Chapter {chapterNum} of a {genre} novel. Create engaging, high-quality prose that brings the story to life.
+    writing: `You are a master {genre} author writing Chapter {chapterNum}. Follow the chapter outline precisely - it is your highest priority.
 
-CRITICAL CONTEXT:
-{contextInfo}
-
-CHAPTER {chapterNum} DETAILED PLAN:
+**CHAPTER {chapterNum} OUTLINE (FOLLOW EXACTLY):**
 {chapterOutline}
 
-PREVIOUS CHAPTER ENDING (for seamless continuity):
+**PREVIOUS CHAPTER ENDING (for smooth transition):**
 {previousChapterEnding}
 
 {styleExcerptSection}
 
-SCENE STRUCTURE REQUIREMENTS:
-- **Opening**: Strong scene opener that hooks readers and flows from previous chapter
-- **Development**: 2-3 key plot beats that advance the story as outlined
-- **Character Moments**: Include emotional beats and character development
-- **Climax**: Chapter tension peak or revelation as planned
-- **Ending**: Compelling transition hook for next chapter
+**WRITING REQUIREMENTS:**
+- Target Length: {targetWordCount} words
+- Style: {styleDirection}
+- Audience: {targetAudience}
 
-PROSE REQUIREMENTS FOR {genre}:
-- **Dialogue**: 40% - Create distinct character voices and natural conversations
-- **Action/Events**: 30% - Show don't tell for major plot developments
-- **Description/Atmosphere**: 30% - Vivid settings and emotional atmosphere
-- **Pacing**: {genre}-appropriate rhythm and tension building
-- **Style**: {styleDirection}
+**CRITICAL INSTRUCTIONS:**
+1. Follow the chapter outline exactly - do not deviate or continue past the planned ending
+2. Focus on the current chapter's specific plot beats and character moments
+3. Create smooth transition from previous chapter ending
+4. End exactly where the outline specifies
+5. Avoid melodramatic or overly emotional dialogue/descriptions
+6. Show don't tell - use concrete actions and dialogue over internal thoughts
+7. Keep dialogue natural and character-appropriate
 
-GENRE-SPECIFIC ELEMENTS:
-{genreSpecificElements}
+**PROSE BALANCE:**
+- Dialogue: 40% (natural, distinct character voices)
+- Action/Events: 35% (show story progress through scenes)
+- Description: 25% (efficient scene-setting, avoid purple prose)
 
-WRITING STANDARDS:
-- Target length: {targetWordCount} words
-- Appropriate for {targetAudience}
-- Maintain continuity with previous chapters
-- Follow chapter outline precisely - no deviations
-- Include proper scene transitions and emotional beats
-- End with appropriate tension level as outlined
+**GENRE ELEMENTS:** {genreSpecificElements}
 
-Write Chapter {chapterNum} with compelling, publishable prose that advances the plot exactly as planned while creating an immersive reading experience.`, 
+Write Chapter {chapterNum} following the outline exactly. Do not reference the broader story bible unless directly relevant to this chapter's events.`, 
 
     randomIdea: `You are a creative genius and bestselling author brainstorming machine. Generate a completely original, commercially viable book idea that would captivate readers and become a bestseller.
 
@@ -2152,7 +2164,6 @@ STYLE EXAMPLE TO EMULATE:
             targetAudience: bookData.targetAudience,
             styleDirection: bookData.styleDirection,
             targetWordCount: bookData.targetWordCount,
-            contextInfo: contextInfo,
             chapterOutline: chapterOutline,
             previousChapterEnding: previousChapterEnding,
             genreSpecificElements: genreSpecificElements,
