@@ -4955,9 +4955,30 @@ window.addEventListener('beforeunload', function() {
 // Global error handling
 window.addEventListener('error', function(e) {
     console.error('Global error:', e.error);
+    
+    // Clean up any active loading states
     if (document.getElementById('loading-overlay')?.style.display !== 'none') {
         hideLoadingOverlay();
+    }
+    
+    // Clean up generation indicator if it's showing
+    if (isGenerating || document.getElementById('generation-indicator')?.style.display === 'flex') {
+        hideGenerationInfo();
+    }
+    
+    // Show error to user if in an active process
+    if (document.getElementById('loading-overlay')?.style.display !== 'none' || isGenerating) {
         customAlert('An unexpected error occurred. Please try again.', 'Error');
+    }
+});
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('Unhandled promise rejection:', e.reason);
+    
+    // Clean up generation states
+    if (isGenerating) {
+        hideGenerationInfo();
     }
 });
 
@@ -5060,12 +5081,22 @@ function showGenerationInfo(message = '') {
     }
     
     indicator.style.display = 'flex';
+    
+    // Safety timeout to auto-hide after 5 minutes if not properly cleaned up
+    clearTimeout(window.generationTimeout);
+    window.generationTimeout = setTimeout(() => {
+        console.warn('Generation indicator auto-hidden after timeout');
+        hideGenerationInfo();
+    }, 300000); // 5 minutes
 }
 
 /**
  * Hide generation progress info
  */
 function hideGenerationInfo() {
+    // Clear the safety timeout
+    clearTimeout(window.generationTimeout);
+    
     // Don't hide if loading overlay is active (let loading overlay handle the display)
     const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay && loadingOverlay.style.display === 'flex') {
@@ -5075,8 +5106,15 @@ function hideGenerationInfo() {
     const indicator = document.getElementById('generation-indicator');
     if (indicator) {
         indicator.style.display = 'none';
+        // Force hide with important style as backup
+        indicator.style.setProperty('display', 'none', 'important');
     }
+    
+    // Always reset the generating state
     isGenerating = false;
+    
+    // Remove any potential ai-generating class from body
+    document.body.classList.remove('ai-generating');
 }
 
 // Console welcome

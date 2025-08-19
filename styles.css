@@ -213,7 +213,7 @@
     border-radius: var(--radius-xl);
     padding: var(--spacing-2xl);
     box-shadow: var(--shadow-large);
-    z-index: 9999;
+    z-index: 10000;
     min-width: 420px;
     max-width: 500px;
     align-items: center;
@@ -720,6 +720,57 @@ textarea {
     padding: var(--spacing-lg) var(--spacing-2xl);
     font-size: var(--font-size-lg);
     font-weight: 700;
+}
+
+/* Button size adjustments - makes all buttons a bit smaller */
+.btn {
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+}
+
+.btn-sm {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+}
+
+.btn-large {
+    padding: 8px 14px !important;
+    font-size: 15px !important;
+}
+
+/* Chapter collapse functionality */
+.collapse-chapter-btn {
+    margin-left: auto;
+    padding: 2px 4px;
+    font-size: 10px;
+    min-width: auto;
+    width: 20px;
+    height: 20px;
+}
+
+.chapter-content-field.collapsed { 
+    display: none !important; 
+}
+
+.chapter-header { 
+    align-items: center; 
+    position: relative; 
+}
+
+.chapter-item .collapse-chapter-btn { 
+    position: absolute; 
+    top: 4px; 
+    right: 4px; 
+    z-index: 2; 
+    margin-left: 0; 
+    padding: 0; 
+}
+
+.chapter-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
 }
 
 .btn-ghost {
