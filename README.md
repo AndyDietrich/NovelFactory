@@ -12,7 +12,7 @@ Generate complete, professional-quality books with advanced AI technology. Creat
 
 ### **Core Functionality**
 - **Complete Book Generation**: From concept to finished manuscript
-- **Multi-Step Process**: Setup → Story Structure → Chapter Planning → Writing → Export
+- **Multi-Step Process**: Setup → Story Bible → Chapter Outline → Writing → Export
 - **AI-Powered Quality**: Advanced feedback loops and iterative improvement
 - **One-Click Generation**: Fully automated book creation
 - **Professional Output**: Multiple export formats (TXT, HTML, Markdown)
@@ -108,13 +108,13 @@ novelfactory-ai/
 - Describe your desired writing style
 - Set chapter count and target word count per chapter
 
-### **Step 2: Story Structure**
+### **Step 2: Story Bible**
 - AI generates complete narrative framework
 - Includes character development and plot points
 - Three-act structure with proper pacing
 - Use feedback loops to refine the structure
 
-### **Step 3: Chapter Planning**
+### **Step 3: Chapter Outline**
 - Detailed chapter-by-chapter breakdown
 - Scene structure and plot beats for each chapter
 - Automatically generates book title and blurb

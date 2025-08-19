@@ -67,34 +67,25 @@
         <header class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1 class="app-title">NovelFactory</h1>
-                    <p class="app-subtitle">Craft bestselling novels</p>
+                    <a href="/" class="logo">NovelFactory</a>
+                    <span class="text-neutral-500">Professional AI Book Generator</span>
                 </div>
                 <div class="header-right">
-                    <div class="undo-redo-controls">
-                        <button class="btn btn-ghost btn-sm" id="undo-btn" onclick="undoAction()" disabled title="Undo">
+                    <div class="btn-group">
+                        <button class="btn-ghost btn-sm" id="undo-btn" onclick="undoAction()" disabled title="Undo">
                             <i class="fas fa-undo"></i>
                         </button>
-                        <button class="btn btn-ghost btn-sm" id="redo-btn" onclick="redoAction()" disabled title="Redo">
+                        <button class="btn-ghost btn-sm" id="redo-btn" onclick="redoAction()" disabled title="Redo">
                             <i class="fas fa-redo"></i>
                         </button>
                     </div>
-                    <div class="theme-selector-container">
-                        <select class="theme-selector" id="theme-select" onchange="changeTheme()">
-                            <option value="light">Light</option>
-                            <option value="dark">Dark</option>
-                            <option value="fun">Color</option>
-                        </select>
+                    <div class="theme-toggle">
+                        <button class="theme-option active" data-theme="light" onclick="switchTheme('light')">Light</button>
+                        <button class="theme-option" data-theme="dark" onclick="switchTheme('dark')">Dark</button>
                     </div>
-                    <button class="header-btn" onclick="estimateCosts()">
-                        <span class="label">Cost Estimate</span>
-                    </button>
-                    <button class="header-btn" onclick="showFeedbackForm()">
-                        <span class="label">Feedback</span>
-                    </button>
-                    <button class="header-btn" onclick="showDonationModal()">
-                        <span class="label">Donate</span>
-                    </button>
+                    <button class="header-btn" onclick="estimateCosts()">Cost Estimate</button>
+                    <button class="header-btn" onclick="showFeedbackForm()">Feedback</button>
+                    <button class="header-btn" onclick="showDonationModal()">Donate</button>
                 </div>
             </div>
         </header>
@@ -110,18 +101,10 @@
                     </div>
                 </div>
                 <div class="project-actions">
-                    <button class="btn btn-ghost btn-sm" onclick="newProject()">
-                        <span class="label">New</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="saveProject()">
-                        <span class="label">Save</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" onclick="manageProjects()">
-                        <span class="label">Manage</span>
-                    </button>
-                    <button class="btn btn-ghost btn-sm" id="delete-project-btn" onclick="deleteCurrentProject()" style="display: none;">
-                        <span class="label">Delete</span>
-                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="newProject()">New</button>
+                    <button class="btn btn-ghost btn-sm" onclick="saveProject()">Save</button>
+                    <button class="btn btn-ghost btn-sm" onclick="manageProjects()">Manage</button>
+                    <button class="btn btn-ghost btn-sm" id="delete-project-btn" onclick="deleteCurrentProject()" style="display: none;">Delete</button>
                 </div>
                 <input type="file" id="project-file" style="display: none;" accept=".json" onchange="importProject(event)">
             </div>
@@ -129,31 +112,14 @@
 
         <!-- Navigation -->
         <nav class="navigation">
-            <!--<div class="nav-progress">
-                <div class="progress-line" id="nav-progress-line"></div>
-            </div>-->
             <div class="nav-items">
-                <button class="nav-item" onclick="showStep('settings')" data-step="settings">
-                    <span class="nav-label">Settings</span>
-                </button>
-                <button class="nav-item active" onclick="showStep('setup')" data-step="setup">
-                    <span class="nav-label">Book Setup</span>
-                </button>
-                <button class="nav-item" onclick="showStep('outline')" data-step="outline">
-                    <span class="nav-label">Story Structure</span>
-                </button>
-                <button class="nav-item" onclick="showStep('chapters')" data-step="chapters">
-                    <span class="nav-label">Chapter Planning</span>
-                </button>
-                <button class="nav-item" onclick="showStep('writing')" data-step="writing">
-                    <span class="nav-label">Writing</span>
-                </button>
-                <button class="nav-item" onclick="showStep('export')" data-step="export">
-                    <span class="nav-label">Export</span>
-                </button>
-                <button class="nav-item" onclick="showStep('tutorial')" data-step="tutorial">
-                    <span class="nav-label">Tutorial</span>
-                </button>
+                <button class="nav-item" onclick="showStep('settings')" data-step="settings">Settings</button>
+                <button class="nav-item active" onclick="showStep('setup')" data-step="setup">Book Setup</button>
+                <button class="nav-item" onclick="showStep('outline')" data-step="outline">Story Bible</button>
+                <button class="nav-item" onclick="showStep('chapters')" data-step="chapters">Chapter Outline</button>
+                <button class="nav-item" onclick="showStep('writing')" data-step="writing">Writing</button>
+                <button class="nav-item" onclick="showStep('export')" data-step="export">Export</button>
+                <button class="nav-item" onclick="showStep('tutorial')" data-step="tutorial">Tutorial</button>
             </div>
         </nav>
 
@@ -247,56 +213,39 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons at Bottom -->
-                    <div class="setup-actions">
-                        <div class="random-idea-section">
-                            <button class="btn btn-blue-grey" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">
-                                <span class="label">Generate Random Idea</span>
-                            </button>
-                            <p class="random-idea-hint">Select genre and target audience first, then generate a book idea!</p>
+                    <!-- Action Buttons -->
+                    <div class="card">
+                        <div class="text-center mb-6">
+                            <button class="btn btn-secondary" onclick="generateRandomIdea()" id="random-idea-btn" style="display: none;">Generate Random Idea</button>
+                            <p class="text-sm text-neutral-500 mt-2">Select genre and target audience first, then generate a book idea!</p>
                         </div>
 
-                        <div class="main-setup-actions">
-                            <button class="btn btn-success btn-large" onclick="collectBookData(); autoSave(); showStep('outline'); window.scrollTo({top: 0, behavior: 'smooth'})">
-                                <span class="label">Next: Story Structure</span>
-                            </button>
-                            <button class="btn btn-primary btn-large one-click-btn" onclick="startOneClickGeneration()">
-                                <span class="label">1-Click Generation</span>
-                            </button>
+                        <div class="main-generation-actions">
+                            <button class="btn btn-success btn-lg" onclick="collectBookData(); autoSave(); showStep('outline'); window.scrollTo({top: 0, behavior: 'smooth'})">Next: Story Bible</button>
+                            <button class="btn btn-lg" onclick="startOneClickGeneration()">1-Click Generation</button>
                         </div>
 
-                        <div class="secondary-actions">
-                            <button class="btn btn-danger btn-sm" onclick="resetEverything()">
-                                <span class="label">Reset & Start New</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Story Structure Step -->
+            <!-- Story Bible Step -->
             <div id="outline" class="step">
                 <div class="step-header">
-                    <h2 class="step-title">Story Structure & Characters</h2>
+                    <h2 class="step-title">Story Bible</h2>
                     <p class="step-description">Plot out a story structure and Characters for your novel</p>
                 </div>
 
                 <div class="step-content">
                     <!-- Primary Generation Actions -->
-                    <div class="primary-actions-section">
-                        <div class="main-generation-actions">
-                            <button class="btn btn-primary btn-large" onclick="generateOutline()">
-                                <span class="label">Generate Story Structure</span>
-                            </button>
-                            <button class="btn btn-primary" onclick="showOutlineEditModal()">
-                                <span class="label">Edit</span>
-                            </button>
-                        </div>
+                    <div class="main-generation-actions">
+                        <button class="btn btn-lg" onclick="generateOutline()">Generate Story Bible</button>
+                        <button class="btn btn-secondary" onclick="showOutlineEditModal()">Edit & Improve</button>
                     </div>
 
                     <!-- Content Field -->
                     <div class="form-group">
-                        <label for="outline-content">Story Structure & Characters</label>
+                        <label for="outline-content">Story Bible</label>
                         <div class="textarea-container">
                             <textarea id="outline-content" 
                                     placeholder="Type or paste your story structure here, or use AI generation above..." 
@@ -311,16 +260,16 @@
                     <!-- Navigation -->
                     <div class="step-actions">
                         <button class="btn btn-success btn-large" onclick="proceedToChapters(); window.scrollTo({top: 0, behavior: 'smooth'});" id="outline-next" style="display: none;">
-                            <span class="label">Next: Chapter Planning</span>
+                            <span class="label">Next: Chapter Outline</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Chapter Planning Step -->
+            <!-- Chapter Outline Step -->
             <div id="chapters" class="step">
                 <div class="step-header">
-                    <h2 class="step-title">Chapter Planning</h2>
+                    <h2 class="step-title">Chapter Outline</h2>
                     <p class="step-description">Create a detailed chapter plan for your novel</p>
                 </div>
 
@@ -329,7 +278,7 @@
                     <div class="primary-actions-section">
                         <div class="main-generation-actions">
                             <button class="btn btn-primary btn-large" onclick="generateChapterOutline()">
-                                <span class="label">Generate Chapter Plan</span>
+                                <span class="label">Generate Chapter Outline</span>
                             </button>
                             <button class="btn btn-primary" onclick="showChapterOutlineEditModal()">
                                 <span class="label">Edit</span>
@@ -448,18 +397,21 @@
                 </div>
 
                 <div class="step-content">
-                    <div class="settings-section">
-                        <h3>API Configuration</h3>
+                    <div class="settings-panel">
+                        <div class="settings-title">
+                            <h3>API Configuration</h3>
+                        </div>
+                        <div class="settings-description">
+                            Choose your AI provider and configure authentication
+                        </div>
                         
-                        <div class="api-provider-toggle">
-                            <div class="toggle-group">
-                                <button class="toggle-btn active" onclick="switchApiProvider('openrouter')" id="openrouter-btn">
-                                    OpenRouter
-                                </button>
-                                <button class="toggle-btn" onclick="switchApiProvider('openai')" id="openai-btn">
-                                    OpenAI
-                                </button>
-                            </div>
+                        <div class="btn-group mb-6">
+                            <button class="btn btn-secondary active" onclick="switchApiProvider('openrouter')" id="openrouter-btn">
+                                OpenRouter
+                            </button>
+                            <button class="btn btn-secondary" onclick="switchApiProvider('openai')" id="openai-btn">
+                                OpenAI
+                            </button>
                         </div>
 
                         <div class="form-grid">
@@ -537,7 +489,7 @@
                             
                             <div class="advanced-models-grid">
                                     <div class="model-setting">
-                                        <label for="advanced-model-outline">Story Structure Generation</label>
+                                        <label for="advanced-model-outline">Story Bible Generation</label>
                                         <select id="advanced-model-outline" onchange="saveAdvancedModelSettings()">
                                             <option value="">Use Default Model</option>
                                             <!-- Populated by JavaScript -->
@@ -545,7 +497,7 @@
                                     </div>
                                     
                                     <div class="model-setting">
-                                        <label for="advanced-model-chapters">Chapter Planning</label>
+                                        <label for="advanced-model-chapters">Chapter Outline</label>
                                         <select id="advanced-model-chapters" onchange="saveAdvancedModelSettings()">
                                             <option value="">Use Default Model</option>
                                             <!-- Populated by JavaScript -->
@@ -606,13 +558,13 @@
                                 
                                 <div class="prompt-editors">
                                     <div class="prompt-group">
-                                        <label for="settings-outline-prompt">Story Structure Generation Prompt</label>
+                                        <label for="settings-outline-prompt">Story Bible Generation Prompt</label>
                                         <textarea id="settings-outline-prompt" class="prompt-textarea" rows="8" onchange="saveCustomPrompt('outline')"></textarea>
                                         <button class="btn btn-ghost btn-sm" onclick="resetCustomPrompt('outline')">Reset to Default</button>
                                     </div>
 
                                     <div class="prompt-group">
-                                        <label for="settings-chapters-prompt">Chapter Planning Prompt</label>
+                                        <label for="settings-chapters-prompt">Chapter Outline Prompt</label>
                                         <textarea id="settings-chapters-prompt" class="prompt-textarea" rows="8" onchange="saveCustomPrompt('chapters')"></textarea>
                                         <button class="btn btn-ghost btn-sm" onclick="resetCustomPrompt('chapters')">Reset to Default</button>
                                     </div>
@@ -661,7 +613,7 @@
 
                 <div class="step-content">
                     <div class="tutorial-section">
-                        <h3>Getting Started</h3>
+                        <h3 class="text-2xl font-semibold text-neutral-800 mb-6">Getting Started</h3>
 
                         <div class="tutorial-card">
                             <h4>Data Storage & Privacy</h4>
@@ -691,8 +643,8 @@
                             <p>Follow the structured approach:</p>
                             <ul>
                                 <li><strong>Book Setup:</strong> Define genre, audience, premise, and style</li>
-                                <li><strong>Story Structure:</strong> Create complete narrative framework</li>
-                                <li><strong>Chapter Planning:</strong> Detailed scene-by-scene breakdown</li>
+                                <li><strong>Story Bible:</strong> Create complete narrative framework</li>
+                                <li><strong>Chapter Outline:</strong> Detailed scene-by-scene breakdown</li>
                                 <li><strong>Writing:</strong> Generate professional prose</li>
                                 <li><strong>Editing:</strong> Edit your story by promting to continue, show don't tell, expand or rephrase</li>
                                 <li><strong>Export:</strong> Download in multiple formats</li>
@@ -840,35 +792,34 @@
     <div id="auto-save-indicator" class="auto-save-indicator">Auto-saved</div>
 
     <!-- Custom Alert Modal -->
-    <div id="custom-alert-modal" class="modal custom-alert-modal">
-        <div class="modal-content alert-content">
-            <div class="alert-header">
-                <h3 id="alert-title">Notification</h3>
+    <div id="custom-alert-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="alert-title" class="modal-title">Notification</h3>
             </div>
-            <div class="alert-body">
-                <div id="alert-message">Alert message will appear here</div>
+            <div class="modal-content">
+                <div id="alert-message" class="text-neutral-700">Alert message will appear here</div>
             </div>
-            <div class="alert-footer">
-                <button class="btn btn-primary" id="alert-ok-btn" onclick="closeCustomAlert()">OK</button>
-                <button class="btn btn-ghost" id="alert-cancel-btn" onclick="closeCustomAlert(false)" style="display: none;">Cancel</button>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="alert-cancel-btn" onclick="closeCustomAlert(false)" style="display: none;">Cancel</button>
+                <button class="btn" id="alert-ok-btn" onclick="closeCustomAlert()">OK</button>
             </div>
         </div>
     </div>
 
     <!-- Custom Input Modal -->
-    <div id="custom-input-modal" class="modal custom-input-modal">
-        <div class="modal-content">
+    <div id="custom-input-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3 id="input-title">Input Required</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeCustomInput(null)">Close</button>
+                <h3 id="input-title" class="modal-title">Input Required</h3>
             </div>
-            <div class="modal-body">
-                <p id="input-message">Please enter a value:</p>
-                <input type="text" id="input-field" class="input-field" placeholder="Enter value...">
+            <div class="modal-content">
+                <p id="input-message" class="text-neutral-700 mb-4">Please enter a value:</p>
+                <input type="text" id="input-field" placeholder="Enter value..." class="w-full">
             </div>
             <div class="modal-footer">
-                <button class="btn btn-ghost" id="input-cancel-btn">Cancel</button>
-                <button class="btn btn-primary" id="input-ok-btn">OK</button>
+                <button class="btn btn-secondary" id="input-cancel-btn">Cancel</button>
+                <button class="btn" id="input-ok-btn">OK</button>
             </div>
         </div>
     </div>
@@ -906,32 +857,29 @@
     </div>
 
     <!-- One-Click Generation Modal -->
-    <div id="one-click-modal" class="modal">
-        <div class="modal-content">
+    <div id="one-click-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>1-Click Generation Configuration</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeOneClickModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">1-Click Generation Configuration</h3>
             </div>
-            <div class="modal-body">
-                <p>Configure feedback loops for each generation step:</p>
+            <div class="modal-content">
+                <p class="text-neutral-700 mb-6">Configure feedback loops for each generation step:</p>
                 
                 <div class="one-click-config">
                     <div class="config-row">
-                        <label>Story Structure Feedback Loops:</label>
+                        <label>Story Bible Feedback Loops:</label>
                         <select id="one-click-outline-loops">
                             <option value="0">No feedback</option>
-                            <option value="1">1 loop</option>
+                            <option value="1" selected>1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>
                     </div>
                     <div class="config-row">
-                        <label>Chapter Planning Feedback Loops:</label>
+                        <label>Chapter Outline Feedback Loops:</label>
                         <select id="one-click-chapters-loops">
                             <option value="0">No feedback</option>
-                            <option value="1">1 loop</option>
+                            <option value="1" selected>1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>
@@ -940,7 +888,7 @@
                         <label>Writing Feedback Loops:</label>
                         <select id="one-click-writing-loops">
                             <option value="0">No feedback</option>
-                            <option value="1">1 loop</option>
+                            <option value="1" selected>1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>
@@ -948,24 +896,19 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeOneClickModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="startOneClickProcess()">
-                    <span class="label">Start Generation</span>
-                </button>
+                <button class="btn btn-secondary" onclick="closeOneClickModal()">Cancel</button>
+                <button class="btn" onclick="startOneClickProcess()">Start Generation</button>
             </div>
         </div>
     </div>
 
     <!-- Project Management Modal -->
-    <div id="project-management-modal" class="modal">
-        <div class="modal-content">
+    <div id="project-management-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Manage Projects</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeProjectManagementModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">Manage Projects</h3>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="project-management-content">
                     <div class="project-stats">
                         <p>Saved Projects: <span id="project-count">0</span>/10</p>
@@ -979,32 +922,26 @@
                     </div>
                     
                     <div class="project-management-actions">
-                        <button class="btn btn-ghost btn-sm" onclick="exportAllProjects()">
-                            <span class="label">Export All</span>
-                        </button>
-                        <button class="btn btn-ghost btn-sm" onclick="importProjects()">
-                            <span class="label">Import Projects</span>
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="clearAllProjects()">
-                            <span class="label">Clear All</span>
-                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="exportAllProjects()">Export All</button>
+                        <button class="btn btn-secondary btn-sm" onclick="importProjects()">Import Projects</button>
+                        <button class="btn btn-danger btn-sm" onclick="clearAllProjects()">Clear All</button>
                     </div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeProjectManagementModal()">Close</button>
             </div>
         </div>
     </div>
 
     <!-- Feedback Modal -->
-    <div id="feedback-modal" class="modal">
-        <div class="modal-content">
+    <div id="feedback-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Send Feedback</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeFeedbackModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">Send Feedback</h3>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
+            <div class="modal-content">
+                <div class="form-group mb-4">
                     <label for="feedback-type">Feedback Type</label>
                     <select id="feedback-type">
                         <option value="bug">Bug Report</option>
@@ -1020,37 +957,34 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-ghost" onclick="closeFeedbackModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitFeedback()">
-                    <span class="label">Send Feedback</span>
-                </button>
+                <button class="btn btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
+                <button class="btn" onclick="submitFeedback()">Send Feedback</button>
             </div>
         </div>
     </div>
 
     <!-- Chapter Edit Modal -->
-    <div id="chapter-edit-modal" class="modal">
-        <div class="modal-content">
+    <div id="chapter-edit-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3 id="chapter-edit-title">Edit Chapter</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeChapterEditModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 id="chapter-edit-title" class="modal-title">Edit Chapter</h3>
+                <button class="modal-close" onclick="closeChapterEditModal()">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="edit-mode-selection">
-                    <h4>Edit Mode</h4>
-                    <div class="toggle-switch-container">
-                        <div class="toggle-switch-wrapper">
-                            <span class="toggle-label">Automated</span>
+                    <div class="toggle-section-header">
+                        <div class="toggle-info">
+                            <h4>Edit Mode</h4>
+                            <p class="toggle-description">Choose how the AI should edit the chapter</p>
+                        </div>
+                        <div class="toggle-switch-container">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="edit-mode-toggle" onchange="toggleEditMode(this)">
+                                <input type="checkbox" id="edit-mode-toggle" onchange="toggleEditMode(this)" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span class="toggle-label">Manual</span>
+                            <span class="toggle-status" id="edit-mode-status">Automated</span>
                         </div>
                     </div>
-                    <div class="form-hint" id="edit-mode-hint">AI analyzes and improves the chapter automatically</div>
                 </div>
                 
                 <div id="manual-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1077,28 +1011,27 @@
     </div>
 
     <!-- Outline Edit Modal -->
-    <div id="outline-edit-modal" class="modal">
-        <div class="modal-content">
+    <div id="outline-edit-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Edit Story Structure</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeOutlineEditModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">Edit Story Bible</h3>
+                <button class="modal-close" onclick="closeOutlineEditModal()">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="edit-mode-selection">
-                    <h4>Edit Mode</h4>
-                    <div class="toggle-switch-container">
-                        <div class="toggle-switch-wrapper">
-                            <span class="toggle-label">Automated</span>
+                    <div class="toggle-section-header">
+                        <div class="toggle-info">
+                            <h4>Edit Mode</h4>
+                            <p class="toggle-description">Choose how the AI should edit the story structure</p>
+                        </div>
+                        <div class="toggle-switch-container">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="outline-edit-mode-toggle" onchange="toggleOutlineEditMode(this)">
+                                <input type="checkbox" id="outline-edit-mode-toggle" onchange="toggleOutlineEditMode(this)" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span class="toggle-label">Manual</span>
+                            <span class="toggle-status" id="outline-edit-mode-status">Automated</span>
                         </div>
                     </div>
-                    <div class="form-hint" id="outline-edit-mode-hint">AI analyzes and improves the story structure automatically</div>
                 </div>
                 
                 <div id="manual-outline-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1125,28 +1058,27 @@
     </div>
 
     <!-- Chapter Outline Edit Modal -->
-    <div id="chapter-outline-edit-modal" class="modal">
-        <div class="modal-content">
+    <div id="chapter-outline-edit-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Edit Chapter Plan</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeChapterOutlineEditModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">Edit Chapter Plan</h3>
+                <button class="modal-close" onclick="closeChapterOutlineEditModal()">&times;</button>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="edit-mode-selection">
-                    <h4>Edit Mode</h4>
-                    <div class="toggle-switch-container">
-                        <div class="toggle-switch-wrapper">
-                            <span class="toggle-label">Automated</span>
+                    <div class="toggle-section-header">
+                        <div class="toggle-info">
+                            <h4>Edit Mode</h4>
+                            <p class="toggle-description">Choose how the AI should edit the chapter outline</p>
+                        </div>
+                        <div class="toggle-switch-container">
                             <label class="toggle-switch">
-                                <input type="checkbox" id="chapter-outline-edit-mode-toggle" onchange="toggleChapterOutlineEditMode(this)">
+                                <input type="checkbox" id="chapter-outline-edit-mode-toggle" onchange="toggleChapterOutlineEditMode(this)" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span class="toggle-label">Manual</span>
+                            <span class="toggle-status" id="chapter-outline-edit-mode-status">Automated</span>
                         </div>
                     </div>
-                    <div class="form-hint" id="chapter-outline-edit-mode-hint">AI analyzes and edits the chapter plan</div>
                 </div>
                 
                 <div id="manual-chapter-outline-edit-feedback" class="manual-edit-section" style="display: none;">
@@ -1173,15 +1105,12 @@
     </div>
 
     <!-- Donation Modal -->
-    <div id="donation-modal" class="modal">
-        <div class="modal-content">
+    <div id="donation-modal" class="modal-overlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3>Support NovelFactory</h3>
-                <button class="btn btn-ghost btn-sm" onclick="closeDonationModal()">
-                    <span class="label">Close</span>
-                </button>
+                <h3 class="modal-title">Support NovelFactory</h3>
             </div>
-            <div class="modal-body">
+            <div class="modal-content">
                 <div class="donation-content">
                     <p><strong>NovelFactory is completely free to use!</strong></p>
                     <p>If you find this tool helpful and would like to support its development, consider buying me a coffee. Your support helps me:</p>

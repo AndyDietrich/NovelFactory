@@ -45,7 +45,7 @@ NovelFactory is a client-side web application that generates complete books usin
 - Responsive design with mobile-first approach
 
 **AI Generation Pipeline:**
-- Multi-step book generation: Setup → Story Structure → Chapter Planning → Writing
+- Multi-step book generation: Setup → Story Bible → Chapter Outline → Writing
 - Async/await pattern for all AI API calls
 - Feedback loop system for iterative content improvement
 - One-click automated generation option

@@ -99,20 +99,21 @@ function customAlert(message, title = 'Notification') {
         const cancelBtn = document.getElementById('alert-cancel-btn');
         
         titleElement.textContent = title;
-        messageElement.innerHTML = message.replace(/\n/g, '<br>');
         
-        // For cost estimation, apply special styling and ensure proper positioning
+        // For cost estimation, use direct HTML and adjust modal width
         if (title === 'Cost Estimation') {
-            messageElement.style.fontFamily = '"Consolas", "Monaco", "Menlo", "Ubuntu Mono", monospace';
-            messageElement.style.fontSize = '14px';
-            messageElement.style.lineHeight = '1.5';
+            messageElement.innerHTML = message;
+            messageElement.style.fontFamily = '';
+            messageElement.style.fontSize = '';
+            messageElement.style.lineHeight = '';
             messageElement.style.textAlign = 'left';
-            messageElement.style.whiteSpace = 'pre-wrap';
-            messageElement.style.overflowWrap = 'break-word';
-            messageElement.style.fontWeight = '400';
+            messageElement.style.whiteSpace = 'normal';
+            messageElement.style.overflowWrap = '';
+            messageElement.style.fontWeight = '';
             modal.querySelector('.modal-content').style.maxWidth = '600px';
             modal.querySelector('.modal-content').style.width = '95%';
         } else {
+            messageElement.innerHTML = message.replace(/\n/g, '<br>');
             // Reset to default styling for other alerts
             messageElement.style.fontSize = '';
             messageElement.style.lineHeight = '';
@@ -562,7 +563,13 @@ ANALYZE WITH FOCUS ON:
    - Descriptive balance and atmosphere
    - Voice consistency throughout
 
-5. **PRIORITY IMPROVEMENTS**:
+5. **FORMAT AND STRUCTURE**:
+   - Proper organization of content (headings, sections, etc.)
+   - Consistent formatting throughout
+   - Appropriate use of structural elements for the content type
+   - Clear division between narrative elements
+
+6. **PRIORITY IMPROVEMENTS**:
    - List 3-5 specific, actionable improvements
    - Rank by importance to commercial success
    - Provide concrete solutions for each issue
@@ -604,7 +611,14 @@ SPECIFIC GUIDELINES:
 
 Create a significantly improved version that addresses the feedback comprehensively while maintaining the artistic and commercial vision. The result should feel like a polished, professional upgrade of the original content.
 
-Write the complete improved {contentType} with all enhancements seamlessly integrated.`, 
+CRITICAL FORMAT REQUIREMENTS:
+- Maintain the exact same structure and format as the original content
+- Preserve all headings, sections, and organizational elements
+- Keep the same narrative format (chapters, scenes, etc.)
+- Do not add new structural elements unless specifically needed for improvement
+- Ensure the output has the same type of content organization as the input
+
+Write the complete improved {contentType} with all enhancements seamlessly integrated, maintaining the original format and structure exactly.`, 
     manualImprovement: `You are a master storyteller and professional editor. Improve the {contentType} based on the specific feedback provided while maintaining all established book parameters unless explicitly overridden by the manual instructions.
 
 ORIGINAL CONTENT:
@@ -637,14 +651,23 @@ EXECUTION GUIDELINES:
 - Maintain professional writing quality throughout
 - Preserve character development and story logic unless specifically asked to change
 
-Create an improved version that perfectly addresses the manual feedback while maintaining the highest standards of storytelling craft.`
+Create an improved version that perfectly addresses the manual feedback while maintaining the highest standards of storytelling craft.
+
+CRITICAL FORMAT REQUIREMENTS:
+- Maintain the exact same structure and format as the original content unless manual feedback specifically requests format changes
+- Preserve all headings, sections, and organizational elements
+- Keep the same narrative format (chapters, scenes, etc.)
+- Do not add new structural elements unless specifically requested in the manual feedback
+- Ensure the output maintains the same type of content organization as the input
+
+Provide the complete improved {contentType} with manual feedback fully implemented, preserving the original format and structure unless explicitly instructed otherwise.`
 };
 
 // ==================================================
 // THEME MANAGEMENT
 // ==================================================
 
-const themes = ['light', 'dark', 'fun'];
+const themes = ['light', 'dark'];
 
 /**
  * Change theme based on dropdown selection
@@ -655,6 +678,22 @@ function changeTheme() {
 }
 
 /**
+ * Switch theme using button-based toggle
+ * @param {string} theme - Theme name
+ */
+function switchTheme(theme) {
+    setTheme(theme);
+    
+    // Update button states
+    document.querySelectorAll('.theme-option').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === theme) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+/**
  * Set application theme
  * @param {string} theme - Theme name
  */
@@ -662,7 +701,14 @@ function setTheme(theme) {
     currentTheme = theme;
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('novelfactory_theme', theme);
-    document.getElementById('theme-select').value = theme;
+    
+    // Update theme button active states
+    document.querySelectorAll('.theme-option').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-theme') === theme) {
+            btn.classList.add('active');
+        }
+    });
 }
 
 /**
@@ -744,14 +790,13 @@ function updateNavProgress() {
         progressLine.style.width = `${progress}%`;
     }
     
-    // Mark completed steps
+    // Only set active step, no completed states
     steps.forEach((step, index) => {
         const navItem = document.querySelector(`[data-step="${step}"]`);
         if (navItem) {
-            if (index < currentIndex) {
-                navItem.classList.add('completed');
-            } else {
-                navItem.classList.remove('completed');
+            navItem.classList.remove('completed', 'active');
+            if (index === currentIndex) {
+                navItem.classList.add('active');
             }
         }
     });
@@ -1599,10 +1644,10 @@ async function generateOutline() {
     }
     
     // Save state for undo before generating
-    saveStateForUndo('Generate Story Structure');
+    saveStateForUndo('Generate Story Bible');
     
     isGenerating = true;
-    showGenerationInfo("Generating complete story structure with integrated characters...");
+    showGenerationInfo("Generating complete story bible...");
 
     try {
         collectBookData();
@@ -1631,7 +1676,7 @@ async function generateOutline() {
             genreRequirements: genreRequirementsText
         });
 
-        const outline = await callAI(prompt, "You are a master storyteller and bestselling author creating commercially successful story structures.", selectedModel);
+        const outline = await callAI(prompt, "You are a master storyteller and bestselling author creating commercially successful story bibles.", selectedModel);
         
         const outlineTextarea = document.getElementById('outline-content');
         if (outlineTextarea) {
@@ -1639,11 +1684,9 @@ async function generateOutline() {
             saveOutlineContent();
         }
         
-        const outlineNavItem = document.querySelector('[data-step="outline"]');
-        if (outlineNavItem) outlineNavItem.classList.add('completed');
 
     } catch (error) {
-        await customAlert(`Error generating story structure: ${error.message}`, 'Generation Error');
+        await customAlert(`Error generating story bible: ${error.message}`, 'Generation Error');
     } finally {
         isGenerating = false;
         hideGenerationInfo();
@@ -1674,10 +1717,10 @@ async function generateChapterOutline() {
     }
     
     // Save state for undo before generating
-    saveStateForUndo('Generate Chapter Plan');
+    saveStateForUndo('Generate Chapter Outline');
     
     isGenerating = true;
-    showGenerationInfo("Creating detailed chapter plan with scene breakdowns...");
+    showGenerationInfo("Creating detailed chapter outline with scene breakdowns...");
 
     try {
         const selectedModel = getSelectedModel('chapters');
@@ -1738,11 +1781,9 @@ async function generateChapterOutline() {
             saveChaptersContent();
         }
         
-        const chaptersNavItem = document.querySelector('[data-step="chapters"]');
-        if (chaptersNavItem) chaptersNavItem.classList.add('completed');
 
     } catch (error) {
-        await customAlert(`Error generating chapter plan: ${error.message}`, 'Generation Error');
+        await customAlert(`Error generating chapter outline: ${error.message}`, 'Generation Error');
     } finally {
         isGenerating = false;
         hideGenerationInfo();
@@ -1827,7 +1868,7 @@ function saveChaptersContent() {
  * Clear outline content with confirmation
  */
 async function clearOutlineContent() {
-    const confirmed = await customConfirm('Are you sure you want to clear the story structure content?', 'Clear Content');
+    const confirmed = await customConfirm('Are you sure you want to clear the story bible content?', 'Clear Content');
     if (confirmed) {
         const textarea = document.getElementById('outline-content');
         if (textarea) {
@@ -1841,7 +1882,7 @@ async function clearOutlineContent() {
  * Clear chapters content with confirmation
  */
 async function clearChaptersContent() {
-    const confirmed = await customConfirm('Are you sure you want to clear the chapter plan content?', 'Clear Content');
+    const confirmed = await customConfirm('Are you sure you want to clear the chapter outline content?', 'Clear Content');
     if (confirmed) {
         const textarea = document.getElementById('chapters-content');
         if (textarea) {
@@ -2010,9 +2051,16 @@ function toggleChapterContent(chapterNum) {
 function toggleChapterCollapse(chapterNum) {
     const contentField = document.getElementById(`chapter-${chapterNum}-content-field`);
     const collapseBtn = document.querySelector(`button[onclick="toggleChapterCollapse(${chapterNum})"]`);
-    if (!contentField) return;
     
+    if (!contentField) {
+        console.warn(`Content field not found for chapter ${chapterNum}. Make sure you're on the Writing tab and chapters are initialized.`);
+        return;
+    }
+    
+    // Toggle the collapsed class
     contentField.classList.toggle('collapsed');
+    
+    // Update the button icon
     if (collapseBtn) {
         const icon = collapseBtn.querySelector('i');
         if (icon) {
@@ -2027,13 +2075,6 @@ function toggleChapterCollapse(chapterNum) {
 
 //（Continuing existing per-chapter save flow; updated to avoid Event reliance）
 // Replace previous saveChapterContent to be robust and not rely on event
-
-function toggleChapterCollapse(chapterNum) {
-    const contentField = document.getElementById(`chapter-${chapterNum}-content-field`);
-    const collapseBtn = document.getElementById(`chapter-${chapterNum}-collapse-btn`);
-    contentField.classList.toggle('collapsed');
-    collapseBtn.innerHTML = contentField.classList.contains('collapsed') ? '<span class="label">▶</span>' : '<span class="label">▼</span>';
-}
 
 /**
  * Save chapter content with visual feedback
@@ -2253,8 +2294,8 @@ BOOK CONTEXT:
 - Style Direction: ${bookData.styleDirection}
 
 CHAPTER ${chapterNum} CONTEXT:
-- Complete Story Structure: ${bookData.outline}
-- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+- Complete Story Bible: ${bookData.outline}
+- Chapter Outline: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
 
 ${styleExcerptSection}
 
@@ -2270,7 +2311,7 @@ FOLLOWING TEXT (to connect to):
 REQUIREMENTS:
 - Continue seamlessly from the preceding text
 - Write in the established voice and style
-- Advance the plot naturally according to the chapter plan
+- Advance the plot naturally according to the chapter outline
 - Maintain character consistency
 - Write 200-300 words of engaging, publishable prose
 - If there's following text, ensure your continuation flows smoothly into it
@@ -2351,8 +2392,8 @@ BOOK CONTEXT:
 - Style Direction: ${bookData.styleDirection}
 
 CHAPTER ${chapterNum} CONTEXT:
-- Complete Story Structure: ${bookData.outline}
-- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+- Complete Story Bible: ${bookData.outline}
+- Chapter Outline: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
 
 ${styleExcerptSection}
 
@@ -2451,8 +2492,8 @@ BOOK CONTEXT:
 - Style Direction: ${bookData.styleDirection}
 
 CHAPTER ${chapterNum} CONTEXT:
-- Complete Story Structure: ${bookData.outline}
-- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+- Complete Story Bible: ${bookData.outline}
+- Chapter Outline: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
 
 ${styleExcerptSection}
 
@@ -2552,8 +2593,8 @@ BOOK CONTEXT:
 - Style Direction: ${bookData.styleDirection}
 
 CHAPTER ${chapterNum} CONTEXT:
-- Complete Story Structure: ${bookData.outline}
-- Chapter Plan: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
+- Complete Story Bible: ${bookData.outline}
+- Chapter Outline: ${extractChapterOutline(bookData.chapterOutline, chapterNum)}
 
 ${styleExcerptSection}
 
@@ -2624,15 +2665,6 @@ function updateOverallProgress() {
         nextBtn.style.display = (completedChapters === bookData.numChapters) ? 'inline-flex' : 'none';
     }
 
-    // Update navigation state
-    const writingNavItem = document.querySelector('[data-step="writing"]');
-    if (writingNavItem) {
-        if (completedChapters === bookData.numChapters) {
-            writingNavItem.classList.add('completed');
-        } else {
-            writingNavItem.classList.remove('completed');
-        }
-    }
 }
 
 /**
@@ -2844,6 +2876,7 @@ async function runChapterFeedback(chapterNum) {
 let currentEditingChapter = null;
 
 // Global variable to store chapter content for undo functionality
+let currentChapterEditMode = 'automated';
 
 /**
  * Show chapter edit modal
@@ -2872,16 +2905,13 @@ function showChapterEditModal(chapterNum) {
  * @param {HTMLInputElement} toggleElement - The checkbox input element
  */
 function toggleEditMode(toggleElement) {
-    const mode = toggleElement.checked ? 'manual' : 'automated';
+    const mode = toggleElement.checked ? 'automated' : 'manual';
+    currentChapterEditMode = mode;
     
-    // Update helper text
-    const hintElement = document.getElementById('edit-mode-hint');
-    if (hintElement) {
-        if (mode === 'automated') {
-            hintElement.textContent = 'AI analyzes and improves the chapter automatically';
-        } else {
-            hintElement.textContent = 'Provide specific feedback for AI to implement';
-        }
+    // Update status text
+    const statusElement = document.getElementById('edit-mode-status');
+    if (statusElement) {
+        statusElement.textContent = mode === 'automated' ? 'Automated' : 'Manual';
     }
     
     // Show/hide manual feedback section
@@ -2900,7 +2930,7 @@ function toggleEditMode(toggleElement) {
 function selectEditMode(mode) {
     const toggle = document.getElementById('edit-mode-toggle');
     if (toggle) {
-        toggle.checked = mode === 'manual';
+        toggle.checked = mode === 'automated';
         toggleEditMode(toggle);
     }
 }
@@ -2921,13 +2951,7 @@ async function executeChapterEdit() {
         return;
     }
     
-    const activeBtn = document.querySelector('.edit-mode-btn.active');
-    if (!activeBtn) {
-        await customAlert('Please select an edit mode.', 'No Mode Selected');
-        return;
-    }
-    
-    const editMode = activeBtn.dataset.mode;
+    const editMode = currentChapterEditMode;
     const feedbackLoops = parseInt(document.getElementById('chapter-edit-loops').value);
     let manualFeedback = '';
     
@@ -3040,17 +3064,13 @@ function closeOutlineEditModal() {
  * @param {HTMLInputElement} toggleElement - The checkbox input element
  */
 function toggleOutlineEditMode(toggleElement) {
-    const mode = toggleElement.checked ? 'manual' : 'automated';
+    const mode = toggleElement.checked ? 'automated' : 'manual';
     currentOutlineEditMode = mode;
     
-    // Update helper text
-    const hintElement = document.getElementById('outline-edit-mode-hint');
-    if (hintElement) {
-        if (mode === 'automated') {
-            hintElement.textContent = 'AI analyzes and improves the story structure automatically';
-        } else {
-            hintElement.textContent = 'Provide specific feedback for AI to implement';
-        }
+    // Update status text
+    const statusElement = document.getElementById('outline-edit-mode-status');
+    if (statusElement) {
+        statusElement.textContent = mode === 'automated' ? 'Automated' : 'Manual';
     }
     
     // Show/hide manual feedback section
@@ -3065,7 +3085,7 @@ function toggleOutlineEditMode(toggleElement) {
 function selectOutlineEditMode(mode) {
     const toggle = document.getElementById('outline-edit-mode-toggle');
     if (toggle) {
-        toggle.checked = mode === 'manual';
+        toggle.checked = mode === 'automated';
         toggleOutlineEditMode(toggle);
     }
 }
@@ -3110,17 +3130,13 @@ function closeChapterOutlineEditModal() {
  * @param {HTMLInputElement} toggleElement - The checkbox input element
  */
 function toggleChapterOutlineEditMode(toggleElement) {
-    const mode = toggleElement.checked ? 'manual' : 'automated';
+    const mode = toggleElement.checked ? 'automated' : 'manual';
     currentChapterOutlineEditMode = mode;
     
-    // Update helper text
-    const hintElement = document.getElementById('chapter-outline-edit-mode-hint');
-    if (hintElement) {
-        if (mode === 'automated') {
-            hintElement.textContent = 'AI analyzes and edits the chapter plan';
-        } else {
-            hintElement.textContent = 'Provide specific feedback for AI to implement';
-        }
+    // Update status text
+    const statusElement = document.getElementById('chapter-outline-edit-mode-status');
+    if (statusElement) {
+        statusElement.textContent = mode === 'automated' ? 'Automated' : 'Manual';
     }
     
     // Show/hide manual feedback section
@@ -3135,7 +3151,7 @@ function toggleChapterOutlineEditMode(toggleElement) {
 function selectChapterOutlineEditMode(mode) {
     const toggle = document.getElementById('chapter-outline-edit-mode-toggle');
     if (toggle) {
-        toggle.checked = mode === 'manual';
+        toggle.checked = mode === 'automated';
         toggleChapterOutlineEditMode(toggle);
     }
 }
@@ -3167,20 +3183,20 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
 
     const outlineElement = document.getElementById('outline-content');
     if (!outlineElement) {
-        await customAlert('Could not find story structure content element.', 'Element Not Found');
+        await customAlert('Could not find story bible content element.', 'Element Not Found');
         return;
     }
     
     const outline = outlineElement.value;
     
     if (!outline.trim()) {
-        await customAlert('No story structure content to edit. Please generate the story structure first.', 'No Content');
+        await customAlert('No story bible content to edit. Please generate the story bible first.', 'No Content');
         return;
     }
 
     try {
         isGenerating = true;
-        showGenerationInfo(`Editing Story Structure with ${editMode} mode...`);
+        showGenerationInfo(`Editing Story Bible with ${editMode} mode...`);
 
         let improvedOutline = outline;
 
@@ -3197,7 +3213,7 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
         bookData.outline = improvedOutline;
         saveToLocalStorage();
 
-        await customAlert(`Story structure edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        await customAlert(`Story bible edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
         
     } catch (error) {
         await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
@@ -3216,20 +3232,20 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
 
     const chapterOutlineElement = document.getElementById('chapters-content');
     if (!chapterOutlineElement) {
-        await customAlert('Could not find chapter plan content element.', 'Element Not Found');
+        await customAlert('Could not find chapter outline content element.', 'Element Not Found');
         return;
     }
     
     const chapterOutline = chapterOutlineElement.value;
     
     if (!chapterOutline.trim()) {
-        await customAlert('No chapter plan content to edit. Please generate the chapter plan first.', 'No Content');
+        await customAlert('No chapter outline content to edit. Please generate the chapter outline first.', 'No Content');
         return;
     }
 
     try {
         isGenerating = true;
-        showGenerationInfo(`Editing Chapter Plan with ${editMode} mode...`);
+        showGenerationInfo(`Editing Chapter Outline with ${editMode} mode...`);
 
         let improvedChapterOutline = chapterOutline;
 
@@ -3246,7 +3262,7 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
         bookData.chapterOutline = improvedChapterOutline;
         saveToLocalStorage();
 
-        await customAlert(`Chapter plan edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        await customAlert(`Chapter outline edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
         
     } catch (error) {
         await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
@@ -3430,14 +3446,14 @@ async function startOneClickGeneration() {
         return;
     }
     
-    document.getElementById('one-click-modal').classList.add('active');
+    document.getElementById('one-click-modal').style.display = 'flex';
 }
  
 /**
  * Close one-click modal
  */
 function closeOneClickModal() {
-    document.getElementById('one-click-modal').classList.remove('active');
+    document.getElementById('one-click-modal').style.display = 'none';
 }
  
 /**
@@ -3452,40 +3468,33 @@ async function startOneClickProcess() {
     showLoadingOverlay('Starting one-click generation...');
     
     oneClickCancelled = false;
+    isGenerating = true;
     
     try {
         // Step 1: Generate Outline
-        updateLoadingText('Generating story structure...');
+        updateLoadingText('Generating story bible...');
         showStep('outline');
         await generateOutline();
         
         if (oneClickCancelled) return;
         
         if (outlineLoops > 0) {
-            updateLoadingText(`Improving story structure (${outlineLoops} feedback loops)...`);
-            const outlineLoopsEl = document.getElementById('outline-feedback-loops');
-            const outlineModeEl = document.getElementById('outline-feedback-mode');
-            if (outlineLoopsEl) outlineLoopsEl.value = outlineLoops;
-            if (outlineModeEl) outlineModeEl.value = 'ai';
-            await runFeedbackLoop('outline');
+            updateLoadingText(`Improving story bible (${outlineLoops} feedback loops)...`);
+            await runOutlineEdit('ai', outlineLoops, '');
         }
         
         if (oneClickCancelled) return;
         
         // Step 2: Generate Chapter Outline
-        updateLoadingText('Creating detailed chapter plan...');
+        updateLoadingText('Creating detailed chapter outline...');
         showStep('chapters');
         await generateChapterOutline();
         
         if (oneClickCancelled) return;
         
         if (chaptersLoops > 0) {
-            updateLoadingText(`Improving chapter plan (${chaptersLoops} feedback loops)...`);
-            const chaptersLoopsEl = document.getElementById('chapters-feedback-loops');
-            const chaptersModeEl = document.getElementById('chapters-feedback-mode');
-            if (chaptersLoopsEl) chaptersLoopsEl.value = chaptersLoops;
-            if (chaptersModeEl) chaptersModeEl.value = 'ai';
-            await runFeedbackLoop('chapters');
+            updateLoadingText(`Improving chapter outline (${chaptersLoops} feedback loops)...`);
+            await runChapterOutlineEdit('ai', chaptersLoops, '');
         }
         
         if (oneClickCancelled) return;
@@ -3495,11 +3504,8 @@ async function startOneClickProcess() {
         showStep('writing');
         
         updateLoadingText('Writing all chapters...');
-        const writingLoopsEl = document.getElementById('writing-feedback-loops');
-        const writingModeEl = document.getElementById('writing-feedback-mode');
-        if (writingLoopsEl) writingLoopsEl.value = writingLoops;
-        if (writingModeEl) writingModeEl.value = 'ai';
-     for (let i = 1; i <= bookData.numChapters; i++) {
+        
+        for (let i = 1; i <= bookData.numChapters; i++) {
             if (oneClickCancelled) return;
             
             updateLoadingText(`Writing Chapter ${i} of ${bookData.numChapters}...`);
@@ -3507,7 +3513,7 @@ async function startOneClickProcess() {
             
             if (writingLoops > 0) {
                 updateLoadingText(`Improving Chapter ${i} with feedback...`);
-                await runChapterFeedback(i);
+                await runChapterEdit(i, 'ai', writingLoops, '');
             }
             
             updateOverallProgress();
@@ -3537,6 +3543,8 @@ Final Stats:
     } catch (error) {
         hideLoadingOverlay();
         await customAlert(`One-click generation failed: ${error.message}`, 'Generation Failed');
+    } finally {
+        isGenerating = false;
     }
 }
  
@@ -3841,16 +3849,14 @@ function updateDeleteButtonVisibility() {
     }
 }
 
-// Create a new project
+// Create a new project (same functionality as Reset & Start New)
 async function newProject() {
-    if (bookData.premise || bookData.outline) {
-        const confirmed = await customConfirm('Starting a new project will clear your current work. Continue?', 'New Project');
-        if (!confirmed) return;
-    }
+    const confirmed = await customConfirm('This will clear all current work and start fresh. Are you sure?', 'New Project');
+    if (!confirmed) return;
     
-    const projectId = 'project_' + Date.now();
+    // Reset book data
     bookData = {
-        id: projectId,
+        id: 'current',
         title: '',
         blurb: '',
         genre: '',
@@ -3868,16 +3874,40 @@ async function newProject() {
         lastSaved: new Date().toISOString()
     };
     
-    // Reset UI state for new project
-    resetEverything();
+    // Clear all form fields
+    document.getElementById('genre').value = '';
+    document.getElementById('target-audience').value = '';
+    document.getElementById('premise').value = '';
+    document.getElementById('style-direction').value = '';
+    document.getElementById('style-excerpt').value = '';
+    document.getElementById('num-chapters').value = '20';
+    document.getElementById('target-word-count').value = '2000';
+    document.getElementById('outline-content').value = '';
+    document.getElementById('chapters-content').value = '';
     
+    // Clear chapters container
+    const container = document.getElementById('chapters-container');
+    if (container) {
+        container.innerHTML = '<div class="writing-placeholder"><p>Setting up writing interface...</p></div>';
+    }
+    
+    // Reset navigation
+    showStep('setup');
+    updateNavProgress();
+    updateWordCount();
+    updateChapterEstimate();
+    
+    // Update project selector
     const selector = document.getElementById('project-select');
     if (selector) {
         selector.value = 'current';
         updateDeleteButtonVisibility();
     }
     
-    await customAlert('New project created!', 'Project Created');
+    // Save the reset state
+    autoSave();
+    
+    await customAlert('Everything has been reset. You can now start a new project.', 'Reset Complete');
 }
 
 // Save current project
@@ -4010,12 +4040,12 @@ async function deleteCurrentProject() {
 // Manage projects modal
 function manageProjects() {
     updateProjectManagementModal();
-    document.getElementById('project-management-modal').classList.add('active');
+    document.getElementById('project-management-modal').style.display = 'flex';
 }
 
 // Close project management modal
 function closeProjectManagementModal() {
-    document.getElementById('project-management-modal').classList.remove('active');
+    document.getElementById('project-management-modal').style.display = 'none';
 }
 
 // Update project management modal content
@@ -4568,42 +4598,76 @@ async function estimateCosts() {
         }
     };
     
-    const costText = `COST & TIME ESTIMATION FOR COMPLETE BOOK GENERATION
+    const costText = `<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; line-height: 1.6; color: #374151;">
+<h2 style="color: #111827; font-size: 18px; font-weight: 600; margin: 0 0 16px 0; text-align: center;">Cost & Time Estimation</h2>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+<h3 style="color: #1f2937; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Selected Model</h3>
+<p style="margin: 0; font-weight: 500; color: #2563eb;">${modelInfo.label}</p>
+</div>
 
-Selected Model: ${modelInfo.label}
+<div style="background: #fefefe; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0;">
+<h3 style="color: #1f2937; font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Book Specifications</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+  <div><span style="color: #6b7280;">Chapters:</span> <strong>${numChapters}</strong></div>
+  <div><span style="color: #6b7280;">Words/Chapter:</span> <strong>${targetWordCount.toLocaleString()}</strong></div>
+  <div style="grid-column: 1/-1;"><span style="color: #6b7280;">Total Length:</span> <strong>${(numChapters * targetWordCount).toLocaleString()} words</strong></div>
+</div>
+</div>
 
-Book Specifications:
-  Chapters: ${numChapters}
-  Words per Chapter: ${targetWordCount.toLocaleString()}
-  Total Book Length: ${(numChapters * targetWordCount).toLocaleString()} words
+<div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 16px; margin: 16px 0;">
+<h3 style="color: #c2410c; font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Cost Breakdown</h3>
+<div style="font-size: 13px; margin-bottom: 12px;">
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #78716c;">Input Tokens:</span> 
+    <span style="font-weight: 500;">${totalInputTokens.toLocaleString()}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #78716c;">Output Tokens:</span> 
+    <span style="font-weight: 500;">${totalOutputTokens.toLocaleString()}</span>
+  </div>
+</div>
+<div style="border-top: 1px solid #fed7aa; padding-top: 8px; font-size: 13px;">
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #78716c;">Input Cost:</span> 
+    <span style="font-weight: 500;">$${totalInputCostEst.toFixed(2)}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #78716c;">Output Cost:</span> 
+    <span style="font-weight: 500;">$${totalOutputCostEst.toFixed(2)}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin: 8px 0 0 0; font-size: 16px; font-weight: 700; color: #c2410c;">
+    <span>TOTAL COST:</span> 
+    <span>$${totalCost.toFixed(2)}</span>
+  </div>
+</div>
+</div>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+<div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 16px; margin: 16px 0;">
+<h3 style="color: #0369a1; font-size: 14px; font-weight: 600; margin: 0 0 12px 0;">Time Estimation</h3>
+<div style="font-size: 13px;">
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #475569;">Processing:</span> 
+    <span style="font-weight: 500;">${formatTime(inputProcessingTime)}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+    <span style="color: #475569;">Generation:</span> 
+    <span style="font-weight: 500;">${formatTime(outputGenerationTime)}</span>
+  </div>
+  <div style="display: flex; justify-content: space-between; margin: 8px 0 0 0; font-size: 15px; font-weight: 600; color: #0369a1;">
+    <span>TOTAL TIME:</span> 
+    <span>${formatTime(totalTimeWithOverhead)}</span>
+  </div>
+  <div style="font-size: 11px; color: #64748b; margin-top: 4px; font-style: italic;">
+    (includes 20% processing buffer)
+  </div>
+</div>
+</div>
 
-Token Usage Breakdown:
-  Input Tokens:  ${totalInputTokens.toLocaleString()}
-  Output Tokens: ${totalOutputTokens.toLocaleString()}
-
-Cost Breakdown:
-  Input Cost:    $${totalInputCostEst.toFixed(2)}
-  Output Cost:   $${totalOutputCostEst.toFixed(2)}
-  
-  TOTAL COST:    $${totalCost.toFixed(2)}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Time Estimation:
-  Processing:    ${formatTime(inputProcessingTime)}
-  Generation:    ${formatTime(outputGenerationTime)}
-  
-  TOTAL TIME:    ${formatTime(totalTimeWithOverhead)} (includes 20% buffer)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Note: Estimates are based on typical model performance and token 
-usage patterns without feedback loops. Actual costs and times may vary depending on 
-content complexity, API load, and generation quality requirements.`;
+<div style="background: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 12px; color: #6b7280; line-height: 1.5;">
+<strong>Note:</strong> Estimates are based on typical model performance and token usage patterns without feedback loops. Actual costs and times may vary depending on content complexity, API load, and generation quality requirements.
+</div>
+</div>`;
     
     await customAlert(costText, 'Cost Estimation');
 }
@@ -4691,10 +4755,10 @@ function loadFromLocalStorage() {
 
 // Donation
 function showDonationModal() {
-    document.getElementById('donation-modal').classList.add('active');
+    document.getElementById('donation-modal').style.display = 'flex';
 }
 function closeDonationModal() {
-    document.getElementById('donation-modal').classList.remove('active');
+    document.getElementById('donation-modal').style.display = 'none';
 }
 function setDonationAmount(amount) {
     selectedDonationAmount = amount;
@@ -4720,10 +4784,10 @@ async function proceedToDonate() {
 
 // Feedback
 function showFeedbackForm() {
-    document.getElementById('feedback-modal').classList.add('active');
+    document.getElementById('feedback-modal').style.display = 'flex';
 }
 function closeFeedbackModal() {
-    document.getElementById('feedback-modal').classList.remove('active');
+    document.getElementById('feedback-modal').style.display = 'none';
     document.getElementById('feedback-type').value = 'bug';
     document.getElementById('feedback-message').value = '';
 }
@@ -4762,7 +4826,7 @@ function hideLoadingOverlay() {
 
 // Cancellation and modal helpers
 function closeOneClickModal() {
-    document.getElementById('one-click-modal').classList.remove('active');
+    document.getElementById('one-click-modal').style.display = 'none';
 }
 async function closeCustomAlertWindow() { await closeCustomAlert(true); }
 
@@ -4798,7 +4862,9 @@ function initializeApp() {
     
     // Theme
     const savedTheme = localStorage.getItem('novelfactory_theme') || 'light';
-    setTheme(savedTheme);
+    // Ensure theme is valid (fallback from removed 'fun' theme)
+    const validTheme = themes.includes(savedTheme) ? savedTheme : 'light';
+    setTheme(validTheme);
     
     // Collapse sections default
     document.querySelectorAll('.collapsible-content').forEach(content => {
