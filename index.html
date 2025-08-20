@@ -799,6 +799,9 @@
         <div class="generation-text">
             <h3 id="generation-title">AI Generation in Progress</h3>
             <p id="generation-description">Please wait while the AI processes your request...</p>
+            <button class="btn btn-danger btn-sm" onclick="cancelOneClickGeneration()" id="generation-cancel-btn" style="display: none; margin-top: var(--space-3);">
+                <span class="label">Cancel</span>
+            </button>
         </div>
     </div>
 
@@ -883,8 +886,8 @@
                     <div class="config-row">
                         <label>Story Bible Feedback Loops:</label>
                         <select id="one-click-outline-loops">
-                            <option value="0">No feedback</option>
-                            <option value="1" selected>1 loop</option>
+                            <option value="0" selected>No feedback</option>
+                            <option value="1">1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>
@@ -892,8 +895,8 @@
                     <div class="config-row">
                         <label>Chapter Outline Feedback Loops:</label>
                         <select id="one-click-chapters-loops">
-                            <option value="0">No feedback</option>
-                            <option value="1" selected>1 loop</option>
+                            <option value="0" selected>No feedback</option>
+                            <option value="1">1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>
@@ -901,8 +904,8 @@
                     <div class="config-row">
                         <label>Writing Feedback Loops:</label>
                         <select id="one-click-writing-loops">
-                            <option value="0">No feedback</option>
-                            <option value="1" selected>1 loop</option>
+                            <option value="0" selected>No feedback</option>
+                            <option value="1">1 loop</option>
                             <option value="2">2 loops</option>
                             <option value="3">3 loops</option>
                         </select>

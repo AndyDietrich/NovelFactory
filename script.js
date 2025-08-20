@@ -3037,7 +3037,7 @@ function showOutlineEditModal() {
     // Reset form
     selectOutlineEditMode('automated');
     document.getElementById('outline-edit-instructions').value = '';
-    document.getElementById('outline-edit-loops').value = '2';
+    document.getElementById('outline-edit-loops').value = '1';
     
     // Show modal
     document.getElementById('outline-edit-modal').style.display = 'flex';
@@ -3103,7 +3103,7 @@ function showChapterOutlineEditModal() {
     // Reset form
     selectChapterOutlineEditMode('automated');
     document.getElementById('chapter-outline-edit-instructions').value = '';
-    document.getElementById('chapter-outline-edit-loops').value = '2';
+    document.getElementById('chapter-outline-edit-loops').value = '1';
     
     // Show modal
     document.getElementById('chapter-outline-edit-modal').style.display = 'flex';
@@ -3206,7 +3206,11 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
 
         // Hide progress before showing success alert
         hideGenerationInfo();
-        await customAlert(`Story bible edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        
+        // Only show completion alert if not in one-click generation mode
+        if (!window.oneClickInProgress) {
+            await customAlert(`Story bible edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        }
         
     } catch (error) {
         hideGenerationInfo();
@@ -3261,7 +3265,11 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
 
         // Hide progress before showing success alert
         hideGenerationInfo();
-        await customAlert(`Chapter outline edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        
+        // Only show completion alert if not in one-click generation mode
+        if (!window.oneClickInProgress) {
+            await customAlert(`Chapter outline edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
+        }
         
     } catch (error) {
         hideGenerationInfo();
@@ -3542,54 +3550,54 @@ async function startOneClickProcess() {
     const writingLoops = parseInt(document.getElementById('one-click-writing-loops').value);
     
     closeOneClickModal();
-    showLoadingOverlay('Starting one-click generation...');
     
     oneClickCancelled = false;
-    isGenerating = true;
+    window.oneClickInProgress = true;
+    showGenerationInfo('Starting one-click generation...');
     
     try {
         // Step 1: Generate Outline
-        updateLoadingText('Generating story bible...');
+        showGenerationInfo('Generating story bible...');
         showStep('outline');
         await generateOutline();
         
         if (oneClickCancelled) return;
         
         if (outlineLoops > 0) {
-            updateLoadingText(`Improving story bible (${outlineLoops} feedback loops)...`);
+            showGenerationInfo(`Improving story bible (${outlineLoops} feedback loops)...`);
             await runOutlineEdit('ai', outlineLoops, '');
         }
         
         if (oneClickCancelled) return;
         
         // Step 2: Generate Chapter Outline
-        updateLoadingText('Creating detailed chapter outline...');
+        showGenerationInfo('Creating detailed chapter outline...');
         showStep('chapters');
         await generateChapterOutline();
         
         if (oneClickCancelled) return;
         
         if (chaptersLoops > 0) {
-            updateLoadingText(`Improving chapter outline (${chaptersLoops} feedback loops)...`);
+            showGenerationInfo(`Improving chapter outline (${chaptersLoops} feedback loops)...`);
             await runChapterOutlineEdit('ai', chaptersLoops, '');
         }
         
         if (oneClickCancelled) return;
         
         // Step 3: Setup Writing Interface and Generate Chapters
-        updateLoadingText('Setting up writing interface...');
+        showGenerationInfo('Setting up writing interface...');
         showStep('writing');
         
-        updateLoadingText('Writing all chapters...');
+        showGenerationInfo('Writing all chapters...');
         
         for (let i = 1; i <= bookData.numChapters; i++) {
             if (oneClickCancelled) return;
             
-            updateLoadingText(`Writing Chapter ${i} of ${bookData.numChapters}...`);
+            showGenerationInfo(`Writing Chapter ${i} of ${bookData.numChapters}...`);
             await generateSingleChapter(i);
             
             if (writingLoops > 0) {
-                updateLoadingText(`Improving Chapter ${i} with feedback...`);
+                showGenerationInfo(`Improving Chapter ${i} with feedback...`);
                 await runChapterEdit(i, 'ai', writingLoops, '');
             }
             
@@ -3599,11 +3607,11 @@ async function startOneClickProcess() {
         if (oneClickCancelled) return;
         
         // Step 4: Complete
-        updateLoadingText('Finalizing book...');
+        showGenerationInfo('Finalizing book...');
         showStep('export');
         updateBookStats();
         
-        hideLoadingOverlay();
+        hideGenerationInfo();
         
         const completedChapters = bookData.chapters.filter(c => c).length;
         const totalWords = bookData.chapters.filter(c => c).reduce((total, chapter) => total + countWords(chapter), 0);
@@ -3618,10 +3626,11 @@ Final Stats:
 • Ready for publishing!`, 'Generation Complete');
         
     } catch (error) {
-        hideLoadingOverlay();
+        hideGenerationInfo();
         await customAlert(`One-click generation failed: ${error.message}`, 'Generation Failed');
     } finally {
         isGenerating = false;
+        window.oneClickInProgress = false;
     }
 }
  
@@ -3630,7 +3639,8 @@ Final Stats:
  */
 function cancelOneClickGeneration() {
     oneClickCancelled = true;
-    hideLoadingOverlay();
+    window.oneClickInProgress = false;
+    hideGenerationInfo();
 }
  
 /**
@@ -5221,6 +5231,12 @@ function showGenerationInfo(message = '') {
     
     indicator.style.display = 'flex';
     
+    // Show cancel button for one-click generation (check if oneClickCancelled flag is actively being used)
+    const cancelBtn = document.getElementById('generation-cancel-btn');
+    if (cancelBtn && window.oneClickInProgress) {
+        cancelBtn.style.display = 'block';
+    }
+    
     // Safety timeout to auto-hide after 5 minutes if not properly cleaned up
     clearTimeout(window.generationTimeout);
     window.generationTimeout = setTimeout(() => {
@@ -5247,6 +5263,12 @@ function hideGenerationInfo() {
         indicator.style.display = 'none';
         // Force hide with important style as backup
         indicator.style.setProperty('display', 'none', 'important');
+    }
+    
+    // Hide cancel button
+    const cancelBtn = document.getElementById('generation-cancel-btn');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
     }
     
     // Always reset the generating state
