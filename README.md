@@ -11,7 +11,7 @@ Generate complete, professional-quality books with advanced AI technology. Creat
 ## Features
 
 ### **Core Functionality**
-- **Complete Book Generation**: From concept to finished manuscript
+- **Complete Book Generation**: From concept to finished novel
 - **Multi-Step Process**: Setup → Story Bible → Chapter Outline → Writing → Export
 - **AI-Powered Quality**: Advanced feedback loops and iterative improvement
 - **One-Click Generation**: Fully automated book creation
@@ -19,7 +19,7 @@ Generate complete, professional-quality books with advanced AI technology. Creat
 
 ### **User Experience**
 - **Modern Design**: Clean, modern, and intuitive interface
-- **Three Themes**: Light, Dark, and color schemes
+- **Two Themes**: Light and Dark color schemes
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
 - **Auto-Save**: Never lose your work with automatic saving in your browser
 
@@ -83,7 +83,7 @@ novelfactory-ai/
 
 #### OpenRouter (Recommended)
 - **Website**: [openrouter.ai](https://openrouter.ai)
-- **Models**: Claude Sonnet 4, Claude Opus 4.1, Claude Sonnet 3.5 (Thinking), GPT-5, GPT-5-mini, GPT-5-nano, GPT-4o, Gemini 2.5 Pro, Gemini 2.5 Flash, DeepSeek (Chat) V3
+- **Models**: Claude Sonnet 4, Claude Opus 4.1, Claude Sonnet 3.5 (Thinking), GPT-5, GPT-5-mini, GPT-5-nano, GPT-4o, Gemini 2.5 Pro, Gemini 2.5 Flash, DeepSeek (Chat) V3 and more
 - **Benefits**: Access to multiple AI providers, competitive pricing
 
 #### OpenAI
@@ -106,6 +106,7 @@ novelfactory-ai/
 - Select target audience (Children, YA, Adult, etc.)
 - Enter a compelling premise (2-3 sentences)
 - Describe your desired writing style
+- Optional upload of a writing excerpt as reference for the AI
 - Set chapter count and target word count per chapter
 
 ### **Step 2: Story Bible**
@@ -137,16 +138,10 @@ novelfactory-ai/
 ### **Light Theme**
 - Clean, professional appearance
 - High contrast for readability
-- Perfect for daytime use
 
 ### **Dark Theme**
 - Easy on the eyes
 - Ideal for extended writing sessions
-- Reduces eye strain in low light
-
-### **Color Theme**
-- Vibrant colors and gradients
-- Playful and inspiring design
 
 ---
 
@@ -158,7 +153,7 @@ novelfactory-ai/
 - Model comparison with cost indicators
 
 ### **Cost-Saving Tips**
-- Use GPT-4o Mini or GPT-5 Nano for budget-friendly generation
+- Use GPT-4o Mini or GPT-5 Nano for budget-friendly generation or play around with one of the free models
 - Reduce max tokens for shorter responses
 - Minimize feedback loops for basic projects
 - Generate chapters individually to control usage

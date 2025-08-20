@@ -9,7 +9,7 @@ const CONFIG = {
     MAX_SAVED_PROJECTS: 10,
     AUTO_SAVE_INTERVAL: 30000, // 30 seconds
     READING_SPEED_WPM: 250,
-    VERSION: '1.0.7'
+    VERSION: '1.1.0'
 };
 
 /**
@@ -54,8 +54,7 @@ let aiSettings = {
         analysis: '',
         improvement: '',
         manualImprovement: '',
-        randomIdea: '',
-        bookTitle: ''
+        randomIdea: ''
     }
 };
 
@@ -331,6 +330,10 @@ BOOK CONCEPT:
 
 CREATE A COMPLETE STORY BIBLE:
 
+## 0. BOOK TITLE & MARKETING
+**Book Title:** Create an irresistible, commercially appealing title that captures the {genre} essence and appeals to {targetAudience}
+**Book Blurb:** Write a compelling 2-3 paragraph book description that hooks readers and makes them want to purchase immediately. Focus on conflict, stakes, and emotional appeal for {targetAudience}
+
 ## 1. CORE STORY FOUNDATIONS
 **Premise & Logline:** One-sentence hook + core concept
 **Central Themes:** 2-3 key ideas explored (love, betrayal, survival, freedom, etc.)
@@ -484,46 +487,6 @@ FORMAT YOUR RESPONSE EXACTLY AS:
 PREMISE: [Your 2-3 sentence premise here]
 STYLE: [Your 1-2 sentence style direction here]  
 CHAPTERS: [Number only]`,
-    bookTitle: `You are a bestselling book marketing expert and title creation genius. Create an irresistible, clickbait-worthy book title and compelling blurb that will make readers immediately want to purchase and read this book.
-
-BOOK DETAILS:
-- Genre: {genre}
-- Target Audience: {targetAudience}
-- Premise: {premise}
-- Style Direction: {styleDirection}
-
-COMPLETE STORY STRUCTURE:
-{outline}
-
-DETAILED CHAPTER PLAN:
-{chapterOutline}
-
-CREATE:
-
-1. **BOOK TITLE**: A powerful, attention-grabbing title that:
-   - Makes readers stop scrolling and say "I NEED to read this!"
-   - Perfectly captures the genre and audience expectations
-   - Uses proven bestselling title formulas for {genre}
-   - Is memorable, intriguing, and marketable
-   - Has emotional hooks that create immediate desire
-
-2. **BOOK BLURB** (150-200 words): A compelling back-cover description that:
-   - Opens with an irresistible hook that grabs attention instantly
-   - Introduces the main character(s) and their compelling situation
-   - Presents the central conflict/stakes in an exciting way
-   - Creates urgency and emotional investment
-   - Ends with a cliffhanger question that demands answers
-   - Uses power words and emotional triggers for {targetAudience}
-   - Follows proven bestselling blurb formulas for {genre}
-
-MARKET RESEARCH: Consider what makes {genre} titles successful in today's market. Think of titles that would trend on social media, generate word-of-mouth, and create instant recognition.
-
-FORMAT YOUR RESPONSE EXACTLY AS:
-TITLE: [Your amazing title here]
-
-BLURB: [Your compelling 150-200 word blurb here]
-
-Make this book impossible to ignore!`,
     analysis: `You are a professional editor and story consultant with 20+ years of experience analyzing {contentType} for {genre} novels targeting {targetAudience}. Provide detailed, actionable feedback while maintaining the established parameters.
 
 CONTENT TO ANALYZE:
@@ -590,7 +553,7 @@ MANDATORY PARAMETERS TO MAINTAIN:
 - Premise: {premise} - Preserve the core story concept
 - Style Direction: {styleDirection} - Maintain the specified writing style
 - Target Word Count: {targetWordCount} words per chapter (if applicable)
-- Number of Chapters: {numChapters} (maintain story structure)
+- Number of Chapters: {numChapters} (maintain story bible)
 
 IMPROVEMENT REQUIREMENTS:
 1. Address ALL critical issues identified in the feedback
@@ -604,7 +567,7 @@ IMPROVEMENT REQUIREMENTS:
 SPECIFIC GUIDELINES:
 - If improving chapters, maintain target word count of {targetWordCount}
 - Preserve character voices and development arcs
-- Maintain plot consistency with overall story structure
+- Maintain plot consistency with overall story bible
 - Enhance dialogue quality and authenticity
 - Improve pacing for {genre} expectations
 - Strengthen emotional beats and tension
@@ -660,7 +623,101 @@ CRITICAL FORMAT REQUIREMENTS:
 - Do not add new structural elements unless specifically requested in the manual feedback
 - Ensure the output maintains the same type of content organization as the input
 
-Provide the complete improved {contentType} with manual feedback fully implemented, preserving the original format and structure unless explicitly instructed otherwise.`
+Provide the complete improved {contentType} with manual feedback fully implemented, preserving the original format and structure unless explicitly instructed otherwise.`,
+
+    // Specialized edit prompts for different content types
+    outlineEdit: `You are a master storyteller editing a STORY BIBLE for a {genre} novel targeting {targetAudience}. Analyze and improve the story bible while maintaining its complete structure and format.
+
+CURRENT STORY BIBLE:
+{originalContent}
+
+EDITING REQUIREMENTS:
+- Genre: {genre} - Enhance genre conventions and expectations
+- Target Audience: {targetAudience} - Improve appeal and appropriateness
+- Premise: {premise} - Strengthen the core story concept
+- Style Direction: {styleDirection} - Enhance the specified writing style
+- Number of Chapters: {numChapters} - Maintain story structure for this length
+
+IMPROVEMENT PRIORITIES:
+1. **Story Structure Enhancement:** Strengthen three-act structure, pacing, and plot progression
+2. **Character Development:** Deepen protagonist arc, antagonist motivation, and supporting cast
+3. **World Building:** Enhance setting, culture, and story-specific elements for immersion
+4. **Thematic Coherence:** Strengthen central themes and ensure consistent exploration
+5. **Commercial Appeal:** Improve marketability for {targetAudience} while maintaining artistic vision
+6. **Genre Compliance:** Ensure all {genre} expectations and tropes are properly utilized
+
+CRITICAL FORMAT REQUIREMENTS:
+- Keep the EXACT same section structure (## 0. BOOK TITLE & MARKETING, ## 1. CORE STORY FOUNDATIONS, ## 2. THREE-ACT STORY STRUCTURE MAP, etc.)
+- Maintain all subsection formatting (**Book Title:**, **Book Blurb:**, **PROTAGONIST:**, **ACT ONE:** patterns, etc.)
+- Preserve the complete chapter breakdown and act divisions
+- Keep all organizational elements and headers identical
+- Enhance content within existing structure, don't reorganize
+
+Create an improved story bible that addresses weaknesses while maintaining the complete original format and structure. The result should be a polished, professional upgrade that maintains every structural element.`,
+
+    chaptersEdit: `You are a master storyteller editing a complete chapter outline for ALL {numChapters} chapters. Analyze and improve the chapter outline while maintaining its exact structure and format.
+
+CURRENT CHAPTER OUTLINE:
+{originalContent}
+
+STORY BIBLE REFERENCE:
+{outline}
+
+EDITING REQUIREMENTS:
+- Target: {targetWordCount} words per chapter
+- Genre: {genre} - Enhance genre-specific pacing and elements
+- Target Audience: {targetAudience} - Improve engagement and appropriateness
+- Style Direction: {styleDirection} - Strengthen style consistency
+
+IMPROVEMENT PRIORITIES:
+1. **Pacing Enhancement:** Improve chapter flow and story progression balance
+2. **Plot Development:** Strengthen plot beats, conflicts, and revelations per chapter
+3. **Character Arcs:** Enhance character development and relationship dynamics
+4. **Chapter Hooks:** Improve opening and ending hooks for reader engagement
+5. **Continuity:** Ensure seamless transitions and logical story progression
+6. **Genre Elements:** Strengthen {genre} conventions and reader expectations
+
+CRITICAL FORMAT REQUIREMENTS:
+- Maintain EXACT chapter structure: **CHAPTER [NUMBER]: [TITLE]**
+- Keep identical formatting for all sections (*Scene Structure:*, *Chapter Details:*, *Continuity Notes:*)
+- Preserve all subsection patterns (Opening Hook, Plot Beats, Character Moments, etc.)
+- Maintain the same organizational flow for ALL {numChapters} chapters
+- Keep word targets and continuity notes structure
+- Use the separator "---" between chapters exactly as in original
+
+Enhance each chapter's content while preserving the complete original format and structure. Ensure the improved outline maintains professional quality and serves as a precise writing guide.`,
+
+    chapterEdit: `You are a master {genre} author editing Chapter {chapterNum}. Analyze and improve the chapter while maintaining its narrative flow and structure.
+
+CURRENT CHAPTER CONTENT:
+{originalContent}
+
+CHAPTER OUTLINE REFERENCE:
+{chapterOutline}
+
+EDITING REQUIREMENTS:
+- Target Length: {targetWordCount} words (maintain approximate length)
+- Style: {styleDirection} - Enhance and strengthen style consistency
+- Audience: {targetAudience} - Improve engagement and appropriateness
+- Genre: {genre} - Strengthen genre elements and conventions
+
+IMPROVEMENT PRIORITIES:
+1. **Narrative Flow:** Enhance pacing, scene transitions, and story progression
+2. **Character Voice:** Strengthen dialogue, internal thoughts, and character consistency
+3. **Scene Development:** Improve setting description, action sequences, and emotional beats
+4. **Style Refinement:** Enhance {styleDirection} elements and writing craft
+5. **Genre Enhancement:** Strengthen {genre} conventions, atmosphere, and reader expectations
+6. **Emotional Impact:** Deepen character relationships and emotional resonance
+
+CRITICAL GUIDELINES:
+- Maintain the chapter's existing plot progression and key events
+- Preserve character development and story continuity
+- Keep the same general structure and scene flow
+- Enhance without adding major new plot elements
+- Maintain consistency with the chapter outline
+- Preserve the chapter's role in the overall story arc
+
+Create an improved chapter that addresses weaknesses in execution while maintaining the existing plot structure and story progression. Focus on craft enhancement rather than structural changes.`
 };
 
 // ==================================================
@@ -861,7 +918,7 @@ function setupEventListeners() {
     const genreSelect = document.getElementById('genre');
     const audienceSelect = document.getElementById('target-audience');
 
-    // Random idea button visibility - always visible with styling based on selection
+    // Random idea button styling based on selection
     function checkRandomButtonVisibility() {
         const randomBtn = document.getElementById('random-idea-btn');
         if (randomBtn) {
@@ -921,45 +978,6 @@ function setupEventListeners() {
     if (expandTextarea) {
         expandTextarea.addEventListener('input', updateExpandedWordCount);
     }
-}
-
-// ==================================================
-// KEYBOARD SHORTCUTS
-// ==================================================
-
-/**
- * Set up keyboard shortcuts for power users
- */
-function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey || e.metaKey) {
-            switch(e.key) {
-                case 's':
-                    e.preventDefault();
-                    autoSave();
-                    break;
-                case 'g':
-                    e.preventDefault();
-                    if (bookData.currentStep === 'outline') generateOutline();
-                    else if (bookData.currentStep === 'chapters') generateChapterOutline();
-                    break;
-                case 'd':
-                    e.preventDefault();
-                    toggleTheme();
-                    break;
-            }
-        }
-        if (e.key === 'Escape') {
-            // Close any open modals
-            closeExpandModal();
-            closeOneClickModal();
-            closeFeedbackModal();
-            closeDonationModal();
-            closeCustomAlert(false);
-            closeProjectManagementModal();
-            closeCustomInput(null);
-        }
-    });
 }
 
 // ==================================================
@@ -1261,7 +1279,7 @@ function getSelectedModel(step) {
 function saveAdvancedModelSettings() {
     const advancedModels = {};
     
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea'].forEach(step => {
         const select = document.getElementById(`advanced-model-${step}`);
         if (select && select.value) {
             advancedModels[step] = select.value;
@@ -1278,7 +1296,7 @@ function saveAdvancedModelSettings() {
  * Reset advanced model settings to defaults
  */
 function resetAdvancedModelSettings() {
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea'].forEach(step => {
         const select = document.getElementById(`advanced-model-${step}`);
         if (select) {
             select.value = '';
@@ -1403,7 +1421,7 @@ function updateMainModelSelect() {
  * Update advanced model selection dropdowns
  */
 function updateAdvancedModelSelects() {
-    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea', 'bookTitle'].forEach(step => {
+    ['outline', 'chapters', 'writing', 'feedback', 'randomIdea'].forEach(step => {
         updateAdvancedModelSelect(`advanced-model-${step}`);
     });
     
@@ -1635,7 +1653,7 @@ function collectBookData() {
 }
 
 /**
- * Generate story outline
+ * Generate story bible
  */
 async function generateOutline() {
     if (isGenerating) {
@@ -1678,6 +1696,13 @@ async function generateOutline() {
 
         const outline = await callAI(prompt, "You are a master storyteller and bestselling author creating commercially successful story bibles.", selectedModel);
         
+        // Extract title and blurb from the story bible
+        const titleMatch = outline.match(/\*\*Book Title:\*\*\s*(.+?)(?:\n|\*\*)/i);
+        const blurbMatch = outline.match(/\*\*Book Blurb:\*\*\s*((?:.|\n)*?)(?=\n##|\n\*\*[^B]|$)/i);
+        
+        bookData.title = titleMatch ? titleMatch[1].trim().replace(/["']/g, '') : extractFirstSentence(bookData.premise);
+        bookData.blurb = blurbMatch ? blurbMatch[1].trim() : bookData.premise;
+        
         const outlineTextarea = document.getElementById('outline-content');
         if (outlineTextarea) {
             outlineTextarea.value = outline;
@@ -1694,7 +1719,7 @@ async function generateOutline() {
 }
 
 /**
- * Regenerate story outline
+ * Regenerate story bible
  */
 async function regenerateOutline() {
     await generateOutline();
@@ -1736,48 +1761,9 @@ async function generateChapterOutline() {
 
         const chapterOutline = await callAI(prompt, "You are a master storyteller creating detailed chapter breakdowns for commercially successful novels.", selectedModel);
         
-        // Generate book title and blurb
-        showGenerationInfo("Generating compelling book title and blurb...");
-        
-        const titleModel = getSelectedModel('bookTitle');
-        
-        const titleBlurbPrompt = formatPrompt(aiSettings.customPrompts.bookTitle || defaultPrompts.bookTitle, {
-            genre: bookData.genre,
-            targetAudience: bookData.targetAudience,
-            premise: bookData.premise,
-            styleDirection: bookData.styleDirection,
-            outline: bookData.outline,
-            chapterOutline: chapterOutline
-        });
-
-        const titleBlurbResponse = await callAI(titleBlurbPrompt, "You are a bestselling book marketing expert and title creation genius.", titleModel);
-        
-        // Parse title and blurb from response
-        const lines = titleBlurbResponse.split('\n');
-        let title = '';
-        let blurb = '';
-        let collectingBlurb = false;
-
-        for (const line of lines) {
-            if (line.startsWith('TITLE:')) {
-                title = line.replace('TITLE:', '').trim();
-            } else if (line.startsWith('BLURB:')) {
-                blurb = line.replace('BLURB:', '').trim();
-                collectingBlurb = true;
-            } else if (collectingBlurb && line.trim()) {
-                blurb += ' ' + line.trim();
-            }
-        }
-
-        bookData.title = title || extractFirstSentence(bookData.premise);
-        bookData.blurb = blurb || bookData.premise;
-
-        const titleBlurbSection = `BOOK TITLE: "${bookData.title}"\n\nBOOK BLURB:\n${bookData.blurb}\n\n${'='.repeat(50)}\n\n`;
-        const finalContent = titleBlurbSection + chapterOutline;
-        
         const chaptersTextarea = document.getElementById('chapters-content');
         if (chaptersTextarea) {
-            chaptersTextarea.value = finalContent;
+            chaptersTextarea.value = chapterOutline;
             saveChaptersContent();
         }
         
@@ -1919,7 +1905,7 @@ function setupWritingInterface() {
     }
     bookData.chapters = Array(bookData.numChapters).fill(null).map((_, i) => bookData.chapters[i] || '');
 
-    // Add primary generation actions section (similar to story structure and chapter planning)
+    // Add primary generation actions section (similar to story bible and chapter outline)
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'primary-actions-section';
     actionsDiv.innerHTML = `
@@ -2170,10 +2156,10 @@ BOOK SETUP:
 - Premise: ${bookData.premise}
 - Style Direction: ${bookData.styleDirection}
 
-COMPLETE STORY STRUCTURE:
+COMPLETE STORY BIBLE:
 ${bookData.outline}
 
-DETAILED CHAPTER PLAN:
+DETAILED CHAPTER OUTLINE:
 ${bookData.chapterOutline}
         `;
 
@@ -2999,6 +2985,8 @@ async function runChapterEdit(chapterNum, editMode, feedbackLoops, manualFeedbac
         return;
     }
 
+    // Save state for undo before editing
+    saveStateForUndo(`Edit Chapter ${chapterNum}`);
 
     try {
         isGenerating = true;
@@ -3014,7 +3002,7 @@ async function runChapterEdit(chapterNum, editMode, feedbackLoops, manualFeedbac
             if (editMode === 'manual') {
                 improvedChapter = await runManualFeedback('chapter', improvedChapter, manualFeedback, feedbackModel);
             } else {
-                improvedChapter = await runAIFeedback('chapter', improvedChapter, feedbackModel);
+                improvedChapter = await runSpecializedEdit('chapter', improvedChapter, feedbackModel, chapterNum);
             }
         }
 
@@ -3194,6 +3182,9 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
         return;
     }
 
+    // Save state for undo before editing
+    saveStateForUndo('Edit Story Bible');
+
     try {
         isGenerating = true;
         showGenerationInfo(`Editing Story Bible with ${editMode} mode...`);
@@ -3204,7 +3195,7 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
             if (editMode === 'manual') {
                 improvedOutline = await runManualFeedback('outline', improvedOutline, manualFeedback, getSelectedModel());
             } else {
-                improvedOutline = await runAIFeedback('outline', improvedOutline, getSelectedModel());
+                improvedOutline = await runSpecializedEdit('outline', improvedOutline, getSelectedModel());
             }
         }
 
@@ -3213,13 +3204,16 @@ async function runOutlineEdit(editMode, feedbackLoops, manualFeedback = '') {
         bookData.outline = improvedOutline;
         saveToLocalStorage();
 
+        // Hide progress before showing success alert
+        hideGenerationInfo();
         await customAlert(`Story bible edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
         
     } catch (error) {
+        hideGenerationInfo();
         await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
     } finally {
         isGenerating = false;
-        hideGenerationInfo();
+        // hideGenerationInfo() moved to before success alert
     }
 }
 
@@ -3243,6 +3237,9 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
         return;
     }
 
+    // Save state for undo before editing
+    saveStateForUndo('Edit Chapter Outline');
+
     try {
         isGenerating = true;
         showGenerationInfo(`Editing Chapter Outline with ${editMode} mode...`);
@@ -3253,7 +3250,7 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
             if (editMode === 'manual') {
                 improvedChapterOutline = await runManualFeedback('chapters', improvedChapterOutline, manualFeedback, getSelectedModel());
             } else {
-                improvedChapterOutline = await runAIFeedback('chapters', improvedChapterOutline, getSelectedModel());
+                improvedChapterOutline = await runSpecializedEdit('chapters', improvedChapterOutline, getSelectedModel());
             }
         }
 
@@ -3262,13 +3259,16 @@ async function runChapterOutlineEdit(editMode, feedbackLoops, manualFeedback = '
         bookData.chapterOutline = improvedChapterOutline;
         saveToLocalStorage();
 
+        // Hide progress before showing success alert
+        hideGenerationInfo();
         await customAlert(`Chapter outline edited successfully with ${feedbackLoops} ${editMode} edit loop(s).`, 'Edit Complete');
         
     } catch (error) {
+        hideGenerationInfo();
         await customAlert(`Error during editing: ${error.message}`, 'Edit Error');
     } finally {
         isGenerating = false;
-        hideGenerationInfo();
+        // hideGenerationInfo() moved to before success alert
     }
 }
 
@@ -3330,6 +3330,83 @@ async function runAIFeedback(contentType, content, feedbackModel) {
     });
     
     return await callAI(improvementPrompt, "You are a master storyteller and professional editor.", feedbackModel);
+}
+
+/**
+ * Run specialized edit for different content types using format-specific prompts
+ * @param {string} contentType - Type of content (outline, chapters, chapter)
+ * @param {string} content - Content to edit
+ * @param {string} feedbackModel - Model to use
+ * @param {number} chapterNum - Chapter number (for chapter edits)
+ * @returns {Promise<string>} Improved content
+ */
+async function runSpecializedEdit(contentType, content, feedbackModel, chapterNum = null) {
+    let promptKey;
+    let additionalData = {};
+    
+    switch (contentType) {
+        case 'outline':
+            promptKey = 'outlineEdit';
+            break;
+        case 'chapters':
+            promptKey = 'chaptersEdit';
+            additionalData = { outline: bookData.outline };
+            break;
+        case 'chapter':
+            promptKey = 'chapterEdit';
+            additionalData = { 
+                chapterNum: chapterNum,
+                chapterOutline: getChapterOutlineForChapter(chapterNum)
+            };
+            break;
+        default:
+            throw new Error(`Unknown content type: ${contentType}`);
+    }
+    
+    const editPrompt = formatPrompt(defaultPrompts[promptKey], {
+        contentType: contentType,
+        originalContent: content,
+        genre: bookData.genre,
+        targetAudience: bookData.targetAudience,
+        premise: bookData.premise,
+        styleDirection: bookData.styleDirection,
+        targetWordCount: bookData.targetWordCount,
+        numChapters: bookData.numChapters,
+        ...additionalData
+    });
+    
+    return await callAI(editPrompt, "You are a master storyteller and professional editor.", feedbackModel);
+}
+
+/**
+ * Get chapter outline section for specific chapter
+ * @param {number} chapterNum - Chapter number
+ * @returns {string} Chapter outline section
+ */
+function getChapterOutlineForChapter(chapterNum) {
+    if (!bookData.chapterOutline) return '';
+    
+    // Try to extract the specific chapter section from the full outline
+    const lines = bookData.chapterOutline.split('\n');
+    let chapterStart = -1;
+    let chapterEnd = -1;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.match(new RegExp(`\\*\\*CHAPTER\\s+${chapterNum}\\s*:`, 'i'))) {
+            chapterStart = i;
+        } else if (chapterStart !== -1 && line.match(/\*\*CHAPTER\s+\d+\s*:/i) && !line.match(new RegExp(`\\*\\*CHAPTER\\s+${chapterNum}\\s*:`, 'i'))) {
+            chapterEnd = i;
+            break;
+        }
+    }
+    
+    if (chapterStart !== -1) {
+        const endIndex = chapterEnd !== -1 ? chapterEnd : lines.length;
+        return lines.slice(chapterStart, endIndex).join('\n').trim();
+    }
+    
+    return bookData.chapterOutline; // Fallback to full outline
 }
  
 /**
@@ -4375,9 +4452,6 @@ function initializePrompts() {
     if (document.getElementById('settings-randomidea-prompt')) {
         document.getElementById('settings-randomidea-prompt').value = aiSettings.customPrompts?.randomIdea || defaultPrompts.randomIdea;
     }
-    if (document.getElementById('settings-booktitle-prompt')) {
-        document.getElementById('settings-booktitle-prompt').value = aiSettings.customPrompts?.bookTitle || defaultPrompts.bookTitle;
-    }
     
     ['outline', 'chapters', 'writing'].forEach(step => {
         const feedbackPrompt = document.getElementById(`${step}-feedback-prompt`);
@@ -4460,8 +4534,7 @@ function exportSettings() {
             chapters: document.getElementById('settings-chapters-prompt')?.value || defaultPrompts.chapters,
             writing: document.getElementById('settings-writing-prompt')?.value || defaultPrompts.writing,
             analysis: document.getElementById('settings-analysis-prompt')?.value || defaultPrompts.analysis,
-            randomIdea: document.getElementById('settings-randomidea-prompt')?.value || defaultPrompts.randomIdea,
-            bookTitle: document.getElementById('settings-booktitle-prompt')?.value || defaultPrompts.bookTitle
+            randomIdea: document.getElementById('settings-randomidea-prompt')?.value || defaultPrompts.randomIdea
         },
         version: CONFIG.VERSION,
         exportDate: new Date().toISOString()
@@ -4536,11 +4609,11 @@ async function estimateCosts() {
     const styleTokens = wordsToTokens((bookData.styleDirection || '').split(' ').length);
     const basePromptTokens = 7500; // Estimated tokens for prompts and instructions
     
-    // Story structure generation
+    // Story bible generation
     const outlineInputTokens = basePromptTokens + premiseTokens + styleTokens;
     const outlineOutputTokens = wordsToTokens(3000);
     
-    // Chapter planning generation
+    // Chapter outline generation
     const chaptersInputTokens = basePromptTokens + outlineOutputTokens;
     const chaptersOutputTokens = wordsToTokens(6000);
     
@@ -4736,7 +4809,7 @@ function autoSave() {
 function showAutoSaveIndicator() {
     const indicator = document.getElementById('auto-save-indicator');
     indicator.classList.add('show');
-    setTimeout(() => indicator.classList.remove('show'), 2000);
+    setTimeout(() => indicator.classList.remove('show'), 1000);
 }
 
 function saveToLocalStorage() {
@@ -4781,6 +4854,7 @@ async function proceedToDonate() {
         await customAlert('Thank you for supporting NovelFactory! Your generosity helps keep this tool free for everyone.', 'Thank You!');
     }, 1000);
 }
+
 
 // Feedback
 function showFeedbackForm() {
@@ -4843,7 +4917,6 @@ function initializeApp() {
     loadProjects();
     
     setupEventListeners();
-    setupKeyboardShortcuts();
     setupAutoSave();
     
     initializePrompts();
@@ -5182,12 +5255,3 @@ function hideGenerationInfo() {
     // Remove any potential ai-generating class from body
     document.body.classList.remove('ai-generating');
 }
-
-// Console welcome
-console.log(`
-
-NovelFactory v${CONFIG.VERSION}
-https://novelfactory.ink
-
-Happy writing!
-`);

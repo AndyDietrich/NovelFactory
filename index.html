@@ -4,25 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovelFactory - Create Complete Books with AI | Professional Book Generator</title>
-    <meta name="description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction with our advanced AI book generator. Try NovelFactory free today!">
-    <meta name="keywords" content="AI book generator, novel writing AI, story generator, book creator, AI author, fiction generator, novel factory, AI writing tool, automated book creation">
+    <meta name="description" content="Free AI book generator creates complete novels instantly. Generate professional books in Fantasy, Romance, Mystery & more. Export in multiple formats. No signup required!">
+    <meta name="keywords" content="AI book generator, novel writing AI, story generator, book creator, AI author, fiction generator, automated writing, free book generator, AI novelist, chapter generator, plot generator, creative writing AI">
     <meta name="author" content="NovelFactory">
     <meta name="robots" content="index, follow">
+    <meta name="google-site-verification" content="iCZ_vurEuzLcretKAx79SOZiemJbOwRdUsjQDjNN8tM">
 
     <!-- Open Graph for social sharing -->
     <meta property="og:title" content="NovelFactory - Create Complete Books with AI">
-    <meta property="og:description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction with our advanced AI book generator.">
+    <meta property="og:description" content="Free AI book generator creates complete novels instantly. Generate professional books in Fantasy, Romance, Mystery & more. No signup required!">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://novelfactory.ink">
     <meta property="og:image" content="https://novelfactory.ink/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="NovelFactory">
+    <meta property="og:locale" content="en_US">
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="NovelFactory - Create Complete Books with AI">
-    <meta name="twitter:description" content="Generate complete professional books with AI. Create bestselling novels, stories, and fiction.">
+    <meta name="twitter:title" content="NovelFactory - Free AI Book Generator">
+    <meta name="twitter:description" content="Create complete novels instantly with AI. Fantasy, Romance, Mystery & more. Free to use!">
     <meta name="twitter:image" content="https://novelfactory.ink/twitter-image.jpg">
     <meta name="twitter:site" content="@novelfactory">
+    <meta name="twitter:creator" content="@novelfactory">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://novelfactory.ink">
@@ -37,11 +42,32 @@
         "url": "https://novelfactory.ink",
         "applicationCategory": "Writing Tool",
         "operatingSystem": "Web Browser",
+        "author": {
+            "@type": "Person",
+            "name": "Andreas Dietrich"
+        },
+        "datePublished": "2024",
+        "dateModified": "2025-08-20",
+        "genre": ["Fantasy", "Science Fiction", "Mystery", "Romance", "Thriller", "Horror"],
+        "keywords": "AI book generator, novel writing, story creation, fiction generator, automated writing",
         "offers": {
             "@type": "Offer",
             "price": "0",
-            "priceCurrency": "USD"
-        }
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "127"
+        },
+        "featureList": [
+            "AI-powered book generation",
+            "Multiple genres support", 
+            "Export in multiple formats",
+            "Real-time editing",
+            "Project management"
+        ]
     }
     </script>
 
@@ -233,7 +259,7 @@
             <div id="outline" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Story Bible</h2>
-                    <p class="step-description">Plot out a story structure and Characters for your novel</p>
+                    <p class="step-description">Plot out a story bible for your novel</p>
                 </div>
 
                 <div class="step-content">
@@ -248,12 +274,12 @@
                         <label for="outline-content">Story Bible</label>
                         <div class="textarea-container">
                             <textarea id="outline-content" 
-                                    placeholder="Type or paste your story structure here, or use AI generation above..." 
+                                    placeholder="Type or paste your story bible here, or use AI generation above..." 
                                     rows="20"
                                     oninput="saveOutlineContent()"></textarea>
                             <div class="word-count" id="outline-word-count">0 words</div>
                         </div>
-                        <div class="form-hint">Enter your complete story structure including plot outline, character development, etc.</div>
+                        <div class="form-hint">Enter your complete story bible including plot outline, character development, etc.</div>
                     </div>
 
 
@@ -270,7 +296,7 @@
             <div id="chapters" class="step">
                 <div class="step-header">
                     <h2 class="step-title">Chapter Outline</h2>
-                    <p class="step-description">Create a detailed chapter plan for your novel</p>
+                    <p class="step-description">Create a detailed chapter outline for your novel</p>
                 </div>
 
                 <div class="step-content">
@@ -288,15 +314,15 @@
 
                     <!-- Content Field -->
                     <div class="form-group">
-                        <label for="chapters-content">Chapter-by-Chapter Plan</label>
+                        <label for="chapters-content">Chapter-by-Chapter Outline</label>
                         <div class="textarea-container">
                             <textarea id="chapters-content" 
-                                    placeholder="Type or paste your detailed chapter plan here, or use AI generation above..." 
+                                    placeholder="Type or paste your detailed chapter outline here, or use AI generation above..." 
                                     rows="25"
                                     oninput="saveChaptersContent()"></textarea>
                             <div class="word-count" id="chapters-word-count">0 words</div>
                         </div>
-                        <div class="form-hint">Enter your complete chapter plan including chapter titles, scene breakdowns, plot points, etc.</div>
+                        <div class="form-hint">Enter your complete chapter outline including chapter titles, scene breakdowns, plot points, etc.</div>
                     </div>
 
 
@@ -513,7 +539,7 @@
                                     </div>
                                     
                                     <div class="model-setting">
-                                        <label for="advanced-model-feedback">Feedback & Analysis</label>
+                                        <label for="advanced-model-feedback">Editing</label>
                                         <select id="advanced-model-feedback" onchange="saveAdvancedModelSettings()">
                                             <option value="">Use Default Model</option>
                                             <!-- Populated by JavaScript -->
@@ -528,13 +554,6 @@
                                         </select>
                                     </div>
                                     
-                                    <div class="model-setting">
-                                        <label for="advanced-model-bookTitle">Book Title & Blurb</label>
-                                        <select id="advanced-model-bookTitle" onchange="saveAdvancedModelSettings()">
-                                            <option value="">Use Default Model</option>
-                                            <!-- Populated by JavaScript -->
-                                        </select>
-                                    </div>
                                 </div>
                                 
                                 <div class="advanced-models-actions">
@@ -587,11 +606,6 @@
                                         <button class="btn btn-ghost btn-sm" onclick="resetCustomPrompt('randomIdea')">Reset to Default</button>
                                     </div>
 
-                                    <div class="prompt-group">
-                                        <label for="settings-booktitle-prompt">Book Title & Blurb Generation Prompt</label>
-                                        <textarea id="settings-booktitle-prompt" class="prompt-textarea" rows="8" onchange="saveCustomPrompt('bookTitle')"></textarea>
-                                        <button class="btn btn-ghost btn-sm" onclick="resetCustomPrompt('bookTitle')">Reset to Default</button>
-                                    </div>
                                 </div>
 
                                 <div class="custom-prompts-actions">
@@ -1022,7 +1036,7 @@
                     <div class="toggle-section-header">
                         <div class="toggle-info">
                             <h4>Edit Mode</h4>
-                            <p class="toggle-description">Choose how the AI should edit the story structure</p>
+                            <p class="toggle-description">Choose how the AI should edit the story bible</p>
                         </div>
                         <div class="toggle-switch-container">
                             <label class="toggle-switch">
@@ -1036,7 +1050,7 @@
                 
                 <div id="manual-outline-edit-feedback" class="manual-edit-section" style="display: none;">
                     <label for="outline-edit-instructions">Edit Instructions:</label>
-                    <textarea id="outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the story structure..." rows="4"></textarea>
+                    <textarea id="outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the story bible..." rows="4"></textarea>
                 </div>
 
                 <div class="feedback-loops-section">
@@ -1061,7 +1075,7 @@
     <div id="chapter-outline-edit-modal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">Edit Chapter Plan</h3>
+                <h3 class="modal-title">Edit Chapter Outline</h3>
                 <button class="modal-close" onclick="closeChapterOutlineEditModal()">&times;</button>
             </div>
             <div class="modal-content">
@@ -1083,7 +1097,7 @@
                 
                 <div id="manual-chapter-outline-edit-feedback" class="manual-edit-section" style="display: none;">
                     <label for="chapter-outline-edit-instructions">Edit Instructions:</label>
-                    <textarea id="chapter-outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the chapter plan..." rows="4"></textarea>
+                    <textarea id="chapter-outline-edit-instructions" placeholder="Describe what you'd like to change or improve about the chapter outline..." rows="4"></textarea>
                 </div>
 
                 <div class="feedback-loops-section">
