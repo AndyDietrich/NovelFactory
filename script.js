@@ -1131,8 +1131,9 @@ function updateContentAfterFeedback(contentType, improvedContent) {
  * @param {string} model - Model to use
  * @returns {Promise<string>} AI response
  */
-async function callAI(prompt, systemPrompt = "", model = null) {
+async function callAI(prompt, systemPrompt = "", model = null, retryCount = 0) {
     const settings = getAISettings(model);
+    const maxRetries = 3;
     
     if (!settings.apiKey) {
         throw new Error('Please enter your API key in the AI Settings page.');
@@ -1197,13 +1198,75 @@ async function callAI(prompt, systemPrompt = "", model = null) {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || `API Error: ${response.status}`);
+            let errorMessage = `API Error: ${response.status}`;
+            try {
+                const errorData = await response.text();
+                const error = JSON.parse(errorData);
+                errorMessage = error.error?.message || errorMessage;
+            } catch (parseError) {
+                // If we can't parse the error response, use the status
+                console.warn('Failed to parse error response:', parseError);
+            }
+            
+            // Retry on server errors (5xx) or rate limits (429)
+            if ((response.status >= 500 || response.status === 429) && retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+                console.log(`Retrying API call after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return await callAI(prompt, systemPrompt, model, retryCount + 1);
+            }
+            
+            throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        let data;
+        try {
+            const responseText = await response.text();
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Failed to parse API response as JSON:', parseError);
+            
+            // Retry on JSON parse errors
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000;
+                console.log(`Retrying API call due to JSON parse error after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return await callAI(prompt, systemPrompt, model, retryCount + 1);
+            }
+            
+            throw new Error(`Invalid JSON response from API: ${parseError.message}`);
+        }
+
+        // Validate response structure
+        if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000;
+                console.log(`Retrying API call due to invalid response structure after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return await callAI(prompt, systemPrompt, model, retryCount + 1);
+            }
+            throw new Error('Invalid API response structure: missing choices array');
+        }
+        
+        if (!data.choices[0].message || !data.choices[0].message.content) {
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000;
+                console.log(`Retrying API call due to missing message content after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return await callAI(prompt, systemPrompt, model, retryCount + 1);
+            }
+            throw new Error('Invalid API response structure: missing message content');
+        }
+
         return data.choices[0].message.content;
     } catch (error) {
+        if (retryCount < maxRetries && (error.name === 'TypeError' || error.message.includes('fetch'))) {
+            const delay = Math.pow(2, retryCount) * 1000;
+            console.log(`Retrying API call due to network error after ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return await callAI(prompt, systemPrompt, model, retryCount + 1);
+        }
+        
         throw new Error(`API call failed: ${error.message}`);
     }
 }
@@ -3556,10 +3619,34 @@ async function startOneClickProcess() {
     showGenerationInfo('Starting one-click generation...');
     
     try {
-        // Step 1: Generate Outline
+        // Step 1: Generate Outline with retry logic
         showGenerationInfo('Generating story bible...');
         showStep('outline');
-        await generateOutline();
+        
+        let outlineRetries = 0;
+        const maxOutlineRetries = 3;
+        let outlineSuccess = false;
+        
+        while (!outlineSuccess && outlineRetries < maxOutlineRetries) {
+            try {
+                if (outlineRetries > 0) {
+                    showGenerationInfo(`Retrying story bible generation (attempt ${outlineRetries + 1}/${maxOutlineRetries})...`);
+                    const delay = Math.pow(2, outlineRetries) * 2000; // 2s, 4s, 8s
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                
+                await generateOutline();
+                outlineSuccess = true;
+                
+            } catch (error) {
+                outlineRetries++;
+                console.error(`Story bible generation attempt ${outlineRetries} failed:`, error.message);
+                
+                if (outlineRetries >= maxOutlineRetries) {
+                    throw new Error(`Failed to generate story bible after ${maxOutlineRetries} attempts: ${error.message}`);
+                }
+            }
+        }
         
         if (oneClickCancelled) return;
         
@@ -3570,10 +3657,34 @@ async function startOneClickProcess() {
         
         if (oneClickCancelled) return;
         
-        // Step 2: Generate Chapter Outline
+        // Step 2: Generate Chapter Outline with retry logic
         showGenerationInfo('Creating detailed chapter outline...');
         showStep('chapters');
-        await generateChapterOutline();
+        
+        let chapterOutlineRetries = 0;
+        const maxChapterOutlineRetries = 3;
+        let chapterOutlineSuccess = false;
+        
+        while (!chapterOutlineSuccess && chapterOutlineRetries < maxChapterOutlineRetries) {
+            try {
+                if (chapterOutlineRetries > 0) {
+                    showGenerationInfo(`Retrying chapter outline generation (attempt ${chapterOutlineRetries + 1}/${maxChapterOutlineRetries})...`);
+                    const delay = Math.pow(2, chapterOutlineRetries) * 2000; // 2s, 4s, 8s
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+                
+                await generateChapterOutline();
+                chapterOutlineSuccess = true;
+                
+            } catch (error) {
+                chapterOutlineRetries++;
+                console.error(`Chapter outline generation attempt ${chapterOutlineRetries} failed:`, error.message);
+                
+                if (chapterOutlineRetries >= maxChapterOutlineRetries) {
+                    throw new Error(`Failed to generate chapter outline after ${maxChapterOutlineRetries} attempts: ${error.message}`);
+                }
+            }
+        }
         
         if (oneClickCancelled) return;
         
@@ -3594,7 +3705,32 @@ async function startOneClickProcess() {
             if (oneClickCancelled) return;
             
             showGenerationInfo(`Writing Chapter ${i} of ${bookData.numChapters}...`);
-            await generateSingleChapter(i);
+            
+            // Retry chapter generation with exponential backoff
+            let chapterRetries = 0;
+            const maxChapterRetries = 3;
+            let chapterSuccess = false;
+            
+            while (!chapterSuccess && chapterRetries < maxChapterRetries) {
+                try {
+                    if (chapterRetries > 0) {
+                        showGenerationInfo(`Retrying Chapter ${i} (attempt ${chapterRetries + 1}/${maxChapterRetries})...`);
+                        const delay = Math.pow(2, chapterRetries) * 2000; // 2s, 4s, 8s
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    }
+                    
+                    await generateSingleChapter(i);
+                    chapterSuccess = true;
+                    
+                } catch (error) {
+                    chapterRetries++;
+                    console.error(`Chapter ${i} generation attempt ${chapterRetries} failed:`, error.message);
+                    
+                    if (chapterRetries >= maxChapterRetries) {
+                        throw new Error(`Failed to generate Chapter ${i} after ${maxChapterRetries} attempts: ${error.message}`);
+                    }
+                }
+            }
             
             if (writingLoops > 0) {
                 showGenerationInfo(`Improving Chapter ${i} with feedback...`);
@@ -3742,6 +3878,50 @@ async function downloadBook(format) {
             break;
         // EPUB export removed per feedback
     }
+}
+
+/**
+ * Download file to user's computer
+ * @param {string} content - File content
+ * @param {string} filename - Name of the file
+ * @param {string} mimeType - MIME type of the file
+ */
+function downloadFile(content, filename, mimeType) {
+    try {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the URL object
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (error) {
+        console.error('Failed to download file:', error);
+        customAlert(`Failed to download ${filename}: ${error.message}`, 'Download Error');
+    }
+}
+
+/**
+ * Sanitize filename for safe download
+ * @param {string} filename - Original filename
+ * @returns {string} Safe filename
+ */
+function sanitizeFilename(filename) {
+    // Remove or replace unsafe characters for filenames
+    return filename
+        .replace(/[<>:"/\\|?*]/g, '-') // Replace unsafe characters with dash
+        .replace(/\s+/g, '_') // Replace spaces with underscores
+        .replace(/[^\w\-_.]/g, '') // Remove any remaining non-word characters except dash, underscore, dot
+        .substring(0, 100) // Limit length to 100 characters
+        .replace(/^\.+|\.+$/g, '') // Remove leading/trailing dots
+        || 'untitled'; // Fallback if string becomes empty
 }
  
 /**
