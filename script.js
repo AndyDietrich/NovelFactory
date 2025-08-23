@@ -259,7 +259,7 @@ const apiModels = {
             { value: 'openai/gpt-4o-mini', label: 'GPT-4o Mini', cost: { input: 0.15, output: 0.60 }},
             { value: 'openai/gpt-5-nano', label: 'GPT-5 Nano', cost: { input: 0.05, output: 0.40 }},
             { value: 'google/gemini-2.5-flash', label: 'Gemini 2.5 Flash', cost: { input: 0.30, output: 2.50 }},
-            { value: 'deepseek/deepseek-chat-v3-0324', label: 'DeepSeek Chat V3', cost: { input: 0.18, output: 0.72 }},
+            { value: 'deepseek/deepseek-chat-v3.1', label: 'DeepSeek V3.1', cost: { input: 0.20, output: 0.80 }},
             { value: 'deepseek/deepseek-chat-v3-0324:free', label: 'DeepSeek V3: FREE', cost: { input: 0.00, output: 0.00 }},
             { value: 'openai/gpt-oss-20b:free', label: 'OpenAI GPT-OSS 20B: FREE', cost: { input: 0.00, output: 0.00 }},
             { value: 'thedrummer/anubis-70b-v1.1t', label: 'Anubis 70B V1.1T', cost: { input: 0.40, output: 0.70 }},
